@@ -7,6 +7,7 @@ from post_processor import PostProcessor
 from pipeline import Pipeline
 from collector import Collector
 from dispatcher import Dispatcher
+from recorder import Recorder
 from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
@@ -30,4 +31,8 @@ if args.input:
   audio_segment = normaliseFormat(audio_segment)
   with Dispatcher(collector) as dispatcher:
     dispatcher(audio_segment)
+else:
+  with Dispatcher(collector) as dispatcher:
+    with Recorder(dispatcher):
+      input()
 output(collector.content)
