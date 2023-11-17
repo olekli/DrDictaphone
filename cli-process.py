@@ -23,9 +23,13 @@ conversation = Conversation(
 with open(args.input, 'rt') as file:
   input = file.read()
 result = gpt.ask(conversation, input)
-result = result.choices[0].message.content
-if args.output:
-  with open(args.output, 'wt') as file:
-    file.write(result)
+if 'ok' in result:
+  if args.output:
+    with open(args.output, 'wt') as file:
+      file.write(result['ok'])
+  else:
+    print(result['ok'])
+elif 'err' in result:
+  print(f'Error: {result["err"]}')
 else:
-  print(result)
+  print('Error')
