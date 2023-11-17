@@ -23,8 +23,8 @@ args = parser.parse_args()
 context = readContext(args.context)
 transcriber = Transcriber(context.language)
 post_processor = PostProcessor(context, args.topic)
-collector = Collector(Pipeline(transcriber, post_processor))
 output = Output(args.output)
+collector = Collector(Pipeline(transcriber, post_processor), output)
 
 if args.input:
   audio_segment = AudioSegment.from_file(args.input)
@@ -35,4 +35,3 @@ else:
   with Dispatcher(collector) as dispatcher:
     with Recorder(dispatcher):
       input()
-output(collector.content)

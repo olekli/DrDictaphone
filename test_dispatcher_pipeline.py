@@ -14,10 +14,19 @@ class DummyPostProcessor:
   def __call__(self, textual_context, text):
     return f'p{"".join(textual_context)}{text}'
 
+class DummyOutput:
+  def __init__(self):
+    self.content = []
+
+  def __call__(self, text):
+    self.content.append(text)
+
 def test_dispatches_correctly():
-  collector = Collector(Pipeline(DummyTranscriber(), DummyPostProcessor()))
+  output = DummyOutput()
+  collector = Collector(Pipeline(DummyTranscriber(), DummyPostProcessor()), output)
   with Dispatcher(collector) as dispatcher:
     dispatcher('1')
     dispatcher('2')
     dispatcher('3')
   assert collector.content == [ 'pt1', 'ppt1tpt12', 'ppt1ppt1tpt12tpt1ppt1tpt123' ]
+  assert output.content == collector.content

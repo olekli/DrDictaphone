@@ -5,12 +5,9 @@ class Output:
   def __init__(self, filename = None):
     self.filename = filename
 
-  def makeText(self, content):
-    return '\n\n'.join(content)
-
   def __call__(self, content):
     if self.filename:
-      with open(self.filename, 'wt') as file:
-        file.write(self.makeText(content))
+      with open(self.filename, 'at') as file:
+        file.write(f'\n{content}\n')
     else:
-      print(self.makeText(content))
+      print(f'\n{content}\n')
