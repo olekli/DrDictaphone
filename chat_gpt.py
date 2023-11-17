@@ -7,8 +7,6 @@ load_dotenv()
 import os
 import json
 
-client = OpenAI(api_key = os.environ.get('API_KEY', ''))
-
 tools = [
   {
     "type": "function",
@@ -84,6 +82,7 @@ class ChatGpt:
     if 'messages' in conversation.context.options:
       del conversation.context.options['messages']
 
+    client = OpenAI(api_key = os.environ.get('API_KEY', ''))
     self._last_completion = client.chat.completions.create(
       messages = messages,
       **options
