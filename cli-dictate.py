@@ -12,6 +12,7 @@ from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
 from read_context import readContext
+from microphone import Microphone
 
 parser = argparse.ArgumentParser(description='dictate')
 parser.add_argument('--context', type=str, required=True, help='context')
@@ -32,6 +33,11 @@ if args.input:
   with Dispatcher(collector) as dispatcher:
     dispatcher(audio_segment)
 else:
+  print('1')
   with Dispatcher(collector) as dispatcher:
-    with Recorder(dispatcher):
-      input()
+    print('2')
+    with Microphone(segment_length = 1) as microphone:
+      print('3')
+      with Recorder(microphone.queue, dispatcher):
+        print('4')
+        input()

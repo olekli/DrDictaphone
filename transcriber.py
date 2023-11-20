@@ -30,6 +30,7 @@ class Transcriber:
       language = self.language,
       prompt = '\n'.join(textual_context)
     )
+    #print(f'WHISPER: {transcript.text} {temp_file} {textual_context}')
     return transcript.text
 
   def __call__(self, textual_context, audio_segment):
