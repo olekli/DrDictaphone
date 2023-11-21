@@ -17,7 +17,7 @@ def test_transcription():
   transcriber = Transcriber('en')
   result = Result()
   transcriber.events.result += result.onResult
-  transcriber('', AudioSegment.from_mp3('test/speech.mp3'))
+  transcriber(AudioSegment.from_mp3('test/speech.mp3'))
   assert result.result == 'This is a test. One, two, three. This is a test.'
 
 @pytest.mark.integration
@@ -25,5 +25,6 @@ def test_weird_context_behaviour():
   transcriber = Transcriber('en')
   result = Result()
   transcriber.events.result += result.onResult
-  transcriber('Some context', AudioSegment.from_mp3('test/speech.mp3'))
-  assert result.result == 'This is a test 123. This is a test.'
+  transcriber.context = [ 'Some context' ]
+  transcriber(AudioSegment.from_mp3('test/speech.mp3'))
+  assert result.result == 'This is a test. One, two, three. This is a test.'

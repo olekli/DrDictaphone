@@ -6,15 +6,12 @@ import functools
 class Pipeline:
   def __init__(self, operations):
     self.operations = operations
-    self.content = []
 
-    prev_slot = self.onResult
+    prev_slot = None
     for operation in reversed(self.operations):
-      operation.events.result += prev_slot
-      prev_slot = functools.partial(operation.__call__, self.content)
+      if prev_slot != None:
+        operation.events.result += prev_slot
+      prev_slot = operation.__call__
 
-  def onResult(self, result):
-    self.content.append(result)
-
-  def __call__(self, audio_segment):
-    self.operations[0](self.content, audio_segment)
+  def __call__(self, item):
+    self.operations[0](item)

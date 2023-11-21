@@ -16,8 +16,9 @@ class Transcriber:
   def __init__(self, language):
     self.language = language
     self.events = Events(( 'result' ))
+    self.context = []
 
-  def __call__(self, context, audio_segment):
+  def __call__(self, audio_segment):
     with tempfile.NamedTemporaryFile(
       prefix = "recorded_audio_",
       suffix = ".mp3",
@@ -30,8 +31,9 @@ class Transcriber:
         model = "whisper-1",
         file = audio_file,
         language = self.language,
-        prompt = '\n'.join(context)
+        prompt = ' '.join(self.context)
       )
       logger.debug(f'whisper replied: {transcript.text}')
-      logger.debug(f'context was: {context}')
+      logger.debug(f'context was: {self.context}')
+      self.context.append(transcript.text)
       self.events.result(transcript.text)

@@ -46,7 +46,7 @@ class Vad:
               self.buffer = self.buffer[end:]
               return
 
-  def __call__(self, context, audio_segment):
+  def __call__(self, audio_segment):
     self.buffer += audio_segment
     logger.debug(f'received segment, buffer len: {len(self.buffer)}')
     self.checkForSpeech()

@@ -8,7 +8,7 @@ class Output:
     self.filename = filename
     self.events = Events(('result'))
 
-  def __call__(self, context, result):
+  def __call__(self, result):
     if self.filename:
       with open(self.filename, 'at') as file:
         file.write(f'\n{result}\n')
