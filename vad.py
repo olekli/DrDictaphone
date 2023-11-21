@@ -14,7 +14,7 @@ class Vad:
     self.events = Events(('result'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
     self.buffer = AudioSegment.empty()
-    self.max_silence = 1500
+    self.max_silence = 500
 
   def checkForSpeech(self):
     if len(self.buffer) >= 3000:
@@ -40,11 +40,12 @@ class Vad:
             gaps.append(
               (predictions[i][0] - predictions[i-1][1], (predictions[0][0], predictions[i-1][1]))
             )
+          cut_at = 0
           for length, (start, end) in gaps:
             if length > self.max_silence:
               self.events.result(self.buffer[start:end])
-              self.buffer = self.buffer[end:]
-              return
+              cut_at = end
+          self.buffer = self.buffer[cut_at:]
 
   def __call__(self, audio_segment):
     self.buffer += audio_segment
