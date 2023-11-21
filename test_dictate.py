@@ -7,7 +7,6 @@ from transcriber import Transcriber
 from post_processor import PostProcessor
 from pipeline import Pipeline
 from dispatcher import Dispatcher
-from recorder import Recorder
 from audio_tools import normaliseFormat
 from output import Output
 from read_context import readContext
@@ -29,9 +28,8 @@ def dictate(audio_filename):
   output = Output()
   pipeline = Pipeline([vad, transcriber, post_processor])
   with FileStream(audio_filename, 1000) as file_stream:
-    with Dispatcher(pipeline) as dispatcher:
-      with Recorder(file_stream.queue, dispatcher):
-        pass
+    with Dispatcher(file_stream.queue, pipeline) as dispatcher:
+      pass
   print(f'RESULT: {output.content}')
   return ' '.join(pipeline.content)
 

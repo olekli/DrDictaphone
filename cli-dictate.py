@@ -6,7 +6,6 @@ from transcriber import Transcriber
 from post_processor import PostProcessor
 from pipeline import Pipeline
 from dispatcher import Dispatcher
-from recorder import Recorder
 from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
@@ -26,15 +25,14 @@ vad = Vad()
 transcriber = Transcriber(context.language)
 post_processor = PostProcessor(context, args.topic)
 output = Output(args.output)
-pipeline = Pipeline([vad, transcriber, post_processor, output])
 
 if args.input:
   audio_segment = AudioSegment.from_file(args.input)
   audio_segment = normaliseFormat(audio_segment)
-  with Dispatcher(pipeline) as dispatcher:
-    dispatcher(audio_segment)
+  pipeline = Pipeline([transcriber, post_processor, output])
+  pipeline(audio_segment)
 else:
-  with Dispatcher(pipeline) as dispatcher:
-    with Microphone(segment_length = 1) as microphone:
-      with Recorder(microphone.queue, dispatcher):
-        input()
+  pipeline = Pipeline([vad, transcriber, post_processor, output])
+  with Microphone(segment_length = 1) as microphone:
+    with Dispatcher(microphone.queue, pipeline) as dispatcher:
+      input()
