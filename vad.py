@@ -13,51 +13,40 @@ class Vad:
   def __init__(self):
     self.events = Events(('result'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
-    self.captured_audio = AudioSegment.empty()
-    self.min_length = 1
-    self.is_capturing = False
+    self.buffer = AudioSegment.empty()
+    self.max_silence = 1500
 
-  def padAudio(self, audio_segment):
-    padding = 3000 - len(audio_segment)
-    if padding > 0:
-      return audio_segment + AudioSegment.silent(duration = padding)
-    else:
-      return audio_segment
-
-  def checkCapturing(self, audio_segment):
-    is_speech = self.checkForSpeech(self.padAudio(audio_segment))
-    if not self.is_capturing and is_speech:
-      logger.debug('start capturing...')
-      return True
-    if self.is_capturing and not is_speech:
-      logger.debug('stop capturing')
-      return False
-    return self.is_capturing
-
-  def checkForSpeech(self, audio_segment):
-    with tempfile.NamedTemporaryFile(
-      prefix = 'recorded_audio_',
-      suffix = '.wav',
-      delete = True
-    ) as temp_file:
-      audio_segment.export(temp_file.name, format = 'wav')
-      predictions = self.vad.get_speech_segments(
-        temp_file.name,
-        large_chunk_size = 2,
-        small_chunk_size = 1
-      )
-      return len(predictions) > 0
-
-  def dispatchAudio(self):
-    if len(self.captured_audio) > (self.min_length * 1000):
-      self.events.result(self.captured_audio)
-    self.captured_audio = AudioSegment.empty()
+  def checkForSpeech(self):
+    if len(self.buffer) >= 3000:
+      with tempfile.NamedTemporaryFile(
+        prefix = 'recorded_audio_',
+        suffix = '.wav',
+        delete = True
+      ) as temp_file:
+        self.buffer.export(temp_file.name, format = 'wav')
+        predictions = self.vad.get_speech_segments(
+          temp_file.name,
+          large_chunk_size = int(len(self.buffer) / 1000) - 1,
+          small_chunk_size = 1,
+          apply_energy_VAD = True,
+        )
+        predictions = [ [int(x * 1000), int(y * 1000)] for [x, y] in predictions.tolist() ]
+        if len(predictions) == 0:
+          self.buffer = AudioSegment.empty()
+        elif len(predictions) > 0:
+          predictions.append([len(self.buffer)])
+          gaps = []
+          for i in range(1, len(predictions)):
+            gaps.append(
+              (predictions[i][0] - predictions[i-1][1], (predictions[0][0], predictions[i-1][1]))
+            )
+          for length, (start, end) in gaps:
+            if length > self.max_silence:
+              self.events.result(self.buffer[start:end])
+              self.buffer = self.buffer[end:]
+              return
 
   def __call__(self, context, audio_segment):
-    is_capturing_ = self.is_capturing
-    self.is_capturing = self.checkCapturing(audio_segment)
-    was_capturing = not self.is_capturing and is_capturing_
-    if self.is_capturing or was_capturing:
-      self.captured_audio = self.captured_audio + audio_segment
-    if was_capturing:
-      self.dispatchAudio()
+    self.buffer += audio_segment
+    logger.debug(f'received segment, buffer len: {len(self.buffer)}')
+    self.checkForSpeech()

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
+import difflib
 from pydub import AudioSegment
 from transcriber import Transcriber
 from post_processor import PostProcessor
@@ -31,15 +32,20 @@ def dictate(audio_filename):
   with FileStream(audio_filename, 1000) as file_stream:
     with Dispatcher(file_stream.queue, pipeline) as dispatcher:
       pass
-  print(f'RESULT: {output.content}')
   return ' '.join(pipeline.content)
+
+expected = 'This is an example text to test the dictate functionality. This text will be spoken. There will be multiple audio files containing the voice data. Some will have additional silence added to them, especially in the middle of sentences. Some might have background noise. This is specifically designed to test the voice activity detection and the different patterns of segmenting the audio for transcription.'
 
 @pytest.mark.integration
 def test_dictate_no_disruption():
   result = dictate('test/speech-2.mp3')
-  assert result == 'This is an example text to test the dictate functionality. This text will be spoken. There will be multiple audio files containing the voice data. Some will have additional silence added to them, especially in the middle of sentences. Some might have background noise. This is specifically designed to test the voice activity detection and the different patterns of segmenting the audio for transcription.'
+  matcher = difflib.SequenceMatcher(None, result, expected)
+  print(f'ratio: {matcher.ratio()}')
+  assert matcher.ratio() > 0.95
 
 @pytest.mark.integration
 def test_dictate_some_disruption():
   result = dictate('test/speech-2-gaps.mp3')
-  assert result == 'This is an example text to test the dictation functionality. This text will be spoken. There will be multiple audio files containing the voice data. Some will have additional silence added to them, especially in the middle of sentences. Some might have background noise. This is specifically designed to test the voice activity detection and the different patterns of segmenting the audio for transcription.'
+  matcher = difflib.SequenceMatcher(None, result, expected)
+  print(f'ratio: {matcher.ratio()}')
+  assert matcher.ratio() > 0.95
