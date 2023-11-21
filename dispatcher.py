@@ -5,8 +5,8 @@ from threading import  Thread
 from queue import Queue
 
 class Dispatcher:
-  def __init__(self, collector):
-    self.collector = collector
+  def __init__(self, pipeline):
+    self.pipeline = pipeline
     self.queue = Queue()
     self.worker_thread = Thread(target = self.worker)
 
@@ -23,7 +23,7 @@ class Dispatcher:
     while True:
       item = self.queue.get()
       if item != None:
-        self.collector(item)
+        self.pipeline(item)
       else:
         return
 

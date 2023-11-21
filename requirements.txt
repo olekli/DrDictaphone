@@ -4,6 +4,7 @@ certifi==2023.7.22
 cffi==1.16.0
 charset-normalizer==3.3.2
 distro==1.8.0
+Events==0.5
 filelock==3.13.1
 fsspec==2023.10.0
 h11==0.14.0

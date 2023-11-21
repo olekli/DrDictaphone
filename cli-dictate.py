@@ -5,7 +5,6 @@ import argparse
 from transcriber import Transcriber
 from post_processor import PostProcessor
 from pipeline import Pipeline
-from collector import Collector
 from dispatcher import Dispatcher
 from recorder import Recorder
 from audio_tools import normaliseFormat
@@ -25,19 +24,15 @@ context = readContext(args.context)
 transcriber = Transcriber(context.language)
 post_processor = PostProcessor(context, args.topic)
 output = Output(args.output)
-collector = Collector(Pipeline(transcriber, post_processor), output)
+pipeline = Pipeline([transcriber, post_processor, output])
 
 if args.input:
   audio_segment = AudioSegment.from_file(args.input)
   audio_segment = normaliseFormat(audio_segment)
-  with Dispatcher(collector) as dispatcher:
+  with Dispatcher(pipeline) as dispatcher:
     dispatcher(audio_segment)
 else:
-  print('1')
-  with Dispatcher(collector) as dispatcher:
-    print('2')
+  with Dispatcher(pipeline) as dispatcher:
     with Microphone(segment_length = 1) as microphone:
-      print('3')
       with Recorder(microphone.queue, dispatcher):
-        print('4')
         input()

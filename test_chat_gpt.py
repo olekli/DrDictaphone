@@ -26,6 +26,7 @@ def test_useful_input_produces_ok_result():
   assert not 'err' in result
   assert result['ok'] == ok_result
 
+@pytest.mark.integration
 def test_broken_input_produces_err_result():
   gpt = ChatGpt()
   conversation = Conversation(
