@@ -3,6 +3,9 @@
 
 from threading import  Thread
 from queue import Queue
+import logger
+
+logger = logger.get(__name__)
 
 class Dispatcher:
   def __init__(self, input_queue, pipeline):
@@ -11,14 +14,14 @@ class Dispatcher:
     self.worker_thread = Thread(target = self.worker)
 
   def __enter__(self):
-    print('entering dispatcher')
+    logger.debug('entering')
     self.worker_thread.start()
     return self
 
   def __exit__(self, exc_type, exc_value, traceback):
     self.queue.put(None)
     self.worker_thread.join()
-    print('exiting dispatcher')
+    logger.debug('exiting')
     return True
 
   def worker(self):

@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 from events import Events
+import logger
+
+logger = logger.get(__name__)
 
 class Transcriber:
   def __init__(self, language):
@@ -29,5 +32,6 @@ class Transcriber:
         language = self.language,
         prompt = '\n'.join(context)
       )
-      #print(f'WHISPER: {transcript.text} {temp_file} {textual_context}')
+      logger.debug(f'whisper replied: {transcript.text}')
+      logger.debug(f'context was: {context}')
       self.events.result(transcript.text)

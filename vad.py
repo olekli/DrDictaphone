@@ -5,6 +5,9 @@ import tempfile
 from pydub import AudioSegment
 from speechbrain.pretrained import VAD
 from events import Events
+import logger
+
+logger = logger.get(__name__)
 
 class Vad:
   def __init__(self):
@@ -24,10 +27,10 @@ class Vad:
   def checkCapturing(self, audio_segment):
     is_speech = self.checkForSpeech(self.padAudio(audio_segment))
     if not self.is_capturing and is_speech:
-      print('start capturing...')
+      logger.debug('start capturing...')
       return True
     if self.is_capturing and not is_speech:
-      print('stop capturing...')
+      logger.debug('stop capturing')
       return False
     return self.is_capturing
 

@@ -12,6 +12,7 @@ from output import Output
 from read_context import readContext
 from file_stream import FileStream
 from vad import Vad
+import logger_config
 
 class Output:
   def __init__(self):

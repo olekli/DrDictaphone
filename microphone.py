@@ -6,6 +6,9 @@ import numpy
 from queue import Queue
 from pydub import AudioSegment
 from audio_tools import normaliseFormat
+import logger
+
+logger = logger.get(__name__)
 
 class Microphone:
   def __init__(self, segment_length):
@@ -23,6 +26,7 @@ class Microphone:
     self.queue.put(normaliseFormat(audio_segment))
 
   def __enter__(self):
+    logger.debug('entering')
     dtype = numpy.int16
     device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
     sample_rate = int(device_info['default_samplerate'])
@@ -41,4 +45,5 @@ class Microphone:
     return self
 
   def __exit__(self, exc_type, exc_val, exc_tb):
+    logger.debug('exiting')
     return self.input_stream.__exit__(exc_type, exc_val, exc_tb)

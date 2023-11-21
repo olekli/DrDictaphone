@@ -12,6 +12,10 @@ from output import Output
 from read_context import readContext
 from microphone import Microphone
 from vad import Vad
+import logger_config
+import logger
+
+logger = logger.get(__name__)
 
 parser = argparse.ArgumentParser(description='dictate')
 parser.add_argument('--context', type=str, required=True, help='context')
@@ -27,12 +31,15 @@ post_processor = PostProcessor(context, args.topic)
 output = Output(args.output)
 
 if args.input:
+  logger.info(f'Processing audio file: {args.input} ...')
   audio_segment = AudioSegment.from_file(args.input)
   audio_segment = normaliseFormat(audio_segment)
   pipeline = Pipeline([transcriber, post_processor, output])
   pipeline(audio_segment)
 else:
+  logger.info(f'Starting listening...')
   pipeline = Pipeline([vad, transcriber, post_processor, output])
   with Microphone(segment_length = 1) as microphone:
     with Dispatcher(microphone.queue, pipeline) as dispatcher:
       input()
+logger.info(f'done')

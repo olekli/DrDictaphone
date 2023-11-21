@@ -4,6 +4,9 @@
 from chat_gpt import ChatGpt
 from model.Conversation import Conversation
 from events import Events
+import logger
+
+logger = logger.get(__name__)
 
 class PostProcessor:
   def __init__(self, context, topic = ''):
@@ -17,6 +20,10 @@ class PostProcessor:
     conversation = Conversation(context = self.context, topic = self.topic, history = [])
     response = self.chat_gpt.ask(conversation, text)
     if 'ok' in response:
+      logger.debug(f'post replied: {response["ok"]}')
+      logger.debug(f'input was: {text}')
       self.events.result(response['ok'])
     else:
+      logger.debug(f'post replied with error: {response["err"]}')
+      logger.debug(f'input was: {text}')
       self.events.result(text)
