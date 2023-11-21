@@ -34,12 +34,12 @@ if args.input:
   logger.info(f'Processing audio file: {args.input} ...')
   audio_segment = AudioSegment.from_file(args.input)
   audio_segment = normaliseFormat(audio_segment)
-  pipeline = Pipeline([transcriber, post_processor, output])
-  pipeline(audio_segment)
+  with Pipeline([transcriber, post_processor, output]) as pipeline:
+    pipeline(audio_segment)
 else:
   logger.info(f'Starting listening...')
-  pipeline = Pipeline([vad, transcriber, post_processor, output])
-  with Microphone(segment_length = 1) as microphone:
-    with Dispatcher(microphone.queue, pipeline) as dispatcher:
-      input()
+  with Pipeline([vad, transcriber, post_processor, output]) as pipeline:
+    with Microphone(segment_length = 1) as microphone:
+      with Dispatcher(microphone.queue, pipeline) as dispatcher:
+        input()
 logger.info(f'done')

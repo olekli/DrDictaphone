@@ -28,10 +28,10 @@ def dictate(audio_filename):
   post_processor = PostProcessor(context, 'Dictate')
   transcriber = Transcriber(context.language)
   output = Output()
-  pipeline = Pipeline([vad, transcriber, post_processor, output])
-  with FileStream(audio_filename, 1000) as file_stream:
-    with Dispatcher(file_stream.queue, pipeline) as dispatcher:
-      pass
+  with Pipeline([vad, transcriber, post_processor, output]) as pipeline:
+    with FileStream(audio_filename, 1000) as file_stream:
+      with Dispatcher(file_stream.queue, pipeline) as dispatcher:
+        pass
   return ' '.join(output.content)
 
 expected = 'This is an example text to test the dictate functionality. This text will be spoken. There will be multiple audio files containing the voice data. Some will have additional silence added to them, especially in the middle of sentences. Some might have background noise. This is specifically designed to test the voice activity detection and the different patterns of segmenting the audio for transcription.'

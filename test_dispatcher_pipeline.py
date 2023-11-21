@@ -32,9 +32,9 @@ class DummyOutput:
 def test_dispatches_correctly():
   output = DummyOutput()
   queue = Queue()
-  pipeline = Pipeline([DummyTranscriber(), DummyPostProcessor(), output])
-  with Dispatcher(queue, pipeline) as dispatcher:
-    queue.put('1')
-    queue.put('2')
-    queue.put('3')
+  with Pipeline([DummyTranscriber(), DummyPostProcessor(), output]) as pipeline:
+    with Dispatcher(queue, pipeline) as dispatcher:
+      queue.put('1')
+      queue.put('2')
+      queue.put('3')
   assert output.content == [ 'pt1', 'pt2', 'pt3' ]
