@@ -13,6 +13,7 @@ class FileStream:
 
   def __enter__(self):
     audio_file = normaliseFormat(AudioSegment.from_file(self.filename))
+    audio_file = audio_file + AudioSegment.silent(duration = 3000)
     i = 0
     while (i + self.segment_length_ms) < len(audio_file):
       segment = audio_file[i:(i + self.segment_length_ms)]

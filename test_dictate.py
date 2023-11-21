@@ -12,6 +12,7 @@ from audio_tools import normaliseFormat
 from output import Output
 from read_context import readContext
 from file_stream import FileStream
+from vad import Vad
 
 class Output:
   def __init__(self):
@@ -22,10 +23,11 @@ class Output:
 
 def dictate(audio_filename):
   context = readContext('context/transcribe-en.yaml')
+  vad = Vad()
   post_processor = PostProcessor(context, 'Dictate')
   transcriber = Transcriber(context.language)
   output = Output()
-  pipeline = Pipeline([transcriber, post_processor])
+  pipeline = Pipeline([vad, transcriber, post_processor])
   with FileStream(audio_filename, 1000) as file_stream:
     with Dispatcher(pipeline) as dispatcher:
       with Recorder(file_stream.queue, dispatcher):

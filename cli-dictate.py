@@ -12,6 +12,7 @@ from pydub import AudioSegment
 from output import Output
 from read_context import readContext
 from microphone import Microphone
+from vad import Vad
 
 parser = argparse.ArgumentParser(description='dictate')
 parser.add_argument('--context', type=str, required=True, help='context')
@@ -21,10 +22,11 @@ parser.add_argument('--output', type=str, default=None, help='output file')
 args = parser.parse_args()
 
 context = readContext(args.context)
+vad = Vad()
 transcriber = Transcriber(context.language)
 post_processor = PostProcessor(context, args.topic)
 output = Output(args.output)
-pipeline = Pipeline([transcriber, post_processor, output])
+pipeline = Pipeline([vad, transcriber, post_processor, output])
 
 if args.input:
   audio_segment = AudioSegment.from_file(args.input)
