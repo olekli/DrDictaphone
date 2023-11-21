@@ -7,7 +7,7 @@ load_dotenv()
 import os
 import json
 
-tools = [
+default_tools = [
   {
     "type": "function",
     "function": {
@@ -68,7 +68,7 @@ class ChatGpt:
         ]
       ]
 
-  def ask(self, conversation, question):
+  def ask(self, conversation, question, tools = default_tools):
     messages = self.makeMessages(conversation) + [ self._makeMessage('user', question) ]
 
     options = conversation.context.options.model_dump()
