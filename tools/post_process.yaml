@@ -1,27 +1,14 @@
 -
   type: function
   function:
-    name: partial_result
-    description: Use this function with your result if the input seemed incomplete or did not make sense.
-    parameters:
-      type: object
-      properties:
-        partial:
-          type: string
-          description: Your result from following the instructions on an incomplete input.
-      required:
-        - partial
--
-  type: function
-  function:
     name: ok_result
-    description: Use this function with your result if you could follow the instructions given to you and the input seemed to be complete.
+    description: Use this function with your result if you were able to successfully proofread the text provided to you.
     parameters:
       type: object
       properties:
         ok:
           type: string
-          description: Your result from following the instructions.
+          description: Your result from proofreading the text.
       required:
         - ok
 -

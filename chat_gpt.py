@@ -11,8 +11,8 @@ import logger
 logger = logger.get(__name__)
 
 class ChatGpt:
-  cost_prompt = 0.01
-  cost_completion = 0.03
+  cost_prompt = 1
+  cost_completion = 3
 
   def __init__(self):
     self._last_completion = None
@@ -69,7 +69,7 @@ class ChatGpt:
     self.total_tokens += usage.total_tokens
     total_cost = ((self.completion_tokens * ChatGpt.cost_completion) + \
       (self.prompt_tokens * ChatGpt.cost_prompt)) / 1000
-    logger.info(f'total cost: {total_cost}')
+    logger.info(f'total cost: {int(total_cost)}')
 
     tool_calls = self._last_completion.choices[0].message.tool_calls
     if not tool_calls:

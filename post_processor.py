@@ -22,23 +22,25 @@ class PostProcessor:
     self.chat_gpt = ChatGpt()
 
   def onFinalResult(self, text):
+    self.text_buffer.append(text)
+    input = ' '.join(self.text_buffer)
+
+    self.events.temporary_result(input)
+
     conversation = Conversation(context = self.context, topic = self.topic, history = [])
-    input = ' '.join(self.text_buffer + [text])
-    response = self.chat_gpt.ask(conversation, input)
-    if 'ok' in response:
-      logger.debug(f'post replied full: {response["ok"]}')
-      logger.debug(f'input was: {input}')
-      self.text_buffer = []
-      self.events.final_result(response['ok'])
-    elif 'partial' in response:
-      logger.debug(f'post replied partial: {response["partial"]}')
-      logger.debug(f'input was: {input}')
-      self.text_buffer.append(response['partial'])
-      self.events.temporary_result(response['partial'])
-    else:
-      logger.debug(f'post replied with error: {response["err"]}')
-      logger.debug(f'input was: {input}')
-      self.text_buffer.append(text)
+    if input[-1] == '.' and len(input) > 300:
+      response = self.chat_gpt.ask(conversation, input)
+      if 'ok' in response:
+        logger.debug(f'post replied ok: {response["ok"]}')
+        logger.debug(f'input was: {input}')
+        if len(input) > 300:
+          self.text_buffer = []
+          self.events.final_result(response['ok'])
+        else:
+          self.events.temporary_result(response['ok'])
+      else:
+        logger.warning(f'post replied with error: {response["err"]}')
+        logger.warning(f'input was: {input}')
 
   def onTemporaryResult(self, audio_segment):
     assert False
