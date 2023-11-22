@@ -16,7 +16,7 @@ class Transcriber:
 
   def __init__(self, language):
     self.language = language
-    self.events = Events(('final_result', 'temporary_result', 'fence'))
+    self.events = Events(('result', 'fence'))
     self.context = []
     self.buffer = AudioSegment.empty()
     self.total_length = 0
@@ -44,18 +44,15 @@ class Transcriber:
       logger.debug(f'context was: {self.context}')
       return transcript.text
 
-  def onFinalResult(self, audio_segment):
+  def onResult(self, audio_segment):
     self.buffer += audio_segment
     text = self.transcribeBuffer()
-    self.events.temporary_result(text)
+    self.events.result(text)
 
   def onFence(self):
     if len(self.buffer) > 0:
       text = self.transcribeBuffer()
       self.context.append(text)
       self.buffer = AudioSegment.empty()
-      self.events.final_result(text)
+      self.events.result(text)
       self.events.fence()
-
-  def onTemporaryResult(self, audio_segment):
-    assert False

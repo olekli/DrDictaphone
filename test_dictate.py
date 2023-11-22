@@ -17,9 +17,15 @@ import logger_config
 class Output:
   def __init__(self):
     self.content = []
+    self.buffer = ''
 
-  def onFinalResult(self, content):
-    self.content.append(content)
+  def onResult(self, content):
+    self.buffer = content
+
+  def onFence(self):
+    if self.buffer:
+      self.content.append(self.buffer)
+      self.buffer = ''
 
 def dictate(context, audio_filename):
   context = readContext(context)
@@ -41,6 +47,7 @@ def test_dictate_no_disruption():
   result = dictate('context/transcribe-en.yaml', 'test/speech-2.mp3')
   matcher = difflib.SequenceMatcher(None, result, expected)
   print(f'ratio: {matcher.ratio()}')
+  print(f'**** RESULT: {result}')
   assert matcher.ratio() > 0.95
 
 @pytest.mark.integration
@@ -56,4 +63,5 @@ def test_dictate_no_disruption_non_english():
   result = dictate('context/transcribe-de.yaml', 'test/speech-2-de.mp3')
   matcher = difflib.SequenceMatcher(None, result, expected_de)
   print(f'ratio: {matcher.ratio()}')
+  print(f'**** RESULT: {result}')
   assert matcher.ratio() > 0.95

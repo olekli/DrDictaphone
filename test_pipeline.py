@@ -9,25 +9,34 @@ from model.PipelineResult import PipelineResult, PipelineResultType
 
 class DummyTranscriber:
   def __init__(self):
-    self.events = Events(('final_result', 'temporary_result'))
+    self.events = Events(('result', 'fence'))
 
-  def onFinalResult(self, audio_segment):
-    self.events.final_result(f't{audio_segment}')
+  def onResult(self, audio_segment):
+    self.events.result(f't{audio_segment}')
+
+  def onFence(self):
+    pass
 
 class DummyPostProcessor:
   def __init__(self):
-    self.events = Events(('final_result', 'temporary_result'))
+    self.events = Events(('result', 'fence'))
 
-  def onFinalResult(self, text):
-    self.events.final_result(f'p{text}')
+  def onResult(self, text):
+    self.events.result(f'p{text}')
+
+  def onFence(self):
+    pass
 
 class DummyOutput:
   def __init__(self):
-    self.events = Events(('final_result', 'temporary_result'))
+    self.events = Events(('result', 'fence'))
     self.content = []
 
-  def onFinalResult(self, text):
+  def onResult(self, text):
     self.content.append(text)
+
+  def onFence(self):
+    pass
 
 def test_dispatches_correctly():
   output = DummyOutput()

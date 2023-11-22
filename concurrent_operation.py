@@ -14,12 +14,8 @@ class ConcurrentOperation:
     self.thread = Thread(target = self.run)
     self.queue = Queue()
 
-  def queueFinalResult(self, item):
-    self.queue.put(PipelineResult(type = PipelineResultType.Final, value = item))
-    logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
-
-  def queueTemporaryResult(self, item):
-    self.queue.put(PipelineResult(type = PipelineResultType.Temporary, value = item))
+  def queueResult(self, item):
+    self.queue.put(PipelineResult(type = PipelineResultType.Result, value = item))
     logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def queueFence(self):
@@ -30,18 +26,12 @@ class ConcurrentOperation:
     while True:
       next_result = self.queue.get()
       cached_temporary_result = None
-      if next_result.type == PipelineResultType.Final:
-        self.operation.onFinalResult(next_result.value)
+      if next_result.type == PipelineResultType.Result:
+        self.operation.onResult(next_result.value)
       elif next_result.type == PipelineResultType.Fence:
         self.operation.onFence()
-      elif (next_result.type == PipelineResultType.Temporary) and self.queue.empty():
-        self.operation.onTemporaryResult(next_result.value)
-      elif (next_result.type == PipelineResultType.Temporary) and not self.queue.empty():
-        cached_temporary_result = next_result
       elif next_result.type == PipelineResultType.Shutdown:
-        if cached_temporary_result:
-          self.operation.onFinalResult(cached_temporary_result.value)
-          self.operation.onFence()
+        self.operation.onFence()
         return
 
   def __enter__(self):

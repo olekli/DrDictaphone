@@ -9,19 +9,15 @@ class Pipeline:
   def __init__(self, operations):
     self.operations = []
 
-    prev_slot_final = None
-    prev_slot_temporary = None
+    prev_slot_result = None
     prev_slot_fence = None
     for operation in reversed(operations):
       concurrent_operation = ConcurrentOperation(operation)
-      if prev_slot_final != None:
-        operation.events.final_result += prev_slot_final
-      if prev_slot_temporary != None:
-        operation.events.temporary_result += prev_slot_temporary
+      if prev_slot_result != None:
+        operation.events.result += prev_slot_result
       if prev_slot_fence != None:
         operation.events.fence += prev_slot_fence
-      prev_slot_final = concurrent_operation.queueFinalResult
-      prev_slot_temporary = concurrent_operation.queueTemporaryResult
+      prev_slot_result = concurrent_operation.queueResult
       prev_slot_fence = concurrent_operation.queueFence
       self.operations.insert(0, concurrent_operation)
 
@@ -35,4 +31,4 @@ class Pipeline:
       operation.__exit__(exc_type, exc_value, traceback)
 
   def __call__(self, item):
-    self.operations[0].queueFinalResult(item)
+    self.operations[0].queueResult(item)

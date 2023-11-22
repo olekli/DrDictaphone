@@ -14,7 +14,7 @@ class PostProcessor:
     self.context = context
     self.topic = topic
     self.more_pp = more_pp
-    self.events = Events(('final_result', 'temporary_result', 'fence'))
+    self.events = Events(('result', 'fence'))
     self.text_buffer = ''
     self.conversation = Conversation(context = self.context, topic = self.topic, history = [])
 
@@ -23,16 +23,16 @@ class PostProcessor:
     self.context.system = instructions + self.context.system
     self.chat_gpt = ChatGpt()
 
-  def onFinalResult(self, text):
+  def onResult(self, text):
     self.text_buffer = text
-    self.events.temporary_result(text)
+    self.events.result(text)
 
     if self.more_pp:
       response = self.chat_gpt.ask(self.conversation, text)
       if 'ok' in response:
         logger.debug(f'post replied ok: {response["ok"]}')
         logger.debug(f'input was: {input}')
-        self.events.temporary_result(response['ok'])
+        self.events.result(response['ok'])
       else:
         logger.warning(f'post replied with error: {response["err"]}')
         logger.warning(f'input was: {input}')
@@ -44,11 +44,8 @@ class PostProcessor:
         logger.debug(f'post replied ok: {response["ok"]}')
         logger.debug(f'input was: {input}')
         self.text_buffer = ''
-        self.events.final_result(response['ok'])
+        self.events.result(response['ok'])
       else:
         logger.warning(f'post replied with error: {response["err"]}')
         logger.warning(f'input was: {input}')
       self.events.fence()
-
-  def onTemporaryResult(self, text):
-    self.onFinalResult(text)

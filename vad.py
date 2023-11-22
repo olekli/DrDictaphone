@@ -15,7 +15,7 @@ class Vad:
     silence_threshold_fence = 2000,
     min_length = 500
   ):
-    self.events = Events(('final_result', 'temporary_result', 'fence'))
+    self.events = Events(('result', 'fence'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
     self.buffer = AudioSegment.silent(duration = 3000)
     self.silence_threshold_content = silence_threshold_content
@@ -54,19 +54,16 @@ class Vad:
               self.events.fence()
             if length > self.silence_threshold_content:
               if (end - start) > self.min_length:
-                self.events.final_result(self.buffer[start:end])
+                self.events.result(self.buffer[start:end])
               else:
                 logger.warning(f'dropping segment because it is too short: {end - start}')
               cut_at = end
           self.buffer = self.buffer[cut_at:]
 
-  def onFinalResult(self, audio_segment):
+  def onResult(self, audio_segment):
     self.buffer += audio_segment
     logger.debug(f'received segment, buffer len: {len(self.buffer)}')
     self.checkForSpeech()
 
   def onFence(self):
     self.events.fence()
-
-  def onTemporaryResult(self, audio_segment):
-    assert False

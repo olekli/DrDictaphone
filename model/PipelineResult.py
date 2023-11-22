@@ -7,8 +7,7 @@ from typing import Any
 from enum import Enum
 
 class PipelineResultType(Enum):
-  Temporary = 'temporary'
-  Final = 'final'
+  Result = 'result'
   Shutdown = 'shutdown'
   Fence = 'fence'
 
