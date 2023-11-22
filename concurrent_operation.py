@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from threading import Thread
-from queue import SimpleQueue
+from queue import Queue
 import logger
 from model.PipelineResult import PipelineResult, PipelineResultType
 
@@ -12,16 +12,19 @@ class ConcurrentOperation:
   def __init__(self, operation):
     self.operation = operation
     self.thread = Thread(target = self.run)
-    self.queue = SimpleQueue()
+    self.queue = Queue()
 
   def queueFinalResult(self, item):
     self.queue.put(PipelineResult(type = PipelineResultType.Final, value = item))
+    logger.info(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def queueTemporaryResult(self, item):
     self.queue.put(PipelineResult(type = PipelineResultType.Temporary, value = item))
+    logger.info(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def queueFence(self):
     self.queue.put(PipelineResult(type = PipelineResultType.Fence, value = None))
+    logger.info(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def run(self):
     while True:

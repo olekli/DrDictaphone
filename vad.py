@@ -17,7 +17,7 @@ class Vad:
   ):
     self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
-    self.buffer = AudioSegment.empty()
+    self.buffer = AudioSegment.silent(duration = 3000)
     self.silence_threshold_content = silence_threshold_content
     self.silence_threshold_fence = silence_threshold_fence
     self.min_length = min_length
@@ -38,8 +38,9 @@ class Vad:
         )
         predictions = [ [int(x * 1000), int(y * 1000)] for [x, y] in predictions.tolist() ]
         if len(predictions) == 0:
-          self.buffer = AudioSegment.empty()
-          self.events.fence()
+          if len(self.buffer) > 3000:
+            self.events.fence()
+          self.buffer = AudioSegment.silent(duration = 3000)
         elif len(predictions) > 0:
           predictions.append([len(self.buffer)])
           gaps = []

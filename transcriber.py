@@ -16,14 +16,15 @@ class Transcriber:
     self.language = language
     self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.context = []
+    self.buffer = AudioSegment.empty()
 
-  def onFinalResult(self, audio_segment):
+  def transcribeBuffer(self):
     with tempfile.NamedTemporaryFile(
       prefix = "recorded_audio_",
       suffix = ".mp3",
       delete = True
     ) as temp_file:
-      audio_segment.export(temp_file.name, format = 'mp3')
+      self.buffer.export(temp_file.name, format = 'mp3')
       audio_file = open(temp_file.name, 'rb')
       client = OpenAI(api_key = os.environ.get('API_KEY', ''))
       transcript = client.audio.transcriptions.create(
@@ -34,11 +35,20 @@ class Transcriber:
       )
       logger.debug(f'whisper replied: {transcript.text}')
       logger.debug(f'context was: {self.context}')
-      self.context.append(transcript.text)
-      self.events.final_result(transcript.text)
+      return transcript.text
+
+  def onFinalResult(self, audio_segment):
+    self.buffer += audio_segment
+    text = self.transcribeBuffer()
+    self.events.temporary_result(text)
 
   def onFence(self):
-    self.events.fence()
+    if len(self.buffer) > 0:
+      text = self.transcribeBuffer()
+      self.context.append(text)
+      self.buffer = AudioSegment.empty()
+      self.events.final_result(text)
+      self.events.fence()
 
   def onTemporaryResult(self, audio_segment):
     assert False

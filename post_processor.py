@@ -15,7 +15,7 @@ class PostProcessor:
     self.topic = topic
     self.more_pp = more_pp
     self.events = Events(('final_result', 'temporary_result', 'fence'))
-    self.text_buffer = []
+    self.text_buffer = ''
     self.conversation = Conversation(context = self.context, topic = self.topic, history = [])
 
     with open('instructions/post_process.yaml', 'rt') as file:
@@ -24,13 +24,11 @@ class PostProcessor:
     self.chat_gpt = ChatGpt()
 
   def onFinalResult(self, text):
-    self.text_buffer.append(text)
-    input = ' '.join(self.text_buffer)
-
-    self.events.temporary_result(input)
+    self.text_buffer = text
+    self.events.temporary_result(text)
 
     if self.more_pp:
-      response = self.chat_gpt.ask(self.conversation, input)
+      response = self.chat_gpt.ask(self.conversation, text)
       if 'ok' in response:
         logger.debug(f'post replied ok: {response["ok"]}')
         logger.debug(f'input was: {input}')
@@ -41,17 +39,16 @@ class PostProcessor:
 
   def onFence(self):
     if len(self.text_buffer) > 0:
-      input = ' '.join(self.text_buffer)
-      response = self.chat_gpt.ask(self.conversation, input)
+      response = self.chat_gpt.ask(self.conversation, self.text_buffer)
       if 'ok' in response:
         logger.debug(f'post replied ok: {response["ok"]}')
         logger.debug(f'input was: {input}')
-        self.text_buffer = []
+        self.text_buffer = ''
         self.events.final_result(response['ok'])
       else:
         logger.warning(f'post replied with error: {response["err"]}')
         logger.warning(f'input was: {input}')
       self.events.fence()
 
-  def onTemporaryResult(self, audio_segment):
-    assert False
+  def onTemporaryResult(self, text):
+    self.onFinalResult(text)
