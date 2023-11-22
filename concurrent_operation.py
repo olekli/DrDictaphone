@@ -16,15 +16,15 @@ class ConcurrentOperation:
 
   def queueFinalResult(self, item):
     self.queue.put(PipelineResult(type = PipelineResultType.Final, value = item))
-    logger.info(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
+    logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def queueTemporaryResult(self, item):
     self.queue.put(PipelineResult(type = PipelineResultType.Temporary, value = item))
-    logger.info(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
+    logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def queueFence(self):
     self.queue.put(PipelineResult(type = PipelineResultType.Fence, value = None))
-    logger.info(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
+    logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def run(self):
     while True:

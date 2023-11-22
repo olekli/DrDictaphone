@@ -41,3 +41,4 @@ else:
     with Microphone(segment_length = 1, result_callback = pipeline):
       input()
 logger.info(f'done')
+logger.info(f'total costs incurred: {(transcriber.total_cost + post_processor.chat_gpt.total_cost) / 100}$')

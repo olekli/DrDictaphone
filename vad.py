@@ -11,7 +11,7 @@ logger = logger.get(__name__)
 
 class Vad:
   def __init__(self,
-    silence_threshold_content = 500,
+    silence_threshold_content = 800,
     silence_threshold_fence = 2000,
     min_length = 500
   ):

@@ -19,6 +19,7 @@ class ChatGpt:
     self.prompt_tokens = 0
     self.completion_tokens = 0
     self.total_tokens = 0
+    self.total_cost = 0
 
   @staticmethod
   def _makeMessage(role, content):
@@ -67,9 +68,9 @@ class ChatGpt:
     self.prompt_tokens += usage.prompt_tokens
     self.completion_tokens += usage.completion_tokens
     self.total_tokens += usage.total_tokens
-    total_cost = ((self.completion_tokens * ChatGpt.cost_completion) + \
+    self.total_cost = ((self.completion_tokens * ChatGpt.cost_completion) + \
       (self.prompt_tokens * ChatGpt.cost_prompt)) / 1000
-    logger.info(f'total cost: {int(total_cost)}')
+    logger.debug(f'total cost: {round(self.total_cost)}')
 
     tool_calls = self._last_completion.choices[0].message.tool_calls
     if not tool_calls:

@@ -12,11 +12,15 @@ import logger
 logger = logger.get(__name__)
 
 class Transcriber:
+  cost_second = (0.6 / 60)
+
   def __init__(self, language):
     self.language = language
     self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.context = []
     self.buffer = AudioSegment.empty()
+    self.total_length = 0
+    self.total_cost = 0
 
   def transcribeBuffer(self):
     with tempfile.NamedTemporaryFile(
@@ -33,6 +37,9 @@ class Transcriber:
         language = self.language,
         prompt = ' '.join(self.context)
       )
+      self.total_length += round(len(self.buffer) / 1000)
+      self.total_cost = round(self.total_length * Transcriber.cost_second)
+      logger.debug(f'total cost: {self.total_cost}')
       logger.debug(f'whisper replied: {transcript.text}')
       logger.debug(f'context was: {self.context}')
       return transcript.text
