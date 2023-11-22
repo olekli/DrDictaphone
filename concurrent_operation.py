@@ -36,8 +36,12 @@ class ConcurrentOperation:
 
   def __enter__(self):
     self.thread.start()
+    if callable(getattr(self.operation, '__enter__', None)):
+      self.operation.__enter__()
     return self
 
   def __exit__(self, exc_type, exc_value, traceback):
     self.queue.put(PipelineResult(type = PipelineResultType.Shutdown, value = None))
     self.thread.join()
+    if callable(getattr(self.operation, '__exit__', None)):
+      return self.operation.__exit__(exc_type, exc_value, traceback)

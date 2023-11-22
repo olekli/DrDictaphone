@@ -6,13 +6,15 @@ import numpy
 from pydub import AudioSegment
 from audio_tools import normaliseFormat
 import logger
+from events import Events
 
 logger = logger.get(__name__)
 
 class Microphone:
-  def __init__(self, segment_length, result_callback):
+  def __init__(self, segment_length):
+    self.events = Events(('result', 'fence'))
+
     self.segment_length = segment_length
-    self.result_callback = result_callback
     self.input_stream = None
 
   def callback(self, indata, sample_width, sample_rate, channels):
@@ -22,7 +24,7 @@ class Microphone:
       frame_rate = sample_rate,
       channels = channels
     )
-    self.result_callback(normaliseFormat(audio_segment))
+    self.events.result(normaliseFormat(audio_segment))
 
   def __enter__(self):
     logger.debug('entering')
@@ -46,3 +48,9 @@ class Microphone:
   def __exit__(self, exc_type, exc_val, exc_tb):
     logger.debug('exiting')
     return self.input_stream.__exit__(exc_type, exc_val, exc_tb)
+
+  def onResult(self, result):
+    pass
+
+  def onFence(self):
+    pass

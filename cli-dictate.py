@@ -38,8 +38,8 @@ if args.input:
     pipeline(audio_segment)
 else:
   logger.info(f'Starting listening...')
-  with Pipeline([vad, FenceBeep(), transcriber, post_processor, output]) as pipeline:
-    with Microphone(segment_length = 1, result_callback = pipeline):
-      input()
+  microphone = Microphone(segment_length = 1)
+  with Pipeline([microphone, vad, FenceBeep(), transcriber, post_processor, output]):
+    input()
 logger.info(f'done')
 logger.info(f'total costs incurred: {(transcriber.total_cost + post_processor.chat_gpt.total_cost) / 100}$')
