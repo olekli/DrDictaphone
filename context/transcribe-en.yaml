@@ -9,3 +9,4 @@ options:
   max_tokens: 1000
   model: gpt-4-1106-preview
 language: en
+tools: tools/post_process.yaml

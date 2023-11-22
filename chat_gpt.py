@@ -6,43 +6,9 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 import json
+import logger
 
-default_tools = [
-  {
-    "type": "function",
-    "function": {
-      "name": "ok_result",
-      "description": "Use this function with your result if you could follow the instructions given to you.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "ok": {
-            "type": "string",
-            "description": "Your result from following the instructions.",
-          }
-        },
-        "required": [ "ok" ]
-      },
-    }
-  },
-  {
-    "type": "function",
-    "function": {
-      "name": "err_result",
-      "description": "Use this function to give feedback in case you could not follow the instructions given to you.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "err": {
-            "type": "string",
-            "description": "Your description of the problem with the instructions.",
-          }
-        },
-        "required": [ "err" ]
-      },
-    }
-  },
-]
+logger = logger.get(__name__)
 
 class ChatGpt:
   def __init__(self):
@@ -68,7 +34,7 @@ class ChatGpt:
         ]
       ]
 
-  def ask(self, conversation, question, tools = default_tools):
+  def ask(self, conversation, question):
     messages = self.makeMessages(conversation) + [ self._makeMessage('user', question) ]
 
     options = conversation.context.options.model_dump()
@@ -76,8 +42,11 @@ class ChatGpt:
     options.setdefault('temperature', 0.5)
     options.setdefault('max_tokens', 1000)
     options['stream'] = False
-    options['tools'] = tools
+    if conversation.context.tools:
+      options['tools'] = conversation.context.tools
     options['n'] = 1
+
+    logger.debug(f'options: {options}')
 
     if 'messages' in conversation.context.options:
       del conversation.context.options['messages']

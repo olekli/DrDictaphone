@@ -5,6 +5,7 @@ import pytest
 from chat_gpt import ChatGpt
 from model.Conversation import Conversation
 from read_context import readContext
+import logger_config
 
 ok_text = 'Das ist ein Beispiel Text in deutscher Sparche, der ein paar Relative einfache Fehler enthält. ChatGpt sollte ohne weiteres in der Lage sein diese Fehleer zu korriegeren.'
 

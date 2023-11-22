@@ -1,0 +1,26 @@
+-
+  type: function
+  function:
+    name: ok_result
+    description: Use this function with your result if you could follow the instructions given to you.
+    parameters:
+      type: object
+      properties:
+        ok:
+          type: string
+          description: Your result from following the instructions.
+      required:
+        - ok
+-
+  type: function
+  function:
+    name: err_result
+    description: Use this function to give feedback in case you could not follow the instructions given to you.
+    parameters:
+      type: object
+      properties:
+        err:
+          type: string
+          description: Your description of the problem with the instructions.
+      required:
+        - err

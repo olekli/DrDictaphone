@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 from .Options import Options
@@ -13,6 +13,7 @@ class Context(BaseModel):
   system: List[str]
   options: Options
   language: str
+  tools: Optional[List[dict]]
 
   def __str__(self):
     result = str(self.options)
