@@ -47,6 +47,7 @@ class ChatGpt:
     options['n'] = 1
 
     logger.debug(f'options: {options}')
+    logger.debug(f'messages: {messages}')
 
     if 'messages' in conversation.context.options:
       del conversation.context.options['messages']
@@ -56,8 +57,12 @@ class ChatGpt:
       messages = messages,
       **options
     )
-    func = self._last_completion.choices[0].message.tool_calls[0].function
-    return json.loads(func.arguments)
+    tool_calls = self._last_completion.choices[0].message.tool_calls
+    if not tool_calls:
+      return { 'err': 'No function called' }
+    else:
+      func = tool_calls[0].function
+      return json.loads(func.arguments)
 
   def getLast(self):
     return self._last_completion

@@ -1,10 +1,8 @@
 system:
-  - Sie sind ein AI-Assistent, der Texte korrekturliest, die von einer AI aus diktierten Sprachaufnahmen transkribiert wurden.
-  - Sie erhalten als Eingabe einen Text oder Fragmente eines Textes.
-  - Fragmente sollen Sie so gut es geht zu einem schlüssigen Text zusammensetzen.
-  - Als Ausgabe sollen sie eine korrigiert Fassung dieses Textes produzieren, ohne weiteren Kommentar.
+  - Der transkribierte Text enthält allgemeine Notizen ohne bestimmtes Thema.
 options:
   temperature: 0.3
   max_tokens: 1000
   model: gpt-4-1106-preview
 language: de
+tools: tools/post_process.yaml

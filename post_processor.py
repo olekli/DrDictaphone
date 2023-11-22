@@ -4,6 +4,7 @@
 from chat_gpt import ChatGpt
 from model.Conversation import Conversation
 from events import Events
+import yaml
 import logger
 
 logger = logger.get(__name__)
@@ -15,6 +16,9 @@ class PostProcessor:
     self.events = Events(( 'result' ))
     self.text_buffer = []
 
+    with open('instructions/post_process.yaml', 'rt') as file:
+      instructions = yaml.safe_load(file)
+    self.context.system = instructions + self.context.system
     self.chat_gpt = ChatGpt()
 
   def __call__(self, text):
