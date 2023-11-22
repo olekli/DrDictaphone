@@ -2,26 +2,26 @@
   type: function
   function:
     name: partial_result
-    description: Use this function with your result if the input seemed incomplete or did not make sense.
+    description: Use this function with your result if you were not able to build one or more complete sentences out of the input.
     parameters:
       type: object
       properties:
         partial:
           type: string
-          description: Your result from following the instructions on an incomplete input.
+          description: Your result with one or more incomplete sentences.
       required:
         - partial
 -
   type: function
   function:
     name: ok_result
-    description: Use this function with your result if you could follow the instructions given to you and the input seemed to be complete.
+    description: Use this function with your result if you were able to build complete sentences out of the input.
     parameters:
       type: object
       properties:
         ok:
           type: string
-          description: Your result from following the instructions.
+          description: Your result with complete sentences.
       required:
         - ok
 -
