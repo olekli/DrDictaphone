@@ -34,6 +34,7 @@ class PostProcessor:
       logger.debug(f'post replied partial: {response["partial"]}')
       logger.debug(f'input was: {input}')
       self.text_buffer.append(response['partial'])
+      self.events.temporary_result(response['partial'])
     else:
       logger.debug(f'post replied with error: {response["err"]}')
       logger.debug(f'input was: {input}')
