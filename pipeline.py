@@ -3,17 +3,22 @@
 
 import functools
 from concurrent_operation import ConcurrentOperation
+from model.PipelineResult import PipelineResult, PipelineResultType
 
 class Pipeline:
   def __init__(self, operations):
     self.operations = []
 
-    prev_slot = None
+    prev_slot_final = None
+    prev_slot_temporary = None
     for operation in reversed(operations):
       concurrent_operation = ConcurrentOperation(operation)
-      if prev_slot != None:
-        operation.events.result += prev_slot
-      prev_slot = concurrent_operation.__call__
+      if prev_slot_final != None:
+        operation.events.final_result += prev_slot_final
+      if prev_slot_temporary != None:
+        operation.events.temporary_result += prev_slot_temporary
+      prev_slot_final = concurrent_operation.queueFinalResult
+      prev_slot_temporary = concurrent_operation.queueTemporaryResult
       self.operations.insert(0, concurrent_operation)
 
   def __enter__(self):
@@ -24,7 +29,6 @@ class Pipeline:
   def __exit__(self, exc_type, exc_value, traceback):
     for operation in self.operations:
       operation.__exit__(exc_type, exc_value, traceback)
-    return True
 
   def __call__(self, item):
-    self.operations[0](item)
+    self.operations[0].queueFinalResult(item)

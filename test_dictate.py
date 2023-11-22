@@ -18,7 +18,7 @@ class Output:
   def __init__(self):
     self.content = []
 
-  def __call__(self, content):
+  def onFinalResult(self, content):
     self.content.append(content)
 
 def dictate(context, audio_filename):

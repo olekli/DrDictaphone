@@ -6,12 +6,15 @@ from events import Events
 class Output:
   def __init__(self, filename = None):
     self.filename = filename
-    self.events = Events(('result'))
+    self.events = Events(('final_result', 'temporary_result'))
 
-  def __call__(self, result):
+  def onFinalResult(self, result):
     if self.filename:
       with open(self.filename, 'at') as file:
         file.write(f'\n{result}\n')
     else:
       print(f'\n{result}\n')
-    self.events.result(result)
+    self.events.final_result(result)
+
+  def onTemporaryResult(self, audio_segment):
+    assert False

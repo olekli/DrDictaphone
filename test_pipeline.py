@@ -5,27 +5,28 @@ import pytest
 from pipeline import Pipeline
 from events import Events
 from queue import Queue
+from model.PipelineResult import PipelineResult, PipelineResultType
 
 class DummyTranscriber:
   def __init__(self):
-    self.events = Events(('result'))
+    self.events = Events(('final_result', 'temporary_result'))
 
-  def __call__(self, audio_segment):
-    self.events.result(f't{audio_segment}')
+  def onFinalResult(self, audio_segment):
+    self.events.final_result(f't{audio_segment}')
 
 class DummyPostProcessor:
   def __init__(self):
-    self.events = Events(('result'))
+    self.events = Events(('final_result', 'temporary_result'))
 
-  def __call__(self, text):
-    self.events.result(f'p{text}')
+  def onFinalResult(self, text):
+    self.events.final_result(f'p{text}')
 
 class DummyOutput:
   def __init__(self):
-    self.events = Events(('result'))
+    self.events = Events(('final_result', 'temporary_result'))
     self.content = []
 
-  def __call__(self, text):
+  def onFinalResult(self, text):
     self.content.append(text)
 
 def test_dispatches_correctly():

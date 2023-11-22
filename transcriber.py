@@ -15,10 +15,10 @@ logger = logger.get(__name__)
 class Transcriber:
   def __init__(self, language):
     self.language = language
-    self.events = Events(( 'result' ))
+    self.events = Events(('final_result', 'temporary_result'))
     self.context = []
 
-  def __call__(self, audio_segment):
+  def onFinalResult(self, audio_segment):
     with tempfile.NamedTemporaryFile(
       prefix = "recorded_audio_",
       suffix = ".mp3",
@@ -36,4 +36,7 @@ class Transcriber:
       logger.debug(f'whisper replied: {transcript.text}')
       logger.debug(f'context was: {self.context}')
       self.context.append(transcript.text)
-      self.events.result(transcript.text)
+      self.events.final_result(transcript.text)
+
+  def onTemporaryResult(self, audio_segment):
+    assert False

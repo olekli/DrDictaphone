@@ -11,7 +11,7 @@ logger = logger.get(__name__)
 
 class Vad:
   def __init__(self):
-    self.events = Events(('result'))
+    self.events = Events(('final_result', 'temporary_result'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
     self.buffer = AudioSegment.empty()
     self.max_silence = 500
@@ -43,11 +43,14 @@ class Vad:
           cut_at = 0
           for length, (start, end) in gaps:
             if length > self.max_silence:
-              self.events.result(self.buffer[start:end])
+              self.events.final_result(self.buffer[start:end])
               cut_at = end
           self.buffer = self.buffer[cut_at:]
 
-  def __call__(self, audio_segment):
+  def onFinalResult(self, audio_segment):
     self.buffer += audio_segment
     logger.debug(f'received segment, buffer len: {len(self.buffer)}')
     self.checkForSpeech()
+
+  def onTemporaryResult(self, audio_segment):
+    assert False
