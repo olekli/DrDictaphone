@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-from dispatcher import Dispatcher
 from pipeline import Pipeline
 from events import Events
 from queue import Queue
@@ -33,8 +32,7 @@ def test_dispatches_correctly():
   output = DummyOutput()
   queue = Queue()
   with Pipeline([DummyTranscriber(), DummyPostProcessor(), output]) as pipeline:
-    with Dispatcher(queue, pipeline) as dispatcher:
-      queue.put('1')
-      queue.put('2')
-      queue.put('3')
+    pipeline('1')
+    pipeline('2')
+    pipeline('3')
   assert output.content == [ 'pt1', 'pt2', 'pt3' ]

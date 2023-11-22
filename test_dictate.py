@@ -7,7 +7,6 @@ from pydub import AudioSegment
 from transcriber import Transcriber
 from post_processor import PostProcessor
 from pipeline import Pipeline
-from dispatcher import Dispatcher
 from audio_tools import normaliseFormat
 from output import Output
 from read_context import readContext
@@ -29,9 +28,8 @@ def dictate(context, audio_filename):
   transcriber = Transcriber(context.language)
   output = Output()
   with Pipeline([vad, transcriber, post_processor, output]) as pipeline:
-    with FileStream(audio_filename, 1000) as file_stream:
-      with Dispatcher(file_stream.queue, pipeline) as dispatcher:
-        pass
+    with FileStream(audio_filename, 1000, pipeline) as file_stream:
+      pass
   return ' '.join(output.content)
 
 expected = 'This is an example text to test the dictate functionality. This text will be spoken. There will be multiple audio files containing the voice data. Some will have additional silence added to them, especially in the middle of sentences. Some might have background noise. This is specifically designed to test the voice activity detection and the different patterns of segmenting the audio for transcription.'
