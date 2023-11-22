@@ -2,7 +2,7 @@
   type: function
   function:
     name: partial_result
-    description: Use this function with your result if you could follow the instructions given to you, but feel like the input may have been incomplete or the result does not make sense.
+    description: Use this function with your result if the input seemed incomplete or did not make sense.
     parameters:
       type: object
       properties:
@@ -15,7 +15,7 @@
   type: function
   function:
     name: ok_result
-    description: Use this function with your result if you could follow the instructions given to you and you feel like the input was complete.
+    description: Use this function with your result if you could follow the instructions given to you and the input seemed to be complete.
     parameters:
       type: object
       properties:
