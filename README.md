@@ -1,6 +1,13 @@
 # DrDictaphone
 
 ```
+$ python cli-dictate.py --context context/transcribe-de.yaml --output output.txt
+
+$ sh watch.sh output.txt
+[ ... ]
+```
+
+```
 $ python cli-process.py --context context/proofread-de.yaml --input test/text-garbage.txt
 Error: [ ... ]
 
