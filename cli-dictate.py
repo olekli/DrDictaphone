@@ -11,6 +11,7 @@ from output import Output
 from read_context import readContext
 from microphone import Microphone
 from vad import Vad
+from fence_beep import FenceBeep
 import logger_config
 import logger
 
@@ -37,7 +38,7 @@ if args.input:
     pipeline(audio_segment)
 else:
   logger.info(f'Starting listening...')
-  with Pipeline([vad, transcriber, post_processor, output]) as pipeline:
+  with Pipeline([vad, FenceBeep(), transcriber, post_processor, output]) as pipeline:
     with Microphone(segment_length = 1, result_callback = pipeline):
       input()
 logger.info(f'done')
