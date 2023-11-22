@@ -7,7 +7,7 @@ import os
 class Output:
   def __init__(self, filename = None):
     self.filename = filename
-    self.events = Events(('final_result', 'temporary_result'))
+    self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.last_final_pos = 0
     with open(self.filename, 'rt') as file:
       file.seek(0, os.SEEK_END)
@@ -31,3 +31,6 @@ class Output:
         file.truncate()
         file.write(f'\n{result}\n')
     self.events.temporary_result(result)
+
+  def onFence(self):
+    self.events.fence()

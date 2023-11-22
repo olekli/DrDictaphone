@@ -9,13 +9,12 @@ load_dotenv()
 import os
 from events import Events
 import logger
-
 logger = logger.get(__name__)
 
 class Transcriber:
   def __init__(self, language):
     self.language = language
-    self.events = Events(('final_result', 'temporary_result'))
+    self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.context = []
 
   def onFinalResult(self, audio_segment):
@@ -37,6 +36,9 @@ class Transcriber:
       logger.debug(f'context was: {self.context}')
       self.context.append(transcript.text)
       self.events.final_result(transcript.text)
+
+  def onFence(self):
+    self.events.fence()
 
   def onTemporaryResult(self, audio_segment):
     assert False

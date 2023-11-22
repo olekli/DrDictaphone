@@ -10,12 +10,17 @@ import logger
 logger = logger.get(__name__)
 
 class Vad:
-  def __init__(self):
-    self.events = Events(('final_result', 'temporary_result'))
+  def __init__(self,
+    silence_threshold_content = 500,
+    silence_threshold_fence = 2000,
+    min_length = 500
+  ):
+    self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
     self.buffer = AudioSegment.empty()
-    self.max_silence = 1000
-    self.min_length = 500
+    self.silence_threshold_content = silence_threshold_content
+    self.silence_threshold_fence = silence_threshold_fence
+    self.min_length = min_length
 
   def checkForSpeech(self):
     if len(self.buffer) >= 3000:
@@ -34,6 +39,7 @@ class Vad:
         predictions = [ [int(x * 1000), int(y * 1000)] for [x, y] in predictions.tolist() ]
         if len(predictions) == 0:
           self.buffer = AudioSegment.empty()
+          self.events.fence()
         elif len(predictions) > 0:
           predictions.append([len(self.buffer)])
           gaps = []
@@ -43,7 +49,9 @@ class Vad:
             )
           cut_at = 0
           for length, (start, end) in gaps:
-            if length > self.max_silence:
+            if length > self.silence_threshold_fence:
+              self.events.fence()
+            if length > self.silence_threshold_content:
               if (end - start) > self.min_length:
                 self.events.final_result(self.buffer[start:end])
               else:
@@ -55,6 +63,9 @@ class Vad:
     self.buffer += audio_segment
     logger.debug(f'received segment, buffer len: {len(self.buffer)}')
     self.checkForSpeech()
+
+  def onFence(self):
+    self.events.fence()
 
   def onTemporaryResult(self, audio_segment):
     assert False

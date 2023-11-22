@@ -20,12 +20,17 @@ class ConcurrentOperation:
   def queueTemporaryResult(self, item):
     self.queue.put(PipelineResult(type = PipelineResultType.Temporary, value = item))
 
+  def queueFence(self):
+    self.queue.put(PipelineResult(type = PipelineResultType.Fence, value = None))
+
   def run(self):
     while True:
       next_result = self.queue.get()
       cached_temporary_result = None
       if next_result.type == PipelineResultType.Final:
         self.operation.onFinalResult(next_result.value)
+      elif next_result.type == PipelineResultType.Fence:
+        self.operation.onFence()
       elif (next_result.type == PipelineResultType.Temporary) and self.queue.empty():
         self.operation.onTemporaryResult(next_result.value)
       elif (next_result.type == PipelineResultType.Temporary) and not self.queue.empty():
@@ -33,6 +38,7 @@ class ConcurrentOperation:
       elif next_result.type == PipelineResultType.Shutdown:
         if cached_temporary_result:
           self.operation.onFinalResult(cached_temporary_result.value)
+          self.operation.onFence()
         return
 
   def __enter__(self):

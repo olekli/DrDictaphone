@@ -10,6 +10,7 @@ class PipelineResultType(Enum):
   Temporary = 'temporary'
   Final = 'final'
   Shutdown = 'shutdown'
+  Fence = 'fence'
 
 class PipelineResult(BaseModel):
   model_config = ConfigDict(extra = 'forbid')

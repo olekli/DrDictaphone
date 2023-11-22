@@ -10,11 +10,13 @@ import logger
 logger = logger.get(__name__)
 
 class PostProcessor:
-  def __init__(self, context, topic = ''):
+  def __init__(self, context, topic = '', more_pp = False):
     self.context = context
     self.topic = topic
-    self.events = Events(('final_result', 'temporary_result'))
+    self.more_pp = more_pp
+    self.events = Events(('final_result', 'temporary_result', 'fence'))
     self.text_buffer = []
+    self.conversation = Conversation(context = self.context, topic = self.topic, history = [])
 
     with open('instructions/post_process.yaml', 'rt') as file:
       instructions = yaml.safe_load(file)
@@ -27,20 +29,29 @@ class PostProcessor:
 
     self.events.temporary_result(input)
 
-    conversation = Conversation(context = self.context, topic = self.topic, history = [])
-    if input[-1] == '.' and len(input) > 300:
-      response = self.chat_gpt.ask(conversation, input)
+    if self.more_pp:
+      response = self.chat_gpt.ask(self.conversation, input)
       if 'ok' in response:
         logger.debug(f'post replied ok: {response["ok"]}')
         logger.debug(f'input was: {input}')
-        if len(input) > 300:
-          self.text_buffer = []
-          self.events.final_result(response['ok'])
-        else:
-          self.events.temporary_result(response['ok'])
+        self.events.temporary_result(response['ok'])
       else:
         logger.warning(f'post replied with error: {response["err"]}')
         logger.warning(f'input was: {input}')
+
+  def onFence(self):
+    if len(self.text_buffer) > 0:
+      input = ' '.join(self.text_buffer)
+      response = self.chat_gpt.ask(self.conversation, input)
+      if 'ok' in response:
+        logger.debug(f'post replied ok: {response["ok"]}')
+        logger.debug(f'input was: {input}')
+        self.text_buffer = []
+        self.events.final_result(response['ok'])
+      else:
+        logger.warning(f'post replied with error: {response["err"]}')
+        logger.warning(f'input was: {input}')
+      self.events.fence()
 
   def onTemporaryResult(self, audio_segment):
     assert False
