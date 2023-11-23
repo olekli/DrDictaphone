@@ -54,4 +54,4 @@ if __name__ == '__main__':
       ):
         input()
   logger.info(f'done')
-  logger.info(f'total costs incurred: {(transcriber.total_cost + post_processor.chat_gpt.total_cost) / 100}$')
+  logger.info(f'total costs incurred: {(transcriber.total_cost + chat_gpt.total_cost) / 100}$')

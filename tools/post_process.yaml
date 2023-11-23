@@ -9,6 +9,9 @@
         ok:
           type: string
           description: Your result from proofreading the text.
+        coherent:
+          type: boolean
+          description: Was the result one or more grammatically correct and complete sentences?
       required:
         - ok
 -

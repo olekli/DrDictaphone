@@ -11,7 +11,7 @@ from events import Events
 logger = logger.get(__name__)
 
 class Microphone:
-  def __init__(self, segment_length, rms_threshold = 30):
+  def __init__(self, segment_length, rms_threshold = 0):
     self.events = Events(('result', 'fence'))
 
     self.segment_length = segment_length
