@@ -16,3 +16,6 @@ class PipelineResult(BaseModel):
 
   type: PipelineResultType
   value: Any
+
+  def __str__(self):
+    return f'{self.type}: {self.value}'

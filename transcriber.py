@@ -19,6 +19,8 @@ class Transcriber:
     self.events = Events(('result', 'fence'))
     self.context = []
     self.buffer = AudioSegment.empty()
+    self.text_buffer = ''
+    self.mark = 0
     self.total_length = 0
     self.total_cost = 0
 
@@ -42,6 +44,8 @@ class Transcriber:
       logger.debug(f'total cost: {self.total_cost}')
       logger.debug(f'whisper replied: {transcript.text}')
       logger.debug(f'context was: {self.context}')
+      self.text_buffer = transcript.text
+      self.mark = len(self.buffer)
       return transcript.text
 
   def onResult(self, audio_segment):
@@ -51,8 +55,13 @@ class Transcriber:
 
   def onFence(self):
     if len(self.buffer) > 0:
-      text = self.transcribeBuffer()
+      if len(self.buffer) > self.mark:
+        text = self.transcribeBuffer()
+      else:
+        text = self.text_buffer
       self.context.append(text)
       self.buffer = AudioSegment.empty()
+      self.text_buffer = ''
+      self.mark = 0
       self.events.result(text)
       self.events.fence()
