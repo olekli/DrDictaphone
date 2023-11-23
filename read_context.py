@@ -2,15 +2,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import yaml
-from model.Context import Context
+from model.context import Context
+
+read_from_file = [ 'tools', 'gpt_model', 'options', 'instructions' ]
 
 def readContext(filename):
   with open(filename, 'rt') as file:
     data = yaml.safe_load(file)
-  if 'tools' in data and data['tools']:
-    tools_filename = data['tools']
-    with open(data['tools'], 'rt') as file:
-      data['tools'] = yaml.safe_load(file)
-  else:
-    data['tools'] = None
+  for item in read_from_file:
+    if item in data and data[item] and isinstance(data[item], str):
+      sub_filename = data[item]
+      with open(sub_filename, 'rt') as file:
+        data[item] = yaml.safe_load(file)
   return Context(**data)

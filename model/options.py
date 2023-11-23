@@ -8,9 +8,8 @@ from pydantic import BaseModel, ConfigDict
 class Options(BaseModel):
   model_config = ConfigDict(extra = 'forbid')
 
-  model: str
   temperature: float
   max_tokens: int
 
   def __str__(self):
-    return f'{self.model}, {self.temperature}, {self.max_tokens}'
+    return f'{self.temperature}, {self.max_tokens}'

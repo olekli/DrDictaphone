@@ -1,8 +1,9 @@
-system:
+instructions: instructions/post_process.yaml
+topic:
   - There is no specific topic. The transcription consists of random notes in English language.
+gpt_model: gpt_model/gpt-4-turbo.yaml
 options:
   temperature: 0.3
   max_tokens: 1000
-  model: gpt-4-1106-preview
 language: en
 tools: tools/post_process.yaml

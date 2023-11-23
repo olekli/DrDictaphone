@@ -14,6 +14,7 @@ from output import Output
 from read_context import readContext
 from file_stream import FileStream
 from vad import Vad
+from chat_gpt import ChatGpt
 import logger_config
 
 class Output:
@@ -34,16 +35,12 @@ class Output:
 
 def dictate(context, audio_filename):
   context = readContext(context)
-  file_stream = FileStream(audio_filename, 1000)
-  vad = Vad()
-  post_processor = PostProcessor(context, 'Dictate')
-  transcriber = Transcriber(context.language)
-  output = Output()
+  chat_gpt = ChatGpt(context)
   with Pipeline([
     partial(FileStream, audio_filename, 1000),
     Vad,
     partial(Transcriber, context.language),
-    partial(PostProcessor, context, 'Dictate'),
+    partial(PostProcessor, chat_gpt),
     Output
   ], None):
     pass

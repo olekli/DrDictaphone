@@ -3,7 +3,6 @@
 
 import pytest
 from chat_gpt import ChatGpt
-from model.Conversation import Conversation
 from read_context import readContext
 import logger_config
 
@@ -15,13 +14,8 @@ ok_result = 'Das ist ein Beispieltext in deutscher Sprache, der ein paar relativ
 
 @pytest.mark.integration
 def test_useful_input_produces_ok_result():
-  gpt = ChatGpt()
-  conversation = Conversation(
-    context = readContext('context/proofread-de.yaml'),
-    topic = '',
-    history = []
-  )
-  result = gpt.ask(conversation, ok_text)
+  gpt = ChatGpt(readContext('context/proofread-de.yaml'))
+  result = gpt.ask(ok_text)
 
   assert 'ok' in result
   assert not 'err' in result
@@ -29,13 +23,8 @@ def test_useful_input_produces_ok_result():
 
 @pytest.mark.integration
 def test_broken_input_produces_err_result():
-  gpt = ChatGpt()
-  conversation = Conversation(
-    context = readContext('context/proofread-de.yaml'),
-    topic = '',
-    history = []
-  )
-  result = gpt.ask(conversation, err_text)
+  gpt = ChatGpt(readContext('context/proofread-de.yaml'))
+  result = gpt.ask(err_text)
 
   assert 'err' in result
   assert not 'ok' in result

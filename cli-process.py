@@ -4,25 +4,18 @@
 import argparse
 
 from chat_gpt import ChatGpt
-from model.Conversation import Conversation
 from read_context import readContext
 
 parser = argparse.ArgumentParser(description='gpt-prompt cli')
 parser.add_argument('--context', type = str, required = True, help = 'context')
-parser.add_argument('--topic', type = str, default = '', help = 'topic')
 parser.add_argument('--input', type = str, required = True, help = 'input filename')
 parser.add_argument('--output', type = str, default = None, help = 'output filename')
 args = parser.parse_args()
 
-gpt = ChatGpt()
-conversation = Conversation(
-  context = readContext(args.context),
-  topic = args.topic,
-  history = []
-)
+gpt = ChatGpt(readContext(args.context))
 with open(args.input, 'rt') as file:
   input = file.read()
-result = gpt.ask(conversation, input)
+result = gpt.ask(input)
 if 'ok' in result:
   if args.output:
     with open(args.output, 'wt') as file:

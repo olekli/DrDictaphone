@@ -15,6 +15,7 @@ from vad import Vad
 from fence_beep import FenceBeep
 from status_line import StatusLine
 from display import Display
+from chat_gpt import ChatGpt
 import logger_config
 import logger
 
@@ -29,17 +30,13 @@ if __name__ == '__main__':
   args = parser.parse_args()
 
   context = readContext(args.context)
-  vad = Vad()
-  transcriber = Transcriber(context.language)
-  post_processor = PostProcessor(context, args.topic)
-  output = Output(args.output)
+  chat_gpt = ChatGpt(context)
 
   if args.input:
     logger.info(f'Processing audio file: {args.input} ...')
     audio_segment = AudioSegment.from_file(args.input)
     audio_segment = normaliseFormat(audio_segment)
-    with Pipeline([transcriber, post_processor, output]) as pipeline:
-      pipeline(audio_segment)
+    assert False
   else:
     logger.info(f'Starting listening...')
     status_line = StatusLine()
@@ -50,7 +47,7 @@ if __name__ == '__main__':
           Vad,
           FenceBeep,
           partial(Transcriber, context.language),
-          partial(PostProcessor, context, args.topic),
+          partial(PostProcessor, chat_gpt),
           partial(Output, args.output)
         ],
         display
