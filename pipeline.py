@@ -30,6 +30,8 @@ class Pipeline:
   def __exit__(self, exc_type, exc_value, traceback):
     for operation in self.operations:
       operation.__exit__(exc_type, exc_value, traceback)
+      if self.display:
+        self.display.total_cost += operation.total_cost
 
   def __call__(self, item):
     self.operations[0].queueResult(item)

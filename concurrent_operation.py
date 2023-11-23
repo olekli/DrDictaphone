@@ -17,14 +17,13 @@ class ConcurrentOperation:
     self.display = display
     self.thread = Thread(target = self.run)
     self.queue = Queue()
+    self.total_cost = 0
 
   def queueResult(self, item):
     self.queue.put(PipelineResult(type = PipelineResultType.Result, value = item))
-    #logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def queueFence(self):
     self.queue.put(PipelineResult(type = PipelineResultType.Fence, value = None))
-    #logger.debug(f'{self.operation.__class__.__name__} queue: {self.queue.qsize()}')
 
   def run(self):
     operation = self.operation_factory()
@@ -49,6 +48,8 @@ class ConcurrentOperation:
         break
     if callable(getattr(operation, '__exit__', None)):
       operation.__exit__(None, None, None)
+    if hasattr(operation, 'total_cost'):
+      self.total_cost = operation.total_cost
 
   def __enter__(self):
     self.thread.start()

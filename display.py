@@ -11,6 +11,7 @@ logger = logger.get(__name__)
 class Display:
   def __init__(self, status_line):
     self.status_line = status_line
+    self.total_cost = 0
     self.thread = Thread(target = self.run)
     self.queue = Queue()
 

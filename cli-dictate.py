@@ -53,5 +53,5 @@ if __name__ == '__main__':
         display
       ):
         input()
+      logger.info(f'total costs incurred: {display.total_cost / 100:.2f}$')
   logger.info(f'done')
-  logger.info(f'total costs incurred: {(transcriber.total_cost + chat_gpt.total_cost) / 100}$')

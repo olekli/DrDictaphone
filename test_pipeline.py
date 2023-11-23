@@ -41,7 +41,7 @@ class DummyOutput:
 
 def test_dispatches_correctly():
   queue = Queue()
-  with Pipeline([DummyTranscriber, DummyPostProcessor, DummyOutput]) as pipeline:
+  with Pipeline([DummyTranscriber, DummyPostProcessor, DummyOutput], None) as pipeline:
     pipeline('1')
     pipeline('2')
     pipeline('3')
