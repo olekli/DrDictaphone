@@ -14,7 +14,7 @@ class PostProcessor:
 
     self.text_buffer = [None]
     self.attempts = 0
-    self.max_attempts = 5
+    self.max_attempts = 4
     self.total_cost = 0
 
     self.history = []
@@ -22,9 +22,13 @@ class PostProcessor:
   def makeText(self):
     return ' '.join([line for line in self.text_buffer if line is not None])
 
-  def tryGpt(self, text, history):
-    response = self.chat_gpt.ask(text, history)
+  def tryGpt(self, text):
+#    textual_context = ''
+#    if self.attempts > 1 and len(self.history) > 0:
+#      textual_context = self.history[-1].user_message
+    response = self.chat_gpt.ask(text)
     self.total_cost = self.chat_gpt.total_cost
+    self.attempts += 1
     if 'ok' in response:
       logger.debug(f'post replied: {response}')
       logger.debug(f'input was: {text}')
@@ -50,9 +54,4 @@ class PostProcessor:
     text = self.makeText()
     if len(text) > 0:
       self.text_buffer.append(None)
-      if not self.tryGpt(text, []):
-        pass
-        #self.tryGpt(
-        #  text,
-        #  self.history[-1:]
-        #)
+      self.tryGpt(text)

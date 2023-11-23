@@ -29,8 +29,10 @@ class ChatGpt:
     self.messages = [ makeMessage('system', m) for m in self.context.instructions ]
     self.messages += [ makeMessage('system', m) for m in self.context.topic ]
 
-  def ask(self, question, history = []):
+  def ask(self, question, textual_context = '', history = []):
     this_messages = list(self.messages)
+    if textual_context:
+      this_messages.append(makeMessage('system', textual_context))
     this_messages += [
       item
       for exchange in history
