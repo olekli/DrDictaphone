@@ -6,13 +6,14 @@ from concurrent_operation import ConcurrentOperation
 from model.PipelineResult import PipelineResult, PipelineResultType
 
 class Pipeline:
-  def __init__(self, operations):
+  def __init__(self, operations, display):
     self.operations = []
+    self.display = display
 
     prev_slot_result = None
     prev_slot_fence = None
     for operation in reversed(operations):
-      concurrent_operation = ConcurrentOperation(operation)
+      concurrent_operation = ConcurrentOperation(operation, self.display)
       if prev_slot_result != None:
         concurrent_operation.events.result += prev_slot_result
       if prev_slot_fence != None:

@@ -31,21 +31,21 @@ class PostProcessor:
       response = self.chat_gpt.ask(self.conversation, text)
       if 'ok' in response:
         logger.debug(f'post replied ok: {response["ok"]}')
-        logger.debug(f'input was: {input}')
+        logger.debug(f'input was: {text}')
         self.events.result(response['ok'])
       else:
         logger.warning(f'post replied with error: {response["err"]}')
-        logger.warning(f'input was: {input}')
+        logger.warning(f'input was: {text}')
 
   def onFence(self):
     if len(self.text_buffer) > 0:
       response = self.chat_gpt.ask(self.conversation, self.text_buffer)
       if 'ok' in response:
         logger.debug(f'post replied ok: {response["ok"]}')
-        logger.debug(f'input was: {input}')
+        logger.debug(f'input was: {self.text_buffer}')
         self.text_buffer = ''
         self.events.result(response['ok'])
       else:
         logger.warning(f'post replied with error: {response["err"]}')
-        logger.warning(f'input was: {input}')
+        logger.warning(f'input was: {self.text_buffer}')
       self.events.fence()

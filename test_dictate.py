@@ -45,7 +45,7 @@ def dictate(context, audio_filename):
     partial(Transcriber, context.language),
     partial(PostProcessor, context, 'Dictate'),
     Output
-  ]):
+  ], None):
     pass
   return ' '.join(Output.content)
 

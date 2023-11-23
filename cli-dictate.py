@@ -13,6 +13,8 @@ from read_context import readContext
 from microphone import Microphone
 from vad import Vad
 from fence_beep import FenceBeep
+from status_line import StatusLine
+from display import Display
 import logger_config
 import logger
 
@@ -40,17 +42,19 @@ if __name__ == '__main__':
       pipeline(audio_segment)
   else:
     logger.info(f'Starting listening...')
-    microphone = Microphone(segment_length = 1)
-    with Pipeline(
-      [
-        partial(Microphone, 1),
-        Vad,
-        FenceBeep,
-        partial(Transcriber, context.language),
-        partial(PostProcessor, context, args.topic),
-        partial(Output, args.output)
-      ]
-    ):
-      input()
+    status_line = StatusLine()
+    with Display(status_line) as display:
+      with Pipeline(
+        [
+          partial(Microphone, 1),
+          Vad,
+          FenceBeep,
+          partial(Transcriber, context.language),
+          partial(PostProcessor, context, args.topic),
+          partial(Output, args.output)
+        ],
+        display
+      ):
+        input()
   logger.info(f'done')
   logger.info(f'total costs incurred: {(transcriber.total_cost + post_processor.chat_gpt.total_cost) / 100}$')
