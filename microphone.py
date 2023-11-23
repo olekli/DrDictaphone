@@ -11,11 +11,11 @@ from events import Events
 logger = logger.get(__name__)
 
 class Microphone:
-  def __init__(self, segment_length):
+  def __init__(self, segment_length, rms_threshold = 30):
     self.events = Events(('result', 'fence'))
 
     self.segment_length = segment_length
-    self.input_stream = None
+    self.rms_threshold = rms_threshold
 
   def callback(self, indata, sample_width, sample_rate, channels):
     audio_segment = AudioSegment(
@@ -24,7 +24,9 @@ class Microphone:
       frame_rate = sample_rate,
       channels = channels
     )
-    self.events.result(normaliseFormat(audio_segment))
+    audio_segment = normaliseFormat(audio_segment)
+    if audio_segment.rms > self.rms_threshold:
+      self.events.result(audio_segment)
 
   def __enter__(self):
     logger.debug('entering')
