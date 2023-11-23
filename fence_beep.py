@@ -31,6 +31,6 @@ class FenceBeep:
   def onFence(self):
     if self.beep:
       sd.play(self.audio, self.sample_rate)
-      self.events.fence()
       sd.wait()
       self.beep = False
+    self.events.fence()

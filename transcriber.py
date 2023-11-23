@@ -64,4 +64,4 @@ class Transcriber:
       self.text_buffer = ''
       self.mark = 0
       self.events.result(text)
-      self.events.fence()
+    self.events.fence()
