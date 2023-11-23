@@ -29,8 +29,17 @@ class ChatGpt:
     self.messages = [ makeMessage('system', m) for m in self.context.instructions ]
     self.messages += [ makeMessage('system', m) for m in self.context.topic ]
 
-  def ask(self, question):
-    this_messages = self.messages + [ makeMessage('user', question) ]
+  def ask(self, question, history = []):
+    this_messages = list(self.messages)
+    this_messages += [
+      item
+      for exchange in history
+      for item in [
+        makeMessage('user', exchange.user_message),
+        makeMessage('assistant', exchange.assistant_message)
+      ]
+    ]
+    this_messages += [ makeMessage('user', question) ]
 
     options = self.context.options.model_dump()
     options['model'] = self.context.gpt_model.name
