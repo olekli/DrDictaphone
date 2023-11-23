@@ -17,10 +17,12 @@ class Vad:
   ):
     self.events = Events(('result', 'fence'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
-    self.buffer = AudioSegment.silent(duration = 3000)
+    self.buffer = AudioSegment.silent(duration = 2000)
     self.silence_threshold_content = silence_threshold_content
     self.silence_threshold_fence = silence_threshold_fence
     self.min_length = min_length
+
+    self.fenced_on_no_speech = False
 
   def checkForSpeech(self):
     if len(self.buffer) >= 3000:
@@ -38,10 +40,12 @@ class Vad:
         )
         predictions = [ [int(x * 1000), int(y * 1000)] for [x, y] in predictions.tolist() ]
         if len(predictions) == 0:
-          if len(self.buffer) > 3000:
+          if not self.fenced_on_no_speech:
             self.events.fence()
-          self.buffer = AudioSegment.silent(duration = 3000)
+            self.fenced_on_no_speech = True
+          self.buffer = AudioSegment.silent(duration = 2000)
         elif len(predictions) > 0:
+          self.fenced_on_no_speech = False
           predictions.append([len(self.buffer)])
           gaps = []
           for i in range(1, len(predictions)):
@@ -49,16 +53,20 @@ class Vad:
               (predictions[i][0] - predictions[i-1][1], (predictions[0][0], predictions[i-1][1]))
             )
           cut_at = 0
-          for length, (start, end) in gaps:
-            if length > self.silence_threshold_fence:
-              self.events.fence()
-            if length > self.silence_threshold_content:
+          for silence_after_segment, (start, end) in reversed(gaps):
+            if silence_after_segment > self.silence_threshold_content:
               if (end - start) > self.min_length:
                 self.events.result(self.buffer[start:end])
               else:
                 logger.warning(f'dropping segment because it is too short: {end - start}')
               cut_at = end
-          self.buffer = self.buffer[cut_at:]
+            if silence_after_segment > self.silence_threshold_fence:
+              self.events.fence()
+            if cut_at > 0:
+              self.buffer = AudioSegment.silent(
+                duration = 3000 - len(self.buffer[cut_at:])
+              ) + self.buffer[cut_at:]
+              break
 
   def onResult(self, audio_segment):
     self.buffer += audio_segment
