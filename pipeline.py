@@ -14,9 +14,9 @@ class Pipeline:
     for operation in reversed(operations):
       concurrent_operation = ConcurrentOperation(operation)
       if prev_slot_result != None:
-        operation.events.result += prev_slot_result
+        concurrent_operation.events.result += prev_slot_result
       if prev_slot_fence != None:
-        operation.events.fence += prev_slot_fence
+        concurrent_operation.events.fence += prev_slot_fence
       prev_slot_result = concurrent_operation.queueResult
       prev_slot_fence = concurrent_operation.queueFence
       self.operations.insert(0, concurrent_operation)

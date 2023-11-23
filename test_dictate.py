@@ -3,6 +3,8 @@
 
 import pytest
 import difflib
+from events import Events
+from functools import partial
 from pydub import AudioSegment
 from transcriber import Transcriber
 from post_processor import PostProcessor
@@ -15,8 +17,11 @@ from vad import Vad
 import logger_config
 
 class Output:
+  content = []
+
   def __init__(self):
-    self.content = []
+    self.events = Events(('result', 'fence'))
+    Output.content = []
     self.buffer = ''
 
   def onResult(self, content):
@@ -24,7 +29,7 @@ class Output:
 
   def onFence(self):
     if self.buffer:
-      self.content.append(self.buffer)
+      Output.content.append(self.buffer)
       self.buffer = ''
 
 def dictate(context, audio_filename):
@@ -34,9 +39,15 @@ def dictate(context, audio_filename):
   post_processor = PostProcessor(context, 'Dictate')
   transcriber = Transcriber(context.language)
   output = Output()
-  with Pipeline([file_stream, vad, transcriber, post_processor, output]):
+  with Pipeline([
+    partial(FileStream, audio_filename, 1000),
+    Vad,
+    partial(Transcriber, context.language),
+    partial(PostProcessor, context, 'Dictate'),
+    Output
+  ]):
     pass
-  return ' '.join(output.content)
+  return ' '.join(Output.content)
 
 expected = 'This is an example text to test the dictate functionality. This text will be spoken. There will be multiple audio files containing the voice data. Some will have additional silence added to them, especially in the middle of sentences. Some might have background noise. This is specifically designed to test the voice activity detection and the different patterns of segmenting the audio for transcription.'
 

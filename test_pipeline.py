@@ -28,21 +28,21 @@ class DummyPostProcessor:
     pass
 
 class DummyOutput:
+  content = []
+
   def __init__(self):
     self.events = Events(('result', 'fence'))
-    self.content = []
 
   def onResult(self, text):
-    self.content.append(text)
+    DummyOutput.content.append(text)
 
   def onFence(self):
     pass
 
 def test_dispatches_correctly():
-  output = DummyOutput()
   queue = Queue()
-  with Pipeline([DummyTranscriber(), DummyPostProcessor(), output]) as pipeline:
+  with Pipeline([DummyTranscriber, DummyPostProcessor, DummyOutput]) as pipeline:
     pipeline('1')
     pipeline('2')
     pipeline('3')
-  assert output.content == [ 'pt1', 'pt2', 'pt3' ]
+  assert DummyOutput.content == [ 'pt1', 'pt2', 'pt3' ]
