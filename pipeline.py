@@ -35,3 +35,9 @@ class Pipeline:
 
   def __call__(self, item):
     self.operations[0].queueResult(item)
+
+  def __getitem__(self, operation_name):
+    for operation in self.operations:
+      if operation.operation.__class__.__name__ == operation_name:
+        return operation.operation
+    return None
