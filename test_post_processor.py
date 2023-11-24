@@ -9,6 +9,7 @@ class DummyGpt:
   def __init__(self):
     self.question = None
     self.response = None
+    self.total_cost = 0
 
   def ask(self, question):
     self.question = question
@@ -53,7 +54,7 @@ def test_does_not_retain_text_onResult():
 
 def test_calls_chat_gpt_onFence():
   gpt, spy, post_processor = make()
-  gpt.response = { 'ok': 'foo' }
+  gpt.response = { 'result': 'foo' }
 
   post_processor.onResult('text1')
   post_processor.onResult('text2')
@@ -66,9 +67,9 @@ def test_calls_chat_gpt_onFence():
   { 'coherent': False },
   {},
 ])
-def test_fence_produces_result_on_ok_response(coherent):
+def test_fence_produces_result_on_result_response(coherent):
   gpt, spy, post_processor = make()
-  gpt.response = { 'ok': 'foo', **coherent }
+  gpt.response = { 'result': 'foo', **coherent }
 
   post_processor.onResult('text1')
   post_processor.onResult('text2')
@@ -86,9 +87,9 @@ def test_fence_produces_no_result_on_err_response():
 
   assert spy.content[-1] == 'text2'
 
-def test_fences_on_coherent_ok_response():
+def test_fences_on_coherent_result_response():
   gpt, spy, post_processor = make()
-  gpt.response = { 'ok': 'foo', 'coherent': True }
+  gpt.response = { 'result': 'foo', 'coherent': True }
 
   post_processor.onResult('text1')
   post_processor.onResult('text2')
@@ -100,9 +101,9 @@ def test_fences_on_coherent_ok_response():
   { 'coherent': False },
   {},
 ])
-def test_does_not_fence_on_non_coherent_ok_response(coherent):
+def test_does_not_fence_on_non_coherent_result_response(coherent):
   gpt, spy, post_processor = make()
-  gpt.response = { 'ok': 'foo', **coherent }
+  gpt.response = { 'result': 'foo', **coherent }
 
   post_processor.onResult('text1')
   post_processor.onResult('text2')
@@ -122,7 +123,7 @@ def test_does_not_fence_on_err_response():
 
 def test_fencing_clears_internal_buffer():
   gpt, spy, post_processor = make()
-  gpt.response = { 'ok': 'foo', 'coherent': True }
+  gpt.response = { 'result': 'foo', 'coherent': True }
 
   post_processor.onResult('text1')
   post_processor.onResult('text2')
@@ -132,8 +133,8 @@ def test_fencing_clears_internal_buffer():
   assert spy.content[-1] == 'text3'
 
 @pytest.mark.parametrize("key, coherent", [
-  ( 'ok', { 'coherent': False } ),
-  ( 'ok', {} ),
+  ( 'result', { 'coherent': False } ),
+  ( 'result', {} ),
   ( 'err', {} )
 ])
 def test_not_fencing_stores_internal_buffer(key, coherent):
