@@ -11,7 +11,7 @@ class FileStream:
     self.filename = filename
     self.segment_length_ms = segment_length_ms
 
-  def __enter__(self):
+  def run(self):
     audio_file = normaliseFormat(AudioSegment.from_file(self.filename))
     audio_file = audio_file + AudioSegment.silent(duration = 3000)
     i = 0
@@ -25,13 +25,3 @@ class FileStream:
     last_segment = last_segment + AudioSegment.silent(duration = padding_length)
     assert len(last_segment) == self.segment_length_ms, f'{len(last_segment)} == {self.segment_length_ms}'
     self.events.result(last_segment)
-    return self
-
-  def __exit__(self, exc_type, exc_val, exc_tb):
-    pass
-
-  def onResult(self, result):
-    pass
-
-  def onFence(self):
-    pass

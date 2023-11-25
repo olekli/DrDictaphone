@@ -2,36 +2,28 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import functools
-from concurrent_operation import ConcurrentOperation
-from model.PipelineResult import PipelineResult, PipelineResultType
+from event_loop import EventLoop, connect, associateWithEventLoop
+from events_definition import Events
 
 class Pipeline:
-  def __init__(self, operations, display):
+  def __init__(self, operations):
+    self.events = Events()
     self.operations = []
-    self.display = display
+    self.event_loops = []
 
-    prev_slot_result = None
-    prev_slot_fence = None
-    for operation in reversed(operations):
-      concurrent_operation = ConcurrentOperation(operation, self.display)
-      if prev_slot_result != None:
-        concurrent_operation.events.result += prev_slot_result
-      if prev_slot_fence != None:
-        concurrent_operation.events.fence += prev_slot_fence
-      prev_slot_result = concurrent_operation.queueResult
-      prev_slot_fence = concurrent_operation.queueFence
-      self.operations.insert(0, concurrent_operation)
+    prev_op = self
+    for operation in operations:
+      self.event_loops.append(EventLoop())
+      self.operations.append(operation)
+      associateWithEventLoop(self.operations[-1], self.event_loops[-1])
+      connect(prev_op, None, self.operations[-1], None)
+      prev_op = self.operations[-1]
 
   def __enter__(self):
-    for operation in self.operations:
-      operation.__enter__()
+    for event_loop in self.event_loops:
+      event_loop.__enter__()
     return self
 
   def __exit__(self, exc_type, exc_value, traceback):
-    for operation in self.operations:
-      operation.__exit__(exc_type, exc_value, traceback)
-      if self.display:
-        self.display.total_cost += operation.total_cost
-
-  def __call__(self, item):
-    self.operations[0].queueResult(item)
+    for event_loop in self.event_loops:
+      event_loop.__exit__(exc_type, exc_value, traceback)

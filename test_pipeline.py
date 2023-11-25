@@ -5,7 +5,6 @@ import pytest
 from pipeline import Pipeline
 from events import Events
 from queue import Queue
-from model.PipelineResult import PipelineResult, PipelineResultType
 
 class DummyTranscriber:
   def __init__(self):
@@ -41,8 +40,8 @@ class DummyOutput:
 
 def test_dispatches_correctly():
   queue = Queue()
-  with Pipeline([DummyTranscriber, DummyPostProcessor, DummyOutput], None) as pipeline:
-    pipeline('1')
-    pipeline('2')
-    pipeline('3')
+  with Pipeline([DummyTranscriber(), DummyPostProcessor(), DummyOutput()], None) as pipeline:
+    pipeline.events.result('1')
+    pipeline.events.result('2')
+    pipeline.events.result('3')
   assert DummyOutput.content == [ 'pt1', 'pt2', 'pt3' ]

@@ -39,19 +39,17 @@ if __name__ == '__main__':
     assert False
   else:
     logger.info(f'Starting listening...')
-    status_line = StatusLine()
-    with Display(status_line) as display:
+    with Microphone(1) as microphone:
       with Pipeline(
         [
-          partial(Microphone, 1),
-          Vad,
-          FenceBeep,
-          partial(Transcriber, context.language),
-          partial(PostProcessor, chat_gpt),
-          partial(Output, args.output)
-        ],
-        display
+          microphone,
+          Vad(),
+          FenceBeep(),
+          Transcriber(context.language),
+          PostProcessor(chat_gpt),
+          Output(args.output)
+        ]
       ):
         input()
-      logger.info(f'total costs incurred: {display.total_cost / 100:.2f}$')
+    #logger.info(f'total costs incurred: {display.total_cost / 100:.2f}$')
   logger.info(f'done')
