@@ -4,11 +4,15 @@
 from queue import SimpleQueue
 from threading import Thread
 from events import Events
+import logger
+
+logger = logger.get(__name__)
 
 def connect_(emitter, event_name, receiver, slot_name):
   listeners = getattr(emitter.events, event_name)
   listeners += lambda payload = None: receiver.__event_loop__.enqueue(receiver, slot_name, payload)
   setattr(emitter.events, event_name, listeners)
+  logger.debug(f'connecting {emitter.__class__.__name__} {event_name} -> {receiver.__class__.__name__} {slot_name}')
 
 def connect(emitter, event_name, receiver, slot_name):
   if event_name == None and slot_name == None:
@@ -26,6 +30,7 @@ def associateWithEventLoop(receiver, event_loop):
 
 class EventLoop:
   def __init__(self):
+    self.events = Events(('active', 'idle'))
     self.queue = SimpleQueue()
     self.thread = Thread(target = self.run)
 
@@ -41,11 +46,14 @@ class EventLoop:
     self.thread.join()
 
   def run(self):
+    self.events.idle()
     item = self.queue.get()
     while item != None:
+      self.events.active()
       receiver, slot_name, payload = item
       if payload == None:
         getattr(receiver, slot_name)()
       else:
         getattr(receiver, slot_name)(payload)
+      self.events.idle()
       item = self.queue.get()
