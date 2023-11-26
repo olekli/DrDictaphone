@@ -11,7 +11,7 @@ from pydub import AudioSegment
 from output import Output
 from read_context import readContext
 from microphone import Microphone
-from fence_beep import FenceBeep
+from beep import Beep
 from status_line import StatusLine
 from display import Display
 from chat_gpt import ChatGpt
@@ -39,7 +39,6 @@ if __name__ == '__main__':
     from vad import Vad
     vad = Vad()
     pipeline_assembly.append(vad)
-  pipeline_assembly.append(FenceBeep())
   transcriber = Transcriber(context.language)
   pipeline_assembly.append(transcriber)
   post_processor = PostProcessor(chat_gpt)
@@ -48,7 +47,7 @@ if __name__ == '__main__':
   aggregator = Aggregator()
   pipeline_assembly.append(aggregator)
   with Pipeline(pipeline_assembly) as pipeline:
-    with EventLoop() as main_loop:
+    with EventLoop() as main_loop, EventLoop() as beep_loop:
       app = App()
       associateWithEventLoop(app, main_loop)
 
@@ -73,6 +72,13 @@ if __name__ == '__main__':
         connect(app, 'start_vad', vad, 'enable')
         connect(app, 'start_stream', microphone, 'startStream')
         connect(app, 'stop_stream', microphone, 'stop')
+
+      beep = Beep()
+      associateWithEventLoop(beep, beep_loop)
+      connect(app, 'start_recording', beep, 'beepHigh')
+      connect(app, 'start_stream', beep, 'beepHigh')
+      connect(app, 'stop_recording', beep, 'beepLow')
+      connect(app, 'stop_stream', beep, 'beepLow')
 
       app.run()
   #logger.info(f'total costs incurred: {display.total_cost / 100:.2f}$')
