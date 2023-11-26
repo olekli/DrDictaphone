@@ -11,48 +11,66 @@ from events import Events
 logger = logger.get(__name__)
 
 class Microphone:
-  def __init__(self, segment_length, rms_threshold = 0):
-    self.events = Events(('result', 'fence'))
+  def __init__(self):
+    self.events = Events(('result', 'fence', 'active', 'idle'))
+    self.buffer = AudioSegment.empty()
+    self.running = False
+    self.dtype = numpy.int16
+    self.sample_width = None
+    self.sample_rate = None
+    self.channels = None
 
-    self.segment_length = segment_length
-    self.rms_threshold = rms_threshold
-
-  def callback(self, indata, sample_width, sample_rate, channels):
-    audio_segment = AudioSegment(
+  def makeAudioSegment(self, indata, sample_width, sample_rate, channels):
+    return normaliseFormat(AudioSegment(
       data = indata.tobytes(),
       sample_width = sample_width,
       frame_rate = sample_rate,
       channels = channels
-    )
-    audio_segment = normaliseFormat(audio_segment)
-    if audio_segment.rms > self.rms_threshold:
-      self.events.result(audio_segment)
+    ))
 
-  def __enter__(self):
-    logger.debug('entering')
-    dtype = numpy.int16
+  def callback_buffer(self, indata, frames, time, status):
+    self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
+
+  def callback_stream(self, indata, frames, time, status):
+    self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
+    if len(self.buffer) >= 1000:
+      self.events.result(self.buffer)
+      self.buffer = AudioSegment.empty()
+
+  def makeInputStream(self, callback):
     device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
-    sample_rate = int(device_info['default_samplerate'])
-    channels = device_info['max_input_channels']
-    sample_width = numpy.dtype(dtype).itemsize
+    self.sample_rate = int(device_info['default_samplerate'])
+    self.channels = device_info['max_input_channels']
+    self.sample_width = numpy.dtype(self.dtype).itemsize
 
     self.input_stream = sounddevice.InputStream(
-      samplerate = sample_rate,
-      channels = channels,
-      dtype = dtype,
-      blocksize = sample_rate * self.segment_length,
-      callback = lambda indata, frames, time, status:
-        self.callback(indata, sample_width, sample_rate, channels)
+      samplerate = self.sample_rate,
+      channels = self.channels,
+      dtype = self.dtype,
+      blocksize = int(self.sample_rate / 10),
+      callback = callback
     )
     self.input_stream.__enter__()
-    return self
+    self.running = True
 
-  def __exit__(self, exc_type, exc_val, exc_tb):
-    logger.debug('exiting')
-    return self.input_stream.__exit__(exc_type, exc_val, exc_tb)
+  def startRecording(self):
+    assert not self.running
+    logger.debug('start recording')
+    self.events.active()
+    self.makeInputStream(self.callback_buffer)
 
-  def onResult(self, result):
-    pass
+  def startStream(self):
+    assert not self.running
+    logger.debug('start stream')
+    self.events.active()
+    self.makeInputStream(self.callback_stream)
 
-  def onFence(self):
-    pass
+  def stop(self):
+    logger.debug('stop')
+    self.input_stream.__exit__(None, None, None, None)
+    if len(self.buffer) > 0:
+      self.events.result(self.buffer)
+    self.events.fence()
+    self.buffer = AudioSegment.empty()
+    self.events.idle()
+    self.running = False

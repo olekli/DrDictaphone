@@ -8,6 +8,7 @@ logger = logger.get(__name__)
 
 class StatusLine:
   mapping = {
+    'Mic': 'MIC',
     'Vad': 'VAD',
     'Transcriber': 'TRANS',
     'PostProcessor': 'POST',
@@ -19,8 +20,9 @@ class StatusLine:
 
   def __init__(self):
     self.events = Events(('status_update'))
-    self.items = [ 'VAD', 'TRANS', 'POST', 'OUT' ]
+    self.items = [ 'MIC', 'VAD', 'TRANS', 'POST', 'OUT' ]
     self.status = {
+      'MIC': False,
       'VAD': False,
       'TRANS': False,
       'POST': False,
@@ -29,10 +31,8 @@ class StatusLine:
     for item in self.items:
       setattr(self, f'on{item}active', self.makeClosure(item, True))
       setattr(self, f'on{item}idle', self.makeClosure(item, False))
-    logger.debug(f'__init__: {dir(self)}')
 
   def onUpdate(self, op, status):
-    logger.debug(f'onUpdate: {op} {status}')
     self.status[op] = status
     self.events.status_update(self.getStatusLine())
 

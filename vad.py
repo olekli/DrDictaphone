@@ -15,7 +15,7 @@ class Vad:
     silence_threshold_fence = 2000,
     min_length = 500
   ):
-    self.events = Events(('result', 'fence'))
+    self.events = Events(('result', 'fence', 'active', 'idle'))
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
     self.buffer = AudioSegment.silent(duration = 2000)
     self.silence_threshold_content = silence_threshold_content
@@ -23,6 +23,8 @@ class Vad:
     self.min_length = min_length
 
     self.fenced_on_no_speech = False
+
+    self.pass_thru = True
 
   def checkForSpeech(self):
     if len(self.buffer) >= 3000:
@@ -69,9 +71,23 @@ class Vad:
               break
 
   def onResult(self, audio_segment):
-    self.buffer += audio_segment
-    logger.debug(f'received segment, buffer len: {len(self.buffer)}')
-    self.checkForSpeech()
+    if self.pass_thru:
+      self.events.result(audio_segment)
+    else:
+      self.buffer += audio_segment
+      logger.debug(f'received segment, buffer len: {len(self.buffer)}')
+      self.checkForSpeech()
 
   def onFence(self):
-    self.events.fence()
+    if not self.pass_thru:
+      self.buffer += AudioSegment.silent(duration = int(self.silence_threshold_fence * 1.5))
+      self.fenced_on_no_speech = False
+      self.checkForSpeech()
+      self.pass_thru = True
+      self.events.idle()
+    else:
+      self.events.fence()
+
+  def enable(self):
+    self.pass_thru = False
+    self.events.active()
