@@ -28,8 +28,15 @@ class App:
     self.events = Events(('start_recording', 'stop_recording', 'start_stream', 'stop_stream', 'start_vad', 'stop_vad'))
     self.bindings = self.makeKeyBinds()
     self.text_area = TextArea(focusable = False, read_only = True)
-    self.status_bar_left = Window(content = FormattedTextControl('loading...'), height=1, align=WindowAlign.LEFT)
-    self.status_bar_right = Window(height=1, align=WindowAlign.RIGHT)
+    self.status_bar_left = Window(
+      content = FormattedTextControl('loading...'),
+      height=1,
+      align=WindowAlign.LEFT,
+    )
+    self.status_bar_right = Window(
+      height=1,
+      align=WindowAlign.RIGHT,
+    )
     self.layout = Layout(
       HSplit([
         self.text_area,
@@ -39,7 +46,12 @@ class App:
         ])
       ])
     )
-    self.app = Application(layout = self.layout, key_bindings = self.bindings, full_screen = True)
+    self.app = Application(
+      layout = self.layout,
+      key_bindings = self.bindings,
+      full_screen = True,
+      mouse_support = True
+    )
 
     self.is_recording = False
     self.is_vad = False
@@ -50,8 +62,19 @@ class App:
     bindings.add('q')(lambda event: self.exit())
     bindings.add('v')(lambda event: self.toggleVad())
     bindings.add(' ')(lambda event: self.toggleRecording())
+    bindings.add(Keys.Vt100MouseEvent)(lambda event: self.onMouseLeft(event, self.toggleRecording))
 
     return bindings
+
+  def handleMouse(mouse_event):
+    logger.debug(mouse_event)
+    if mouse_event.event_type == MouseEventType.MOUSE_UP:
+      self.toggleRecording()
+
+  def onMouseLeft(self, event, callback):
+    data = event.key_sequence[0].data.split(';')
+    if data[0] == '\x1b[<0' and data[2][-1] == 'm': # dafuq...
+      callback()
 
   def toggleRecording(self):
     if not self.is_vad:
