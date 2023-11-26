@@ -9,13 +9,12 @@ logger = logger.get(__name__)
 
 class PostProcessor:
   def __init__(self, chat_gpt):
-    self.events = Events(('result', 'fence'))
+    self.events = Events(('result', 'fence', 'costs'))
     self.chat_gpt = chat_gpt
 
     self.text_buffer = [None]
     self.attempts = 0
     self.max_attempts = 5
-    self.total_cost = 0
 
     self.history = []
 
@@ -24,7 +23,7 @@ class PostProcessor:
 
   def tryGpt(self, text):
     response = self.chat_gpt.ask(text)
-    self.total_cost = self.chat_gpt.total_cost
+    self.events.costs(self.chat_gpt.last_cost)
     self.attempts += 1
     if 'result' in response:
       logger.debug(f'post replied: {response}')

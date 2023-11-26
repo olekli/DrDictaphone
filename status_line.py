@@ -16,10 +16,10 @@ class StatusLine:
   }
 
   def makeClosure(self, item, status):
-    return lambda: self.onUpdate(item, status)
+    return lambda: self.onUpdateActivity(item, status)
 
   def __init__(self):
-    self.events = Events(('status_update'))
+    self.events = Events(('status_update_left', 'status_update_right'))
     self.items = [ 'MIC', 'VAD', 'TRANS', 'POST', 'OUT' ]
     self.status = {
       'MIC': False,
@@ -28,15 +28,28 @@ class StatusLine:
       'POST': False,
       'OUT': False
     }
+    self.costs = 0
     for item in self.items:
       setattr(self, f'on{item}active', self.makeClosure(item, True))
       setattr(self, f'on{item}idle', self.makeClosure(item, False))
 
-  def onUpdate(self, op, status):
-    self.status[op] = status
-    self.events.status_update(self.getStatusLine())
+  def update(self):
+    self.events.status_update_left(self.getStatusLineLeft())
+    self.events.status_update_right(self.getStatusLineRight())
 
-  def getStatusLine(self):
+  def onUpdateActivity(self, op, status):
+    self.status[op] = status
+    self.events.status_update_left(self.getStatusLineLeft())
+
+  def onUpdateCosts(self, new_costs):
+    self.costs = new_costs
+    self.events.status_update_right(self.getStatusLineRight())
+
+  def getStatusLineLeft(self):
     to_print = [ item if self.status[item] else '' for item in self.items ]
-    status_line = ''.join(f'{word:<6}' for word in to_print)
+    status_line = '  ' + ''.join(f'{word:<6}' for word in to_print)
+    return status_line
+
+  def getStatusLineRight(self):
+    status_line = f'costs: {(self.costs / 100):.2f}$  '
     return status_line

@@ -25,6 +25,7 @@ class ChatGpt:
     self.completion_tokens = 0
     self.total_tokens = 0
     self.total_cost = 0
+    self.last_cost = 0
 
     self.messages = [ makeMessage('system', m) for m in self.context.instructions ]
     self.messages += [ makeMessage('system', m) for m in self.context.topic ]
@@ -54,6 +55,8 @@ class ChatGpt:
     self.total_tokens += usage.total_tokens
     self.total_cost = ((self.completion_tokens * self.context.gpt_model.output_cost) + \
       (self.prompt_tokens * self.context.gpt_model.input_cost)) / 1000
+    self.last_cost = ((usage.completion_tokens * self.context.gpt_model.output_cost) + \
+      (usage.prompt_tokens * self.context.gpt_model.input_cost)) / 1000
     logger.debug(f'total cost: {round(self.total_cost)}')
 
     tool_calls = self.last_completion.choices[0].message.tool_calls

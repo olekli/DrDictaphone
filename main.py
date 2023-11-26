@@ -18,6 +18,7 @@ from chat_gpt import ChatGpt
 from aggregator import Aggregator
 from app import App
 from event_loop import EventLoop, connect, associateWithEventLoop
+from cost_counter import CostCounter
 import logger_config
 import logger
 
@@ -46,8 +47,11 @@ if __name__ == '__main__':
   pipeline_assembly.append(Output(args.output))
   aggregator = Aggregator()
   pipeline_assembly.append(aggregator)
+  cost_counter = CostCounter()
   with Pipeline(pipeline_assembly) as pipeline:
     with EventLoop() as main_loop, EventLoop() as beep_loop:
+      associateWithEventLoop(cost_counter, main_loop)
+
       app = App()
       associateWithEventLoop(app, main_loop)
 
@@ -60,8 +64,9 @@ if __name__ == '__main__':
       connect(post_processor.__event_loop__, 'active', status_line, 'onPOSTactive')
       connect(post_processor.__event_loop__, 'idle', status_line, 'onPOSTidle')
 
-      connect(status_line, 'status_update', app, 'onUpdateStatus')
-      connect(aggregator, 'result', app, 'onUpdateText')
+      connect(status_line, 'status_update_left', app, 'updateStatusLeft')
+      connect(status_line, 'status_update_right', app, 'updateStatusRight')
+      connect(aggregator, 'result', app, 'updateText')
 
       connect(app, 'start_recording', microphone, 'startRecording')
       connect(app, 'stop_recording', microphone, 'stop')
@@ -79,6 +84,13 @@ if __name__ == '__main__':
       connect(app, 'start_stream', beep, 'beepHigh')
       connect(app, 'stop_recording', beep, 'beepLow')
       connect(app, 'stop_stream', beep, 'beepLow')
+
+      connect(transcriber, 'costs', cost_counter, 'addCosts')
+      connect(post_processor, 'costs', cost_counter, 'addCosts')
+      connect(cost_counter, 'updated', status_line, 'onUpdateCosts')
+
+      app.updateStatusLeft(status_line.getStatusLineLeft)
+      app.updateStatusRight(status_line.getStatusLineRight)
 
       app.run()
   #logger.info(f'total costs incurred: {display.total_cost / 100:.2f}$')
