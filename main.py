@@ -50,6 +50,7 @@ if __name__ == '__main__':
   cost_counter = CostCounter()
   with Pipeline(pipeline_assembly) as pipeline:
     with EventLoop() as main_loop, EventLoop() as beep_loop:
+      associateWithEventLoop(pipeline, main_loop)
       associateWithEventLoop(cost_counter, main_loop)
 
       app = App()
@@ -68,22 +69,22 @@ if __name__ == '__main__':
       connect(status_line, 'status_update_right', app, 'updateStatusRight')
       connect(aggregator, 'result', app, 'updateText')
 
-      connect(app, 'start_recording', microphone, 'startRecording')
-      connect(app, 'stop_recording', microphone, 'stop')
+      connect(app, 'start_rec', pipeline, 'onStartRec')
+      connect(app, 'stop_rec', pipeline, 'onStopRec')
+
+      beep = Beep()
+      associateWithEventLoop(beep, beep_loop)
 
       if args.enable_vad:
         connect(vad, 'active', status_line, 'onVADactive')
         connect(vad, 'idle', status_line, 'onVADidle')
-        connect(app, 'start_vad', vad, 'enable')
-        connect(app, 'start_stream', microphone, 'startStream')
-        connect(app, 'stop_stream', microphone, 'stop')
+        connect(app, 'start_vad', pipeline, 'onStartVad')
+        connect(app, 'stop_vad', pipeline, 'onStopVad')
+        connect(app, 'start_vad', beep, 'beepHigh')
+        connect(app, 'stop_vad', beep, 'beepLow')
 
-      beep = Beep()
-      associateWithEventLoop(beep, beep_loop)
-      connect(app, 'start_recording', beep, 'beepHigh')
-      connect(app, 'start_stream', beep, 'beepHigh')
-      connect(app, 'stop_recording', beep, 'beepLow')
-      connect(app, 'stop_stream', beep, 'beepLow')
+      connect(app, 'start_rec', beep, 'beepHigh')
+      connect(app, 'stop_rec', beep, 'beepLow')
 
       connect(transcriber, 'costs', cost_counter, 'addCosts')
       connect(post_processor, 'costs', cost_counter, 'addCosts')

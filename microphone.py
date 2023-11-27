@@ -6,19 +6,63 @@ import numpy
 from pydub import AudioSegment
 from audio_tools import normaliseFormat
 import logger
-from events import Events
+from pipeline_events import PipelineEvents
 
 logger = logger.get(__name__)
 
 class Microphone:
   def __init__(self):
-    self.events = Events(('result', 'fence', 'active', 'idle'))
+    self.events = PipelineEvents()
     self.buffer = AudioSegment.empty()
-    self.running = False
+    self.recording = False
+    self.streaming = False
     self.dtype = numpy.int16
     self.sample_width = None
     self.sample_rate = None
     self.channels = None
+
+  def onStartRec(self):
+    assert not self.recording and not self.streaming
+    logger.debug('start recording')
+    self.recording = True
+    self.makeInputStream(self.callback_recording)
+    self.events.active()
+    self.events.start_rec()
+
+  def onStopRec(self):
+    assert self.recording
+    logger.debug('stop recording')
+    self.input_stream.__exit__(None, None, None, None)
+
+    if len(self.buffer) > 0:
+      self.events.result(self.buffer)
+
+    self.recording = False
+    self.buffer = AudioSegment.empty()
+    self.events.idle()
+    self.events.stop_rec()
+    self.events.fence()
+
+  def onStartVad(self):
+    assert not self.recording and not self.streaming
+    logger.debug('start stream')
+    self.streaming = True
+    self.events.active()
+    self.makeInputStream(self.callback_stream)
+    self.events.start_vad()
+
+  def onStopVad(self):
+    assert self.streaming
+    logger.debug('stop stream')
+    self.input_stream.__exit__(None, None, None, None)
+
+    if len(self.buffer) > 0:
+      self.events.result(self.buffer)
+
+    self.buffer = AudioSegment.empty()
+    self.streaming = False
+    self.events.idle()
+    self.events.stop_vad()
 
   def makeAudioSegment(self, indata, sample_width, sample_rate, channels):
     return normaliseFormat(AudioSegment(
@@ -28,7 +72,7 @@ class Microphone:
       channels = channels
     ))
 
-  def callback_buffer(self, indata, frames, time, status):
+  def callback_recording(self, indata, frames, time, status):
     self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
 
   def callback_stream(self, indata, frames, time, status):
@@ -51,26 +95,3 @@ class Microphone:
       callback = callback
     )
     self.input_stream.__enter__()
-    self.running = True
-
-  def startRecording(self):
-    assert not self.running
-    logger.debug('start recording')
-    self.events.active()
-    self.makeInputStream(self.callback_buffer)
-
-  def startStream(self):
-    assert not self.running
-    logger.debug('start stream')
-    self.events.active()
-    self.makeInputStream(self.callback_stream)
-
-  def stop(self):
-    logger.debug('stop')
-    self.input_stream.__exit__(None, None, None, None)
-    if len(self.buffer) > 0:
-      self.events.result(self.buffer)
-    self.events.fence()
-    self.buffer = AudioSegment.empty()
-    self.events.idle()
-    self.running = False

@@ -1,7 +1,7 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from events import Events
+from pipeline_events import PipelineEvents
 from model.exchange import Exchange
 import logger
 
@@ -9,7 +9,7 @@ logger = logger.get(__name__)
 
 class PostProcessor:
   def __init__(self, chat_gpt):
-    self.events = Events(('result', 'fence', 'costs'))
+    self.events = PipelineEvents()
     self.chat_gpt = chat_gpt
 
     self.text_buffer = [None]

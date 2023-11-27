@@ -9,7 +9,7 @@ class DummyGpt:
   def __init__(self):
     self.question = None
     self.response = None
-    self.total_cost = 0
+    self.last_cost = 0
 
   def ask(self, question):
     self.question = question

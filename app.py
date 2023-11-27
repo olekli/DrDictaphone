@@ -25,7 +25,7 @@ def call_in_event_loop(method):
 
 class App:
   def __init__(self):
-    self.events = Events(('start_recording', 'stop_recording', 'start_stream', 'stop_stream', 'start_vad', 'stop_vad'))
+    self.events = Events(('start_rec', 'stop_rec', 'start_vad', 'stop_vad'))
     self.bindings = self.makeKeyBinds()
     self.text_area = TextArea(focusable = False, read_only = True)
     self.status_bar_left = Window(
@@ -79,20 +79,19 @@ class App:
   def toggleRecording(self):
     if not self.is_vad:
       if self.is_recording:
-        self.events.stop_recording()
+        self.events.stop_rec()
         self.is_recording = False
       else:
-        self.events.start_recording()
+        self.events.start_rec()
         self.is_recording = True
 
   def toggleVad(self):
     if not self.is_recording:
       if self.is_vad:
-        self.events.stop_stream()
+        self.events.stop_vad()
         self.is_vad = False
       else:
         self.events.start_vad()
-        self.events.start_stream()
         self.is_vad = True
 
   def exit(self):

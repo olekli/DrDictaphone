@@ -7,7 +7,7 @@ from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
 import os
-from events import Events
+from pipeline_events import PipelineEvents
 import logger
 logger = logger.get(__name__)
 
@@ -15,8 +15,8 @@ class Transcriber:
   cost_second = (0.6 / 60)
 
   def __init__(self, language):
+    self.events = PipelineEvents()
     self.language = language
-    self.events = Events(('result', 'fence', 'costs'))
     self.context = []
     self.buffer = AudioSegment.empty()
     self.text_buffer = ''

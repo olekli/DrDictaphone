@@ -1,11 +1,11 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from events import Events
+from pipeline_events import PipelineEvents
 
 class Aggregator:
   def __init__(self):
-    self.events = Events(('result', 'fence'))
+    self.events = PipelineEvents()
     self.content = [None]
 
   def onResult(self, result):
