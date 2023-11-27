@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-from event_loop import EventLoop, connect, associateWithEventLoop
+from event_loop import EventLoop, connect, associateWithEventLoop, forwardEvents
 from events import Events
+from event_spy import EventSpy
 
 class DummyClass:
   def __init__(self):
-    self.events = Events(('new_result', 'updated'))
+    self.events = Events(('new_result', 'updated', 'forward1', 'forward2'))
     self.new_result = []
     self.updated = []
 
@@ -16,6 +17,19 @@ class DummyClass:
 
   def onUpdated(self, item):
     self.updated.append(item)
+
+class Spy:
+  def __init__(self):
+    self.forward1 = []
+    self.forward2 = []
+
+  def onForward1(self, item):
+    logger.debug(item)
+    self.forward1.append(item)
+
+  def onForward2(self, item):
+    logger.debug(item)
+    self.forward2.append(item)
 
 @pytest.mark.parametrize("event_name, slot_name, other", [
   ( 'new_result', 'onNewResult', 'updated' ),
@@ -67,7 +81,26 @@ def test_full_connect_works():
     sender.events.new_result('foo')
     sender.events.updated('bar')
     sender.events.updated('lol')
+    sender.events.forward1('123')
     sender.events.new_result('baz')
+    sender.events.forward2('456')
 
   assert getattr(receiver, 'new_result') == [ 'foo', 'baz' ]
   assert getattr(receiver, 'updated') == [ 'bar', 'lol' ]
+
+def test_forward_works():
+  sender = DummyClass()
+  spy = EventSpy([ 'forward1', 'forward2' ])
+
+  with EventLoop() as event_loop:
+    associateWithEventLoop(sender, event_loop)
+    associateWithEventLoop(spy, event_loop)
+    forwardEvents(sender, [ 'forward1', 'forward2' ])
+    connect(sender, 'forward1', spy, 'onForward1')
+    connect(sender, 'forward2', spy, 'onForward2')
+
+    sender.events.forward1('123')
+    sender.events.forward2('456')
+
+  assert getattr(spy, 'forward1') == [ '123' ]
+  assert getattr(spy, 'forward2') == [ '456' ]

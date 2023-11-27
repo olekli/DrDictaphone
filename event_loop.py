@@ -29,6 +29,14 @@ def connect(emitter, event_name, receiver, slot_name):
   else:
     connect_(emitter, event_name, receiver, slot_name)
 
+def forwardEvents(self, event_names):
+  for event_name in event_names:
+    setattr(
+      self,
+      makeSlotName(event_name),
+      getattr(self.events, event_name)
+    )
+
 def associateWithEventLoop(receiver, event_loop):
   receiver.__event_loop__ = event_loop
 
