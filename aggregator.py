@@ -6,15 +6,17 @@ from pipeline_events import PipelineEvents
 class Aggregator:
   def __init__(self):
     self.events = PipelineEvents()
-    self.content = [None]
+    self.buffer = ''
+    self.final = []
 
   def onResult(self, result):
-    self.content[-1] = result
+    self.buffer = result
     self.events.result(self.makeText())
 
   def onFence(self):
-    self.content.append(None)
+    self.final.append(self.buffer)
+    self.buffer = ''
     self.events.fence()
 
   def makeText(self):
-    return ' '.join([line for line in self.content if line is not None])
+    return '\n\n'.join(self.final + [self.buffer])
