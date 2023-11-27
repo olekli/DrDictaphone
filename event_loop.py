@@ -8,6 +8,10 @@ import logger
 
 logger = logger.get(__name__)
 
+def makeSlotName(event_name):
+  segments = event_name.split('_')
+  return 'on' + ''.join([ segment.capitalize() for segment in segments ])
+
 def connect_(emitter, event_name, receiver, slot_name):
   listeners = getattr(emitter.events, event_name)
   listeners += lambda payload = None: receiver.__event_loop__.enqueue(receiver, slot_name, payload)
@@ -17,9 +21,9 @@ def connect_(emitter, event_name, receiver, slot_name):
 def connect(emitter, event_name, receiver, slot_name):
   if event_name == None and slot_name == None:
     for event_name in emitter.events.__events__:
-      slot_name = f'on{event_name.capitalize()}'
+      slot_name = makeSlotName(event_name)
       if callable(getattr(receiver, slot_name, None)):
-        connect_(emitter, event_name, receiver, f'on{event_name.capitalize()}')
+        connect_(emitter, event_name, receiver, slot_name)
   elif event_name == None or slot_name == None:
     assert False
   else:
