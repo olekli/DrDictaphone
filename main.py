@@ -71,6 +71,8 @@ if __name__ == '__main__':
 
       connect(app, 'start_rec', pipeline, 'onStartRec')
       connect(app, 'stop_rec', pipeline, 'onStopRec')
+      connect(app, 'pause_mic', pipeline, 'onPauseMic')
+      connect(app, 'unpause_mic', pipeline, 'onUnpauseMic')
 
       beep = Beep()
       associateWithEventLoop(beep, beep_loop)
@@ -80,11 +82,13 @@ if __name__ == '__main__':
         connect(vad, 'idle', status_line, 'onVADidle')
         connect(app, 'start_vad', pipeline, 'onStartVad')
         connect(app, 'stop_vad', pipeline, 'onStopVad')
-        connect(app, 'start_vad', beep, 'beepHigh')
-        connect(app, 'stop_vad', beep, 'beepLow')
+        connect(app, 'start_vad', beep, 'beepHighLong')
+        connect(app, 'stop_vad', beep, 'beepLowLong')
 
-      connect(app, 'start_rec', beep, 'beepHigh')
-      connect(app, 'stop_rec', beep, 'beepLow')
+      connect(app, 'start_rec', beep, 'beepHighLong')
+      connect(app, 'stop_rec', beep, 'beepLowLong')
+      connect(app, 'pause_mic', beep, 'beepLowShort')
+      connect(app, 'unpause_mic', beep, 'beepHighShort')
 
       connect(transcriber, 'costs', cost_counter, 'addCosts')
       connect(post_processor, 'costs', cost_counter, 'addCosts')

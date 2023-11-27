@@ -25,7 +25,7 @@ def call_in_event_loop(method):
 
 class App:
   def __init__(self):
-    self.events = Events(('start_rec', 'stop_rec', 'start_vad', 'stop_vad'))
+    self.events = Events(('start_rec', 'stop_rec', 'start_vad', 'stop_vad', 'pause_mic', 'unpause_mic'))
     self.bindings = self.makeKeyBinds()
     self.text_area = TextArea(focusable = False, read_only = True)
     self.status_bar_left = Window(
@@ -55,29 +55,38 @@ class App:
 
     self.is_recording = False
     self.is_vad = False
+    self.is_paused = False
 
   def makeKeyBinds(self):
     bindings = KeyBindings()
 
     bindings.add('q')(lambda event: self.exit())
     bindings.add('v')(lambda event: self.toggleVad())
-    bindings.add(' ')(lambda event: self.toggleRecording())
-    bindings.add(Keys.Vt100MouseEvent)(lambda event: self.onMouseLeft(event, self.toggleRecording))
+    bindings.add(' ')(lambda event: self.togglePauseMic())
+    bindings.add(Keys.Vt100MouseEvent)(self.onMouseEvent)
+    bindings.add('p')(lambda event: self.toggleRecording())
 
     return bindings
 
-  def handleMouse(mouse_event):
-    logger.debug(mouse_event)
-    if mouse_event.event_type == MouseEventType.MOUSE_UP:
-      self.toggleRecording()
-
-  def onMouseLeft(self, event, callback):
+  def onMouseEvent(self, event):
     data = event.key_sequence[0].data.split(';')
     if data[0] == '\x1b[<0' and data[2][-1] == 'm': # dafuq...
-      callback()
+      self.togglePauseMic()
+    elif data[0] == '\x1b[<2' and data[2][-1] == 'm': # dafuq...
+      self.toggleRecording()
+
+  def togglePauseMic(self):
+    if self.is_vad or self.is_recording:
+      if not self.is_paused:
+        self.events.pause_mic()
+        self.is_paused = True
+      else:
+        self.events.unpause_mic()
+        self.is_paused = False
 
   def toggleRecording(self):
     if not self.is_vad:
+      self.is_paused = False
       if self.is_recording:
         self.events.stop_rec()
         self.is_recording = False
@@ -87,6 +96,7 @@ class App:
 
   def toggleVad(self):
     if not self.is_recording:
+      self.is_paused = False
       if self.is_vad:
         self.events.stop_vad()
         self.is_vad = False

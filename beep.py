@@ -7,11 +7,13 @@ import sounddevice as sd
 class Beep:
   def __init__(self):
     self.sample_rate = 44100
-    self.high_beep_audio = self.makeBeep(440)
-    self.low_beep_audio = self.makeBeep(220)
+    self.high_beep_audio_short = self.makeBeep(440, 0.05)
+    self.low_beep_audio_short = self.makeBeep(220, 0.05)
+    self.high_beep_audio_long = self.makeBeep(440, 0.1)
+    self.low_beep_audio_long = self.makeBeep(220, 0.12)
 
-  def makeBeep(self, frequency):
-    duration = 0.08
+  def makeBeep(self, frequency, duration):
+    duration = duration
     volume = 0.2
     t = np.linspace(0, duration, int(self.sample_rate * duration), False)
     note = np.sin(frequency * 2 * np.pi * t)
@@ -25,8 +27,14 @@ class Beep:
     sd.play(audio, self.sample_rate, blocksize = int(self.sample_rate / 5))
     sd.wait()
 
-  def beepHigh(self):
-    self.beep(self.high_beep_audio)
+  def beepHighShort(self):
+    self.beep(self.high_beep_audio_short)
 
-  def beepLow(self):
-    self.beep(self.low_beep_audio)
+  def beepLowShort(self):
+    self.beep(self.low_beep_audio_short)
+
+  def beepHighLong(self):
+    self.beep(self.high_beep_audio_long)
+
+  def beepLowLong(self):
+    self.beep(self.low_beep_audio_long)

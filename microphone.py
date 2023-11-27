@@ -16,6 +16,7 @@ class Microphone:
     self.buffer = AudioSegment.empty()
     self.recording = False
     self.streaming = False
+    self.paused = False
     self.dtype = numpy.int16
     self.sample_width = None
     self.sample_rate = None
@@ -38,6 +39,7 @@ class Microphone:
       self.events.result(self.buffer)
 
     self.recording = False
+    self.paused = False
     self.buffer = AudioSegment.empty()
     self.events.idle()
     self.events.stop_rec()
@@ -61,8 +63,27 @@ class Microphone:
 
     self.buffer = AudioSegment.empty()
     self.streaming = False
+    self.paused = False
     self.events.idle()
     self.events.stop_vad()
+
+  def onPauseMic(self):
+    assert (self.recording or self.streaming) and not self.paused
+    logger.debug('pause mic')
+    self.input_stream.__exit__(None, None, None, None)
+    self.paused = True
+    self.events.idle()
+
+  def onUnpauseMic(self):
+    assert self.paused
+    self.paused = False
+    if self.recording:
+      self.makeInputStream(self.callback_recording)
+    elif self.streaming:
+      self.makeInputStream(self.callback_stream)
+    else:
+      assert False
+    self.events.active()
 
   def makeAudioSegment(self, indata, sample_width, sample_rate, channels):
     return normaliseFormat(AudioSegment(

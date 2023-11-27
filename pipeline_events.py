@@ -13,5 +13,7 @@ class PipelineEvents(events.Events):
     'start_rec',
     'stop_vad',
     'stop_rec',
-    'costs'
+    'costs',
+    'pause_mic',
+    'unpause_mic'
   )
