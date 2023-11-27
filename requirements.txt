@@ -23,6 +23,7 @@ numpy==1.26.2
 openai==1.3.2
 packaging==23.2
 pluggy==1.3.0
+prompt-toolkit==3.0.41
 pycparser==2.21
 pydantic==2.5.1
 pydantic_core==2.14.3
@@ -44,3 +45,4 @@ torchaudio==2.1.1
 tqdm==4.66.1
 typing_extensions==4.8.0
 urllib3==2.1.0
+wcwidth==0.2.12
