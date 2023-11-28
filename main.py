@@ -23,6 +23,8 @@ import logger_config
 import logger
 
 if __name__ == '__main__':
+  print('running...')
+
   logger = logger.get(__name__)
 
   parser = argparse.ArgumentParser(description='dictate')
@@ -98,5 +100,4 @@ if __name__ == '__main__':
       app.updateStatusRight(status_line.getStatusLineRight)
 
       app.run()
-  #logger.info(f'total costs incurred: {display.total_cost / 100:.2f}$')
-  logger.info(f'done')
+  print('exited.')
