@@ -2,14 +2,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
-from functools import partial
+import sys
+import os
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
 from transcriber import Transcriber
 from post_processor import PostProcessor
 from pipeline import Pipeline
 from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
-from config import readProfile, makeOutputFilename, getProfilePath
+from config import readProfile, makeOutputFilename, getProfilePath, createSkel
 from microphone import Microphone
 from beep import Beep
 from status_line import StatusLine
@@ -22,22 +25,53 @@ from cost_counter import CostCounter
 import logger_config
 import logger
 
-if __name__ == '__main__':
-  print('running...')
+def promptForProfile():
+  profile_path = getProfilePath(None)
+  available_profiles = os.listdir(profile_path)
+  available_profiles.sort(
+    key = lambda x: os.path.getatime(os.path.join(profile_path, x)),
+    reverse = True
+  )
+  available_profiles = [
+    x for x, y in [
+      os.path.splitext(entry) for entry in available_profiles
+    ]
+  ]
+  completer = WordCompleter(available_profiles)
+  print('Available profiles:\n')
+  for profile in available_profiles:
+    print(f'{profile}')
+  print('')
+  user_input = prompt(f'Select profile ({available_profiles[0]}): ', completer = completer)
+  if user_input == '':
+    user_input = available_profiles[0]
+  print(f'selected {user_input}')
+  return user_input
 
+if __name__ == '__main__':
   logger = logger.get(__name__)
 
-  parser = argparse.ArgumentParser(description = 'DrDictaphone')
-  parser.add_argument('profile', type = str, default = 'default', help = 'profile to use')
-  parser.add_argument('--output', type = str, default = None, help = 'output file')
-  args = parser.parse_args()
+  createSkel()
 
-  profile = readProfile(getProfilePath(args.profile))
+  if len(sys.argv) > 1:
+    parser = argparse.ArgumentParser(description = 'DrDictaphone')
+    parser.add_argument('profile', type = str, default = 'default', help = 'profile to use')
+    parser.add_argument('--output', type = str, default = None, help = 'output file')
+    args = parser.parse_args()
 
-  if args.output == None:
-    output = makeOutputFilename(profile.output)
+    profile = readProfile(getProfilePath(args.profile))
+
+    if args.output == None:
+      output = makeOutputFilename(profile.output)
+    else:
+      output = args.output
   else:
-    output = args.output
+    profile_path = getProfilePath(promptForProfile())
+    os.utime(profile_path, None)
+    profile = readProfile(profile_path)
+    output = makeOutputFilename(profile.output)
+
+  print('running...')
 
   chat_gpt = ChatGpt(profile.context)
 

@@ -21,8 +21,16 @@ config = {
   }
 }
 
+def createSkel():
+  dirs = [ 'profile', 'context', 'instructions', 'config' ]
+  for dir in dirs:
+    os.makedirs(os.path.join(config['directories']['config'], dir), exist_ok = True)
+
 def getProfilePath(profile):
-  return os.path.join(config['directories']['config'], 'profile', f'{profile}.yaml')
+  profile_path = os.path.join(config['directories']['config'], 'profile')
+  if profile:
+    profile_path = os.path.join(profile_path, f'{profile}.yaml')
+  return profile_path
 
 def makeOutputFilename(path):
   now = datetime.now()
