@@ -8,5 +8,5 @@ import os
 
 def get(module):
   logger = logging.getLogger(module)
-  logger.setLevel(logging.getLevelName(os.environ.get('LOG_LEVEL', 'INFO')))
+  logger.setLevel(logging.getLevelName(os.environ.get('LOG_LEVEL', 'WARNING')))
   return logger
