@@ -68,6 +68,7 @@ if __name__ == '__main__':
       connect(post_processor.__event_loop__, 'idle', status_line, 'onPOSTidle')
 
       connect(status_line, 'status_update_left', app, 'updateStatusLeft')
+      connect(status_line, 'status_update_center', app, 'updateStatusCenter')
       connect(status_line, 'status_update_right', app, 'updateStatusRight')
       connect(aggregator, 'result', app, 'updateText')
 
@@ -96,8 +97,11 @@ if __name__ == '__main__':
       connect(post_processor, 'costs', cost_counter, 'addCosts')
       connect(cost_counter, 'updated', status_line, 'onUpdateCosts')
 
-      app.updateStatusLeft(status_line.getStatusLineLeft)
-      app.updateStatusRight(status_line.getStatusLineRight)
+      connect(microphone, 'time_recorded', status_line, 'onUpdateTimeRecorded')
+
+      app.updateStatusLeft(status_line.getStatusLineLeft())
+      app.updateStatusCenter(status_line.getStatusLineCenter())
+      app.updateStatusRight(status_line.getStatusLineRight())
 
       app.run()
   print('exited.')

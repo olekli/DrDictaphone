@@ -5,7 +5,7 @@ from prompt_toolkit import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.mouse_events import MouseEventType
-from prompt_toolkit.layout.containers import HSplit, Window, WindowAlign
+from prompt_toolkit.layout.containers import HSplit, VSplit, Window, WindowAlign
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import TextArea
 from prompt_toolkit.layout.controls import FormattedTextControl
@@ -33,6 +33,10 @@ class App:
       height=1,
       align=WindowAlign.LEFT,
     )
+    self.status_bar_center = Window(
+      height=1,
+      align=WindowAlign.CENTER,
+    )
     self.status_bar_right = Window(
       height=1,
       align=WindowAlign.RIGHT,
@@ -40,8 +44,9 @@ class App:
     self.layout = Layout(
       HSplit([
         self.text_area,
-        HSplit([
+        VSplit([
           self.status_bar_left,
+          self.status_bar_center,
           self.status_bar_right
         ])
       ])
@@ -115,6 +120,11 @@ class App:
   @call_in_event_loop
   def updateStatusLeft(self, new_status):
     self.status_bar_left.content = FormattedTextControl(new_status)
+    self.app.invalidate()
+
+  @call_in_event_loop
+  def updateStatusCenter(self, new_status):
+    self.status_bar_center.content = FormattedTextControl(new_status)
     self.app.invalidate()
 
   @call_in_event_loop

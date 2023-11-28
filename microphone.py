@@ -17,6 +17,7 @@ class Microphone:
     self.recording = False
     self.streaming = False
     self.paused = False
+    self.time_recorded = 0
     self.dtype = numpy.int16
     self.sample_width = None
     self.sample_rate = None
@@ -40,9 +41,11 @@ class Microphone:
 
     self.recording = False
     self.paused = False
+    self.time_recorded = 0
     self.buffer = AudioSegment.empty()
     self.events.idle()
     self.events.stop_rec()
+    self.events.time_recorded(0)
     self.events.fence()
 
   def onStartVad(self):
@@ -95,6 +98,10 @@ class Microphone:
 
   def callback_recording(self, indata, frames, time, status):
     self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
+    time_recorded = int(len(self.buffer) / 1000)
+    if self.time_recorded != time_recorded:
+      self.time_recorded = time_recorded
+      self.events.time_recorded(self.time_recorded)
 
   def callback_stream(self, indata, frames, time, status):
     self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
