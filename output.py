@@ -9,6 +9,8 @@ class Output:
     self.events = PipelineEvents()
     self.filename = filename
     self.last_final_pos = 0
+    with open(self.filename, 'a'):
+      pass
     with open(self.filename, 'rt') as file:
       file.seek(0, os.SEEK_END)
       self.last_final_pos = file.tell()

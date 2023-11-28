@@ -5,14 +5,12 @@ Dictation app for the terminal, using Whisper for transcription and ChatGPT for 
 ### Running
 
 ```
-$ cat .env
-API_KEY=YOUR_SECRET_OPENAI_API_KEY
-LOG_LEVEL=INFO
-LOG_FILE=drdictaphone.log
+$ mkdir config
+$ echo 'YOUR_SECRET_OPENAI_API_KEY' > config/openai_api_key
 ```
 
 ```
-$ python main.py --context context/transcribe-en.yaml --output output.txt
+$ python main.py default
 ```
 
 ### Controlling:
@@ -25,11 +23,7 @@ On stopping the recording, the transcription and post-processing is invoked, but
 
 ### Voice Activation (VAD)
 
-You can start with `--enable-vad`.
-
-```
-$ python main.py --context context/transcribe-de.yaml --output output.txt --enable-vad
-```
+To enable VAD, you need to set `enable_vad: true` in your profile.
 
 This adds the control:
 
@@ -37,9 +31,23 @@ This adds the control:
 
 VAD is sketchy, though.
 
+You can still use normal recording with VAD enabled. You can disable it as it slows down application startup.
+
+### Profiles
+
+Profiles consist of:
+
+- `context` for transcribing and post-processing, see next section
+- `enable_vad` whether or not to enable VAD, a bool
+- `output` directory, a string
+
+Output will be written to a timestamped file in the output directory.
+
+If you specify `--output filename` on the command line, the specified filename will be used, ignoring the output directory.
+
 ### Contexts
 
-Contexts consist of
+Contexts consist of:
 
 - `instructions` for the post-processor, either a filename to load from or a list of strings
 - `topic` for the post-processor to give some context, a list of strings

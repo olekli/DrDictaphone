@@ -2,9 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from openai import OpenAI
-from dotenv import load_dotenv
-load_dotenv()
-import os
+from config import config
 import json
 import logger
 
@@ -44,7 +42,7 @@ class ChatGpt:
     logger.debug(f'options: {options}')
     logger.debug(f'messages: {this_messages}')
 
-    client = OpenAI(api_key = os.environ.get('API_KEY', ''))
+    client = OpenAI(api_key = config['openai_api_key'])
     self.last_completion = client.chat.completions.create(
       messages = this_messages,
       **options

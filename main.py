@@ -9,7 +9,7 @@ from pipeline import Pipeline
 from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
-from read_context import readContext
+from config import readProfile, makeOutputFilename, getProfilePath
 from microphone import Microphone
 from beep import Beep
 from status_line import StatusLine
@@ -27,26 +27,31 @@ if __name__ == '__main__':
 
   logger = logger.get(__name__)
 
-  parser = argparse.ArgumentParser(description='dictate')
-  parser.add_argument('--context', type=str, required=True, help='context')
-  parser.add_argument('--output', type=str, default=None, help='output file')
-  parser.add_argument('--enable-vad', action='store_true', default=False, help='enable VAD')
+  parser = argparse.ArgumentParser(description = 'DrDictaphone')
+  parser.add_argument('profile', type = str, default = 'default', help = 'profile to use')
+  parser.add_argument('--output', type = str, default = None, help = 'output file')
   args = parser.parse_args()
 
-  context = readContext(args.context)
-  chat_gpt = ChatGpt(context)
+  profile = readProfile(getProfilePath(args.profile))
+
+  if args.output == None:
+    output = makeOutputFilename(profile.output)
+  else:
+    output = args.output
+
+  chat_gpt = ChatGpt(profile.context)
 
   microphone = Microphone()
   pipeline_assembly = [ microphone ]
-  if args.enable_vad:
+  if profile.enable_vad:
     from vad import Vad
     vad = Vad()
     pipeline_assembly.append(vad)
-  transcriber = Transcriber(context.language)
+  transcriber = Transcriber(profile.context.language)
   pipeline_assembly.append(transcriber)
   post_processor = PostProcessor(chat_gpt)
   pipeline_assembly.append(post_processor)
-  pipeline_assembly.append(Output(args.output))
+  pipeline_assembly.append(Output(output))
   aggregator = Aggregator()
   pipeline_assembly.append(aggregator)
   cost_counter = CostCounter()
@@ -80,7 +85,7 @@ if __name__ == '__main__':
       beep = Beep()
       associateWithEventLoop(beep, beep_loop)
 
-      if args.enable_vad:
+      if profile.enable_vad:
         connect(vad, 'active', status_line, 'onVADactive')
         connect(vad, 'idle', status_line, 'onVADidle')
         connect(app, 'start_vad', pipeline, 'onStartVad')

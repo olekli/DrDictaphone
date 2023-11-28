@@ -4,10 +4,8 @@
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
-from dotenv import load_dotenv
-load_dotenv()
-import os
 from pipeline_events import PipelineEvents
+from config import config
 import logger
 logger = logger.get(__name__)
 
@@ -30,7 +28,7 @@ class Transcriber:
     ) as temp_file:
       self.buffer.export(temp_file.name, format = 'mp3')
       audio_file = open(temp_file.name, 'rb')
-      client = OpenAI(api_key = os.environ.get('API_KEY', ''))
+      client = OpenAI(api_key = config['openai_api_key'])
       transcript = client.audio.transcriptions.create(
         model = "whisper-1",
         file = audio_file,
