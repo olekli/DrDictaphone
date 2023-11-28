@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
   print('running...')
 
-  chat_gpt = ChatGpt(profile.context)
+  chat_gpt = ChatGpt(profile.post_processor)
 
   microphone = Microphone()
   pipeline_assembly = [ microphone ]
@@ -81,7 +81,7 @@ if __name__ == '__main__':
     from vad import Vad
     vad = Vad()
     pipeline_assembly.append(vad)
-  transcriber = Transcriber(profile.context.language)
+  transcriber = Transcriber(profile.language)
   pipeline_assembly.append(transcriber)
   post_processor = PostProcessor(chat_gpt)
   pipeline_assembly.append(post_processor)

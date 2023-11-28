@@ -1,3 +1,4 @@
-context: context/transcribe-en.yaml
-enable_vad: false
+topic:
+  - There is no specific topic. The transcription consists of random notes in English language.
+language: en
 output: output

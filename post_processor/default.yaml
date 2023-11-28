@@ -1,9 +1,6 @@
 instructions: instructions/post_process.yaml
-topic:
-  - Der transkribierte Text enthält allgemeine Notizen ohne bestimmtes Thema.
 gpt_model: gpt_model/gpt-4-turbo.yaml
 options:
-  temperature: 0.5
+  temperature: 0.3
   max_tokens: 2000
-language: de
 tools: tools/post_process.yaml

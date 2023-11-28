@@ -53,6 +53,12 @@ def readContentOrFile(content):
   else:
     return content
 
+def applyDefaults(defaults, content):
+  for key in defaults:
+    if key not in content:
+      content[key] = defaults[key]
+  return content
+
 def transform(transformations, content):
   for key in content:
     if key in transformations:
@@ -68,15 +74,28 @@ context_transformations = {
 }
 
 profile_transformations = {
-  'context': [readContentOrFile, lambda content: transform(context_transformations, content)]
+  'post_processor': [readContentOrFile, lambda content: transform(context_transformations, content)]
 }
 
-def readModel(Model, filename, transformations):
+profile_defaults = {
+  'post_processor': 'post_processor/default.yaml',
+  'gpt_model': None,
+  'options': None
+}
+
+def readModel(Model, filename, defaults, transformations):
   filename = makePath('config', filename)
   with open(filename, 'rt') as file:
     data = yaml.safe_load(file)
-  data = transform(transformations, data)
+  data = transform(transformations, applyDefaults(defaults, data))
+  data['post_processor']['topic'] = data['topic']
+  data['post_processor']['language'] = data['language']
+  if data['gpt_model']:
+    data['post_processor']['gpt_model'] = data['gpt_model']
+  if data['options']:
+    data['post_processor']['options'] = { **data['post_processor']['options'], **data['options'] }
   return Model(**data)
 
 def readProfile(filename):
-  return readModel(Profile, filename, profile_transformations)
+  profile = readModel(Profile, filename, profile_defaults, profile_transformations)
+  return profile

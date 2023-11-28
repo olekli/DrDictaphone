@@ -16,9 +16,9 @@ class Context(BaseModel):
   gpt_model: GptModel
   options: Options
   instructions: Instructions
-  topic: Instructions
-  language: str
+  topic: Optional[Instructions]
+  language: Optional[str]
   tools: Optional[Tools]
 
   def __str__(self):
-    return f'{self.gpt_model}, {self.options}, {self.instructions}, {self.language}, {self.tools}'
+    return f'{self.gpt_model}, {self.options}, {self.instructions}, {self.topic}, {self.language}, {self.tools}'

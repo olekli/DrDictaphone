@@ -32,7 +32,7 @@ class ChatGpt:
     this_messages = list(self.messages)
     this_messages += [ makeMessage('user', question) ]
 
-    options = self.context.options.model_dump()
+    options = dict(self.context.options)
     options['model'] = self.context.gpt_model.name
     options['stream'] = False
     if self.context.tools:
