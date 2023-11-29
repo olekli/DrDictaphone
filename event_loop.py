@@ -22,6 +22,8 @@ def connect(emitter, event_name, receiver, slot_name):
   if event_name == None and slot_name == None:
     for event_name in emitter.events.__events__:
       slot_name = makeSlotName(event_name)
+      if not getattr(receiver, slot_name, None) and event_name in receiver.events.__events__:
+        forwardEvents(receiver, [event_name])
       if callable(getattr(receiver, slot_name, None)):
         connect_(emitter, event_name, receiver, slot_name)
   elif event_name == None or slot_name == None:

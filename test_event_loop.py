@@ -5,6 +5,7 @@ import pytest
 from event_loop import EventLoop, connect, associateWithEventLoop, forwardEvents
 from events import Events
 from event_spy import EventSpy
+import time
 
 class DummyClass:
   def __init__(self):
@@ -90,17 +91,50 @@ def test_full_connect_works():
 
 def test_forward_works():
   sender = DummyClass()
+  receiver = DummyClass()
   spy = EventSpy([ 'forward1', 'forward2' ])
 
   with EventLoop() as event_loop:
     associateWithEventLoop(sender, event_loop)
+    associateWithEventLoop(receiver, event_loop)
     associateWithEventLoop(spy, event_loop)
-    forwardEvents(sender, [ 'forward1', 'forward2' ])
-    connect(sender, 'forward1', spy, 'onForward1')
-    connect(sender, 'forward2', spy, 'onForward2')
+    forwardEvents(receiver, [ 'forward1', 'forward2' ])
+    connect(sender, 'forward1', receiver, 'onForward1')
+    connect(sender, 'forward2', receiver, 'onForward2')
+    connect(receiver, 'forward1', spy, 'onForward1')
+    connect(receiver, 'forward2', spy, 'onForward2')
 
     sender.events.forward1('123')
     sender.events.forward2('456')
 
+    time.sleep(0.1)
+
+  assert getattr(spy, 'forward1') == [ '123' ]
+  assert getattr(spy, 'forward2') == [ '456' ]
+
+def test_full_connect_also_forwards_unimplemented():
+  sender = DummyClass()
+  receiver = DummyClass()
+  spy = EventSpy([ 'forward1', 'forward2' ])
+
+  with EventLoop() as event_loop:
+    associateWithEventLoop(sender, event_loop)
+    associateWithEventLoop(receiver, event_loop)
+    associateWithEventLoop(spy, event_loop)
+    connect(sender, None, receiver, None)
+    connect(receiver, 'forward1', spy, 'onForward1')
+    connect(receiver, 'forward2', spy, 'onForward2')
+
+    sender.events.new_result('foo')
+    sender.events.updated('bar')
+    sender.events.updated('lol')
+    sender.events.forward1('123')
+    sender.events.new_result('baz')
+    sender.events.forward2('456')
+
+    time.sleep(0.1)
+
+  assert getattr(receiver, 'new_result') == [ 'foo', 'baz' ]
+  assert getattr(receiver, 'updated') == [ 'bar', 'lol' ]
   assert getattr(spy, 'forward1') == [ '123' ]
   assert getattr(spy, 'forward2') == [ '456' ]
