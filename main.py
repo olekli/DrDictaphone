@@ -12,7 +12,7 @@ from pipeline import Pipeline
 from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
-from config import readProfile, makeOutputFilename, getProfilePath, createSkel
+from config import readProfile, makeOutputFilename, getProfilePath
 from microphone import Microphone
 from beep import Beep
 from status_line import StatusLine
@@ -50,8 +50,6 @@ def promptForProfile():
 
 if __name__ == '__main__':
   logger = logger.get(__name__)
-
-  createSkel()
 
   if len(sys.argv) > 1:
     parser = argparse.ArgumentParser(description = 'DrDictaphone')

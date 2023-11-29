@@ -2,18 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-from dotenv import load_dotenv
-load_dotenv()
-import os
+from config import config
 
-config = {
+logger_config = {
   'level': logging.WARNING,
+  'filename': config['paths']['log'],
   'format': '%(levelname)s: %(name)s: %(message)s'
 #  format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 }
 
-filename = os.environ.get('LOG_FILE', None)
-if filename:
-  config['filename'] = filename
-
-logging.basicConfig(**config)
+logging.basicConfig(**logger_config)

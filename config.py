@@ -4,35 +4,85 @@
 from dotenv import load_dotenv
 load_dotenv()
 import os
+import sys
 import yaml
 from datetime import datetime
 from model.context import Context
 from model.profile import Profile
 
-def getApiKey(config_dir):
-  with open(os.path.join(config_dir, 'config', 'openai_api_key'), 'rt') as file:
-    return file.read().rstrip('\n')
-
 config = {
-  'openai_api_key': getApiKey(os.environ.get('CONFIG_DIR', '.')),
-  'directories': {
-    'config': {
-      'default': os.environ.get('CONFIG_DIR', '.'),
-      'fallback': os.environ.get('CONFIG_FALLBACK_DIR', '.'),
-    },
-    'output': {
-      'default': os.environ.get('OUTPUT_DIR', '.'),
-    }
+  'loglevel': os.environ.get('LOG_LEVEL', 'WARNING'),
+  'logfile': os.environ.get('LOG_FILE', 'drdictaphone.log'),
+  'is_frozen': getattr(sys, 'frozen', False),
+  'paths': {
+    'config': {},
+    'output': {}
   }
 }
 
-def createSkel():
-  dirs = [ 'profile', 'context', 'instructions', 'config' ]
-  for dir in dirs:
-    os.makedirs(os.path.join(config['directories']['config']['default'], dir), exist_ok = True)
+user_path = os.path.expanduser('~/DrDictaphone')
+
+if config['is_frozen']:
+  config['paths']['application'] = sys._MEIPASS
+  config['paths']['log'] = os.path.join(user_path, config['logfile'])
+  config['paths']['config']['user'] = os.path.join(user_path)
+  config['paths']['config']['internal'] = config['paths']['application']
+  config['paths']['output']['user'] = os.path.join(user_path, 'output')
+  config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+else:
+  config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
+  config['paths']['log'] = os.path.join(config['paths']['application'], config['logfile'])
+  config['paths']['config']['user'] = config['paths']['application']
+  config['paths']['output']['user'] = os.path.join(config['paths']['application'], 'output')
+  config['paths']['config']['internal'] = config['paths']['application']
+  config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+
+def getPath(type, path):
+  if os.path.isabs(path):
+    return path
+  else:
+    if 'user' in config['paths'][type]:
+      user_path = os.path.join(config['paths'][type]['user'], path)
+      if not os.path.exists(user_path) and 'internal' in config['paths'][type]:
+        user_path = os.path.join(config['paths'][type]['internal'], path)
+      return user_path
+    elif isinstance(config['paths'][type], str):
+      user_path = os.path.join(config['paths'][type], path)
+      return user_path
+    else:
+      assert False
+
+def createConfigSkel():
+  os.makedirs(os.path.join(config['paths']['config']['user'], 'config'), exist_ok = True)
+  if not os.path.exists(os.path.join(config['paths']['config']['user'], 'profile')):
+    os.makedirs(os.path.join(config['paths']['config']['user'], 'profile'), exist_ok = True)
+    source = os.path.join(config['paths']['config']['internal'], 'profile', 'default.yaml')
+    target =  os.path.join(config['paths']['config']['user'], 'profile', 'default.yaml')
+    with open(source, 'rt') as file:
+      default = file.read()
+    with open(target, 'wt') as file:
+      file.write(default)
+
+createConfigSkel()
+
+def getApiKey():
+  path = config['paths']['openai_api_key']
+  key = None
+  if os.path.exists(path):
+    with open(path, 'rt') as file:
+      key = file.read().rstrip('\n')
+  else:
+    with open(path, 'at'):
+      pass
+  if not key:
+    print(f'Please provide OpenAI API key in file: {path}')
+    sys.exit(1)
+  return key
+
+config['openai_api_key'] = getApiKey()
 
 def getProfilePath(profile):
-  profile_path = makePath('config', 'profile', False)
+  profile_path = getPath('config', 'profile')
   if profile:
     profile_path = os.path.join(profile_path, f'{profile}.yaml')
   return profile_path
@@ -40,22 +90,13 @@ def getProfilePath(profile):
 def makeOutputFilename(path):
   now = datetime.now()
   timestamp = now.strftime("%Y-%m-%d_%H-%M-%S")
-  path = makePath('output', path, False)
+  path = getPath('output', path)
   os.makedirs(path, exist_ok = True)
   return os.path.join(path, f'{timestamp}.txt')
 
-def makePath(type, path, allow_fallback = False):
-  if os.path.isabs(path):
-    return path
-  else:
-    path = os.path.join(config['directories'][type]['default'], path)
-    if not os.path.exists(path) and allow_fallback:
-      path = os.path.join(config['directories'][type]['fallback'], path)
-    return path
-
 def readContentOrFile(content):
   if isinstance(content, str):
-    with open(makePath('config', content, True), 'rt') as file:
+    with open(getPath('config', content), 'rt') as file:
       data = yaml.safe_load(file)
       return data
   else:
@@ -92,7 +133,7 @@ profile_defaults = {
 }
 
 def readModel(Model, filename, defaults, transformations):
-  filename = makePath('config', filename, True)
+  filename = getPath('config', filename)
   with open(filename, 'rt') as file:
     data = yaml.safe_load(file)
   data = transform(transformations, applyDefaults(defaults, data))
