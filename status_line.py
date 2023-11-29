@@ -18,8 +18,9 @@ class StatusLine:
   def makeClosure(self, item, status):
     return lambda: self.onUpdateActivity(item, status)
 
-  def __init__(self):
+  def __init__(self, profile_name):
     self.events = Events(('status_update_left', 'status_update_center', 'status_update_right'))
+    self.profile_name = profile_name
     self.items = [ 'MIC', 'VAD', 'TRANS', 'POST', 'OUT' ]
     self.status = {
       'MIC': False,
@@ -56,7 +57,7 @@ class StatusLine:
     return status_line
 
   def getStatusLineCenter(self):
-    status_line = f'{int(self.time_recorded/60):02d}:{self.time_recorded%60:02d}'
+    status_line = f'{self.profile_name}    {int(self.time_recorded/60):02d}:{self.time_recorded%60:02d}'
     return status_line
 
   def getStatusLineRight(self):

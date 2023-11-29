@@ -58,14 +58,16 @@ if __name__ == '__main__':
     parser.add_argument('--output', type = str, default = None, help = 'output file')
     args = parser.parse_args()
 
-    profile = readProfile(getProfilePath(args.profile))
+    profile_name = args.profile
+    profile = readProfile(getProfilePath(profile_name))
 
     if args.output == None:
       output = makeOutputFilename(profile.output)
     else:
       output = args.output
   else:
-    profile_path = getProfilePath(promptForProfile())
+    profile_name = promptForProfile()
+    profile_path = getProfilePath(profile_name)
     os.utime(profile_path, None)
     profile = readProfile(profile_path)
     output = makeOutputFilename(profile.output)
@@ -99,7 +101,7 @@ if __name__ == '__main__':
       app = App()
       associateWithEventLoop(app, main_loop)
 
-      status_line = StatusLine()
+      status_line = StatusLine(profile_name)
       associateWithEventLoop(status_line, main_loop)
       connect(microphone, 'active', status_line, 'onMICactive')
       connect(microphone, 'idle', status_line, 'onMICidle')
