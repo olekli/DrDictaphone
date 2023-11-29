@@ -22,6 +22,7 @@ from aggregator import Aggregator
 from app import App
 from event_loop import EventLoop, connect, associateWithEventLoop
 from cost_counter import CostCounter
+from output_command import OutputCommand
 import logger_config
 import logger
 
@@ -86,6 +87,9 @@ if __name__ == '__main__':
   pipeline_assembly.append(Output(output))
   aggregator = Aggregator()
   pipeline_assembly.append(aggregator)
+  if profile.output_command:
+    output_command = OutputCommand(profile.output_command)
+    pipeline_assembly.append(output_command)
   cost_counter = CostCounter()
   with Pipeline(pipeline_assembly) as pipeline:
     with EventLoop() as main_loop, EventLoop() as beep_loop:

@@ -2,3 +2,4 @@ topic:
   - There is no specific topic. The transcription consists of random notes in English language.
 language: en
 output: general
+output_command: pbcopy

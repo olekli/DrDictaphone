@@ -129,7 +129,8 @@ profile_transformations = {
 profile_defaults = {
   'post_processor': 'post_processor/default.yaml',
   'gpt_model': None,
-  'options': None
+  'options': None,
+  'output_command': None,
 }
 
 def readModel(Model, filename, defaults, transformations):
