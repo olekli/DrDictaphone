@@ -16,5 +16,6 @@ class PipelineEvents(events.Events):
     'costs',
     'pause_mic',
     'unpause_mic',
-    'time_recorded'
+    'time_recorded',
+    'clear_buffer',
   )

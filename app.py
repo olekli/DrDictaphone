@@ -25,7 +25,7 @@ def call_in_event_loop(method):
 
 class App:
   def __init__(self):
-    self.events = Events(('start_rec', 'stop_rec', 'start_vad', 'stop_vad', 'pause_mic', 'unpause_mic'))
+    self.events = Events(('start_rec', 'stop_rec', 'start_vad', 'stop_vad', 'pause_mic', 'unpause_mic', 'clear_buffer'))
     self.bindings = self.makeKeyBinds()
     self.text_area = TextArea(focusable = False, read_only = True)
     self.status_bar_left = Window(
@@ -70,6 +70,7 @@ class App:
     bindings.add(' ')(lambda event: self.togglePauseMic())
     bindings.add(Keys.Vt100MouseEvent)(self.onMouseEvent)
     bindings.add('p')(lambda event: self.toggleRecording())
+    bindings.add('c')(lambda event: self.events.clear_buffer())
 
     return bindings
 

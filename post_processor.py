@@ -16,8 +16,6 @@ class PostProcessor:
     self.attempts = 0
     self.max_attempts = 5
 
-    self.history = []
-
   def makeText(self):
     return ' '.join([line for line in self.text_buffer if line is not None])
 
@@ -33,7 +31,6 @@ class PostProcessor:
         if self.attempts >= self.max_attempts:
           logger.warning(f'accepting incoherent unit of text: {response["result"]}')
         self.text_buffer = [None]
-        self.history.append(Exchange(user_message = text, assistant_message = response['result']))
         self.attempts = 0
         self.events.fence()
         return True
@@ -51,3 +48,8 @@ class PostProcessor:
     if len(text) > 0:
       self.text_buffer.append(None)
       self.tryGpt(text)
+
+  def onClearBuffer(self):
+    self.text_buffer = [None]
+    self.attempts = 0
+    self.events.clear_buffer()

@@ -120,6 +120,8 @@ if __name__ == '__main__':
       connect(app, 'pause_mic', pipeline, 'onPauseMic')
       connect(app, 'unpause_mic', pipeline, 'onUnpauseMic')
 
+      connect(app, 'clear_buffer', pipeline, 'onClearBuffer')
+
       beep = Beep()
       associateWithEventLoop(beep, beep_loop)
 

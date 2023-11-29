@@ -20,3 +20,9 @@ class Aggregator:
 
   def makeText(self):
     return '\n\n'.join(self.final + [self.buffer])
+
+  def onClearBuffer(self):
+    self.final = []
+    self.buffer = ''
+    self.events.result('')
+    self.events.clear_buffer()

@@ -62,3 +62,8 @@ class Transcriber:
       self.mark = 0
       self.events.result(text)
     self.events.fence()
+
+  def onClearBuffer(self):
+    self.text_buffer = ''
+    self.mark = 0
+    self.events.clear_buffer()
