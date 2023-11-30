@@ -7,6 +7,7 @@ import sys
 import os
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit.shortcuts import set_title
 from transcriber import Transcriber
 from post_processor import PostProcessor
 from pipeline import Pipeline
@@ -52,6 +53,8 @@ def promptForProfile():
 if __name__ == '__main__':
   logger = logger.get(__name__)
 
+  set_title('DrDictaphone')
+
   if len(sys.argv) > 1:
     parser = argparse.ArgumentParser(description = 'DrDictaphone')
     parser.add_argument('profile', type = str, default = 'default', help = 'profile to use')
@@ -71,6 +74,8 @@ if __name__ == '__main__':
     os.utime(profile_path, None)
     profile = readProfile(profile_path)
     output = makeOutputFilename(profile.output)
+
+  set_title(profile_name)
 
   print('running...')
 
