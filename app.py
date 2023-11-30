@@ -24,8 +24,9 @@ def call_in_event_loop(method):
   return wrapper
 
 class App:
-  def __init__(self):
+  def __init__(self, enable_vad):
     self.events = Events(('start_rec', 'stop_rec', 'start_vad', 'stop_vad', 'pause_mic', 'unpause_mic', 'clear_buffer'))
+    self.enable_vad = enable_vad
     self.bindings = self.makeKeyBinds()
     self.text_area = TextArea(focusable = False, read_only = True)
     self.status_bar_left = Window(
@@ -65,11 +66,14 @@ class App:
   def makeKeyBinds(self):
     bindings = KeyBindings()
 
+    if self.enable_vad:
+      bindings.add(' ')(lambda event: self.toggleVad())
+    else:
+      bindings.add(' ')(lambda event: self.togglePauseMic())
+      bindings.add('p')(lambda event: self.toggleRecording())
+
     bindings.add('q')(lambda event: self.exit())
-    bindings.add('v')(lambda event: self.toggleVad())
-    bindings.add(' ')(lambda event: self.togglePauseMic())
     bindings.add(Keys.Vt100MouseEvent)(self.onMouseEvent)
-    bindings.add('p')(lambda event: self.toggleRecording())
     bindings.add('c')(lambda event: self.events.clear_buffer())
 
     return bindings
@@ -77,9 +81,13 @@ class App:
   def onMouseEvent(self, event):
     data = event.key_sequence[0].data.split(';')
     if data[0] == '\x1b[<0' and data[2][-1] == 'm': # dafuq...
-      self.togglePauseMic()
+      if self.enable_vad:
+        self.toggleVad()
+      else:
+        self.togglePauseMic()
     elif data[0] == '\x1b[<2' and data[2][-1] == 'm': # dafuq...
-      self.toggleRecording()
+      if not self.enable_vad:
+        self.toggleRecording()
 
   def togglePauseMic(self):
     if self.is_vad or self.is_recording:
