@@ -9,6 +9,9 @@ import yaml
 from datetime import datetime
 from model.context import Context
 from model.profile import Profile
+from find_ffmpeg import findFfmpeg
+
+findFfmpeg()
 
 config = {
   'loglevel': os.environ.get('LOG_LEVEL', 'WARNING'),

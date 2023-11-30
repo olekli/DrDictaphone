@@ -1,6 +1,7 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from config import readProfile, makeOutputFilename, getProfilePath
 import argparse
 import sys
 import os
@@ -12,7 +13,6 @@ from pipeline import Pipeline
 from audio_tools import normaliseFormat
 from pydub import AudioSegment
 from output import Output
-from config import readProfile, makeOutputFilename, getProfilePath
 from microphone import Microphone
 from beep import Beep
 from status_line import StatusLine
