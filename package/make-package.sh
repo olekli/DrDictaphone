@@ -2,23 +2,9 @@
 
 cd package/icon &&
 sh make-icns.sh &&
-cd ../..
+cd ../.. &&
 
-pyinstaller \
-  --name drdictaphone-internal \
-  --add-data=post_processor:post_processor \
-  --add-data=instructions:instructions \
-  --add-data=tools:tools \
-  --add-data=gpt_model:gpt_model \
-  --add-data=profile:profile \
-  --noconfirm \
-  main.py &&
-
-pyinstaller \
-  --name DrDictaphone \
-  --windowed \
-  --add-data=dist/drdictaphone-internal:app \
-  --add-data=package/kitty-default.conf:. \
-  --icon package/icon/icon.icns \
-  --noconfirm \
-  package/launch.py
+ln -fs package/drdictaphone-internal.spec . &&
+ln -fs package/DrDictaphone.spec . &&
+pyinstaller --noconfirm drdictaphone-internal.spec &&
+pyinstaller --noconfirm DrDictaphone.spec

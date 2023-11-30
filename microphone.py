@@ -111,6 +111,7 @@ class Microphone:
 
   def makeInputStream(self, callback):
     device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
+    logger.info(f'recording on device: {device_info["name"]}')
     self.sample_rate = int(device_info['default_samplerate'])
     self.channels = device_info['max_input_channels']
     self.sample_width = numpy.dtype(self.dtype).itemsize

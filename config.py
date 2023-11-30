@@ -14,7 +14,7 @@ from find_ffmpeg import findFfmpeg
 findFfmpeg()
 
 config = {
-  'loglevel': os.environ.get('LOG_LEVEL', 'WARNING'),
+  'loglevel': os.environ.get('LOG_LEVEL', 'INFO'),
   'logfile': os.environ.get('LOG_FILE', 'drdictaphone.log'),
   'is_frozen': getattr(sys, 'frozen', False),
   'paths': {

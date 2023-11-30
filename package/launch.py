@@ -3,7 +3,7 @@ import sys
 
 kitty_command = f'/Applications/kitty.app/Contents/MacOS/kitty'
 dr_command = f'{sys._MEIPASS}/app/drdictaphone-internal'
-config_path = f'{sys._MEIPASS}/kitty.conf'
+config_path = f'{os.path.expanduser("~/DrDictaphone")}/config/.assembled-kitty.conf'
 default_config_path = f'{sys._MEIPASS}/kitty-default.conf'
 user_config_path = f'{os.path.expanduser("~/DrDictaphone")}/config/kitty.conf'
 
