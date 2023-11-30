@@ -26,7 +26,8 @@ class ChatGpt:
     self.last_cost = 0
 
     self.messages = [ makeMessage('system', m) for m in self.context.instructions ]
-    self.messages += [ makeMessage('system', m) for m in self.context.topic ]
+    if self.context.topic:
+      self.messages += [ makeMessage('system', m) for m in self.context.topic ]
 
   def ask(self, question):
     this_messages = list(self.messages)
