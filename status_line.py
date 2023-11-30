@@ -30,7 +30,7 @@ class StatusLine:
       'OUT': False
     }
     self.costs = 0
-    self.time_recorded = 0
+    self.time_recorded = None
     for item in self.items:
       setattr(self, f'on{item}active', self.makeClosure(item, True))
       setattr(self, f'on{item}idle', self.makeClosure(item, False))
@@ -57,7 +57,10 @@ class StatusLine:
     return status_line
 
   def getStatusLineCenter(self):
-    status_line = f'{self.profile_name}    {int(self.time_recorded/60):02d}:{self.time_recorded%60:02d}'
+    if self.time_recorded != None:
+      status_line = f'{self.profile_name}    {int(self.time_recorded/60):02d}:{self.time_recorded%60:02d}'
+    else:
+      status_line = f'{self.profile_name}'
     return status_line
 
   def getStatusLineRight(self):

@@ -17,7 +17,6 @@ from output import Output
 from microphone import Microphone
 from beep import Beep
 from status_line import StatusLine
-from display import Display
 from chat_gpt import ChatGpt
 from aggregator import Aggregator
 from app import App
@@ -84,8 +83,8 @@ if __name__ == '__main__':
   microphone = Microphone()
   pipeline_assembly = [ microphone ]
   if profile.enable_vad:
-    #from vad import Vad
-    vad = Vad()
+    from vad_light import VadLight
+    vad = VadLight()
     pipeline_assembly.append(vad)
   transcriber = Transcriber(profile.language)
   pipeline_assembly.append(transcriber)
@@ -103,7 +102,7 @@ if __name__ == '__main__':
       associateWithEventLoop(pipeline, main_loop)
       associateWithEventLoop(cost_counter, main_loop)
 
-      app = App()
+      app = App(profile.enable_vad)
       associateWithEventLoop(app, main_loop)
 
       status_line = StatusLine(profile_name)
@@ -135,8 +134,6 @@ if __name__ == '__main__':
         connect(vad, 'idle', status_line, 'onVADidle')
         connect(app, 'start_vad', pipeline, 'onStartVad')
         connect(app, 'stop_vad', pipeline, 'onStopVad')
-        connect(app, 'start_vad', beep, 'beepHighLong')
-        connect(app, 'stop_vad', beep, 'beepLowLong')
 
       connect(app, 'start_rec', beep, 'beepHighLong')
       connect(app, 'stop_rec', beep, 'beepLowLong')
