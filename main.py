@@ -84,7 +84,7 @@ if __name__ == '__main__':
   microphone = Microphone()
   pipeline_assembly = [ microphone ]
   if profile.enable_vad:
-    from vad import Vad
+    #from vad import Vad
     vad = Vad()
     pipeline_assembly.append(vad)
   transcriber = Transcriber(profile.language)

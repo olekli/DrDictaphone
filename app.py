@@ -55,7 +55,7 @@ class App:
       layout = self.layout,
       key_bindings = self.bindings,
       full_screen = True,
-      mouse_support = True
+      mouse_support = False
     )
 
     self.is_recording = False

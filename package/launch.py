@@ -6,6 +6,9 @@ dr_command = f'{sys._MEIPASS}/app/drdictaphone-internal'
 config_path = f'{os.path.expanduser("~/DrDictaphone")}/config/.assembled-kitty.conf'
 default_config_path = f'{sys._MEIPASS}/kitty-default.conf'
 user_config_path = f'{os.path.expanduser("~/DrDictaphone")}/config/kitty.conf'
+user_path = os.path.expanduser('~/DrDictaphone/config')
+
+os.makedirs(user_path, exist_ok = True)
 
 if not os.path.exists(user_config_path):
   with open(default_config_path, 'rt') as source:

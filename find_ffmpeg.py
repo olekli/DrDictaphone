@@ -4,7 +4,7 @@
 import shutil
 import os
 
-paths = [ '/bin', '/usr/bin', '/usr/local/bin' ]
+paths = [ '/bin', '/usr/bin', '/usr/local/bin', '/opt/homebrew/bin' ]
 
 def findFfmpeg():
   path = shutil.which('ffmpeg')

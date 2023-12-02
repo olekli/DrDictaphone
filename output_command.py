@@ -18,7 +18,7 @@ class OutputCommand:
       stdin = subprocess.PIPE,
       stdout = subprocess.PIPE,
       stderr = subprocess.PIPE,
-      text=True
+      text = True
     )
     output, error = process.communicate(input = result)
     if process.returncode != 0:
