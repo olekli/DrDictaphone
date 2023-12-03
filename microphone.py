@@ -15,7 +15,6 @@ class Microphone:
     self.events = PipelineEvents()
     self.buffer = AudioSegment.empty()
     self.recording = False
-    self.streaming = False
     self.paused = False
     self.time_recorded = 0
     self.dtype = numpy.int16
@@ -24,7 +23,7 @@ class Microphone:
     self.channels = None
 
   def onStartRec(self):
-    assert not self.recording and not self.streaming
+    assert not self.recording
     logger.debug('start recording')
     self.recording = True
     self.makeInputStream(self.callback_recording)
@@ -48,30 +47,8 @@ class Microphone:
     self.events.time_recorded(0)
     self.events.fence()
 
-  def onStartVad(self):
-    assert not self.recording and not self.streaming
-    logger.debug('start stream')
-    self.streaming = True
-    self.events.active()
-    self.makeInputStream(self.callback_stream)
-    self.events.start_vad()
-
-  def onStopVad(self):
-    assert self.streaming
-    logger.debug('stop stream')
-    self.input_stream.__exit__(None, None, None, None)
-
-    if len(self.buffer) > 0:
-      self.events.result(self.buffer)
-
-    self.buffer = AudioSegment.empty()
-    self.streaming = False
-    self.paused = False
-    self.events.idle()
-    self.events.stop_vad()
-
   def onPauseMic(self):
-    assert (self.recording or self.streaming) and not self.paused
+    assert self.recording and not self.paused
     logger.debug('pause mic')
     self.input_stream.__exit__(None, None, None, None)
     self.paused = True
@@ -80,12 +57,7 @@ class Microphone:
   def onUnpauseMic(self):
     assert self.paused
     self.paused = False
-    if self.recording:
-      self.makeInputStream(self.callback_recording)
-    elif self.streaming:
-      self.makeInputStream(self.callback_stream)
-    else:
-      assert False
+    self.makeInputStream(self.callback_recording)
     self.events.active()
 
   def makeAudioSegment(self, indata, sample_width, sample_rate, channels):
@@ -102,12 +74,6 @@ class Microphone:
     if self.time_recorded != time_recorded:
       self.time_recorded = time_recorded
       self.events.time_recorded(self.time_recorded)
-
-  def callback_stream(self, indata, frames, time, status):
-    self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
-    if len(self.buffer) >= 1000:
-      self.events.result(self.buffer)
-      self.buffer = AudioSegment.empty()
 
   def makeInputStream(self, callback):
     device_info = sounddevice.query_devices(sounddevice.default.device, 'input')

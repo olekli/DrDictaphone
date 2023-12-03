@@ -83,8 +83,8 @@ if __name__ == '__main__':
   microphone = Microphone()
   pipeline_assembly = [ microphone ]
   if profile.enable_vad:
-    from vad_light import VadLight
-    vad = VadLight()
+    from static_vad import StaticVad
+    vad = StaticVad()
     pipeline_assembly.append(vad)
   transcriber = Transcriber(profile.language)
   pipeline_assembly.append(transcriber)
@@ -102,7 +102,7 @@ if __name__ == '__main__':
       associateWithEventLoop(pipeline, main_loop)
       associateWithEventLoop(cost_counter, main_loop)
 
-      app = App(profile.enable_vad)
+      app = App()
       associateWithEventLoop(app, main_loop)
 
       status_line = StatusLine(profile_name)
@@ -130,12 +130,8 @@ if __name__ == '__main__':
       associateWithEventLoop(beep, beep_loop)
 
       if profile.enable_vad:
-        connect(vad, 'active', status_line, 'onVADactive')
-        connect(vad, 'idle', status_line, 'onVADidle')
-        connect(app, 'start_vad', pipeline, 'onStartVad')
-        connect(app, 'stop_vad', pipeline, 'onStopVad')
-        connect(app, 'start_vad', beep, 'beepHighLong')
-        connect(app, 'stop_vad', beep, 'beepLowLong')
+        connect(vad.__event_loop__, 'active', status_line, 'onVADactive')
+        connect(vad.__event_loop__, 'idle', status_line, 'onVADidle')
 
       connect(app, 'start_rec', beep, 'beepHighLong')
       connect(app, 'stop_rec', beep, 'beepLowLong')

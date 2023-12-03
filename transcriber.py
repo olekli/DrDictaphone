@@ -46,6 +46,7 @@ class Transcriber:
       return transcript.text
 
   def onResult(self, audio_segment):
+    logger.debug(f'received audio of length: {len(audio_segment)}')
     self.buffer += audio_segment
     text = self.transcribeBuffer()
     self.events.result(text)
