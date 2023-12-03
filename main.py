@@ -134,6 +134,8 @@ if __name__ == '__main__':
         connect(vad, 'idle', status_line, 'onVADidle')
         connect(app, 'start_vad', pipeline, 'onStartVad')
         connect(app, 'stop_vad', pipeline, 'onStopVad')
+        connect(app, 'start_vad', beep, 'beepHighLong')
+        connect(app, 'stop_vad', beep, 'beepLowLong')
 
       connect(app, 'start_rec', beep, 'beepHighLong')
       connect(app, 'stop_rec', beep, 'beepLowLong')
