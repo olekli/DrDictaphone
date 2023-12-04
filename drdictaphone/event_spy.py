@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from events import Events
-from event_loop import makeSlotName
+from drdictaphone.event_loop import makeSlotName
 
 class EventSpy:
   def __init__(self, events):

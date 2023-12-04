@@ -1,10 +1,10 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from main import Main
-from pipeline_events import PipelineEvents
-from event_loop import EventLoop, connect,forwardEvents
-import logger
+from drdictaphone.main import Main
+from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone.event_loop import EventLoop, connect,forwardEvents
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

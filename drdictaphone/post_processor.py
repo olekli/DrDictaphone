@@ -1,9 +1,9 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from pipeline_events import PipelineEvents
-from model.exchange import Exchange
-import logger
+from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone.model.exchange import Exchange
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

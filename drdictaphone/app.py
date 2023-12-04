@@ -11,7 +11,7 @@ from prompt_toolkit.widgets import TextArea
 from prompt_toolkit.layout.controls import FormattedTextControl
 from events import Events
 from functools import partial
-import logger
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

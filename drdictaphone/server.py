@@ -5,9 +5,9 @@ import os
 import socket
 import signal
 from jsonrpclib.SimpleJSONRPCServer import SimpleJSONRPCServer
-from main import Main
-import logger_config
-import logger
+from drdictaphone.main import Main
+import drdictaphone.logger_config
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

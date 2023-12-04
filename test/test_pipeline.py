@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-from pipeline import Pipeline
+from drdictaphone.pipeline import Pipeline
 from events import Events
 from queue import Queue
 

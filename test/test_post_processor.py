@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-from post_processor import PostProcessor
-import logger_config
+from drdictaphone.post_processor import PostProcessor
+import drdictaphone.logger_config
 
 class DummyGpt:
   def __init__(self):

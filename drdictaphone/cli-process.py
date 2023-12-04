@@ -3,8 +3,8 @@
 
 import argparse
 
-from chat_gpt import ChatGpt
-from read_context import readContext
+from drdictaphone.chat_gpt import ChatGpt
+from drdictaphone.read_context import readContext
 
 parser = argparse.ArgumentParser(description='gpt-prompt cli')
 parser.add_argument('--context', type = str, required = True, help = 'context')

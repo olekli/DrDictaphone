@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from pydub import AudioSegment
-from audio_tools import normaliseFormat
+from drdictaphone.audio_tools import normaliseFormat
 from events import Events
 
 class FileStream:
