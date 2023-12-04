@@ -1,0 +1,5 @@
+recursive-include  drdictaphone/gpt_model *
+recursive-include  drdictaphone/instructions *
+recursive-include  drdictaphone/post_processor *
+recursive-include  drdictaphone/profile *
+recursive-include  drdictaphone/tools *

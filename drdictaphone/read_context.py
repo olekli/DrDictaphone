@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import yaml
-from model.context import Context
+from drdictaphone.model.context import Context
 
 read_from_file = [ 'tools', 'gpt_model', 'options', 'instructions' ]
 

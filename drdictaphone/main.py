@@ -1,19 +1,19 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from config import readProfile, makeOutputFilename, getProfilePath
 import os
-from microphone import Microphone
-from transcriber import Transcriber
-from chat_gpt import ChatGpt
-from post_processor import PostProcessor
-from output import Output
-from aggregator import Aggregator
-from output_command import OutputCommand
-from cost_counter import CostCounter
-from pipeline import Pipeline
-from event_loop import EventLoop, connect, associateWithEventLoop
-import logger
+from drdictaphone.config import readProfile, makeOutputFilename, getProfilePath
+from drdictaphone.microphone import Microphone
+from drdictaphone.transcriber import Transcriber
+from drdictaphone.chat_gpt import ChatGpt
+from drdictaphone.post_processor import PostProcessor
+from drdictaphone.output import Output
+from drdictaphone.aggregator import Aggregator
+from drdictaphone.output_command import OutputCommand
+from drdictaphone.cost_counter import CostCounter
+from drdictaphone.pipeline import Pipeline
+from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

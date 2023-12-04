@@ -4,7 +4,7 @@
 from queue import SimpleQueue
 from threading import Thread
 from events import Events
-import logger
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

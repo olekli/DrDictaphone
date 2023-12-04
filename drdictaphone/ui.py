@@ -1,20 +1,20 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from config import getProfilePath
 import argparse
 import sys
 import os
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.shortcuts import set_title
-from beep import Beep
-from status_line import StatusLine
-from app import App
-from event_loop import EventLoop, connect, associateWithEventLoop
-from main import Main
-import logger_config
-import logger
+from drdictaphone.config import getProfilePath
+from drdictaphone.beep import Beep
+from drdictaphone.status_line import StatusLine
+from drdictaphone.app import App
+from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop
+from drdictaphone.main import Main
+import drdictaphone.logger_config
+from drdictaphone import logger
 
 def promptForProfile():
   profile_path = getProfilePath(None)

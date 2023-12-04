@@ -7,9 +7,9 @@ import os
 import sys
 import yaml
 from datetime import datetime
-from model.context import Context
-from model.profile import Profile
-from find_ffmpeg import findFfmpeg
+from drdictaphone.model.context import Context
+from drdictaphone.model.profile import Profile
+from drdictaphone.find_ffmpeg import findFfmpeg
 
 findFfmpeg()
 

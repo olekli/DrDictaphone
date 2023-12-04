@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import functools
-from event_loop import EventLoop, connect, associateWithEventLoop, forwardEvents
-from pipeline_events import PipelineEvents
+from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop, forwardEvents
+from drdictaphone.pipeline_events import PipelineEvents
 
 class Pipeline:
   def __init__(self, operations):

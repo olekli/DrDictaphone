@@ -1,8 +1,8 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from pipeline_events import PipelineEvents
 import os
+from drdictaphone.pipeline_events import PipelineEvents
 
 class Output:
   def __init__(self, filename = None):

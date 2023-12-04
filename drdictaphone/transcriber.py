@@ -4,9 +4,9 @@
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
-from pipeline_events import PipelineEvents
-from config import config
-import logger
+from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone.config import config
+from drdictaphone import logger
 logger = logger.get(__name__)
 
 class Transcriber:

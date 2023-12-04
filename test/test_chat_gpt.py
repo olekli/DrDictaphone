@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-from chat_gpt import ChatGpt
-from read_context import readContext
-import logger_config
+from drdictaphone.chat_gpt import ChatGpt
+from drdictaphone.read_context import readContext
+import drdictaphone.logger_config
 
 ok_text = 'Das ist ein Beispiel Text in deutscher Sparche, der ein paar Relative einfache Fehler enthält. ChatGpt sollte ohne weiteres in der Lage sein diese Fehleer zu korriegeren.'
 

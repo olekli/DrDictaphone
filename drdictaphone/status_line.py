@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from events import Events
-import logger
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

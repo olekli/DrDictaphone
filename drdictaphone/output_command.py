@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import subprocess
-from pipeline_events import PipelineEvents
-import logger
+from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

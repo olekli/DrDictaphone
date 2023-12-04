@@ -4,9 +4,9 @@
 import sounddevice
 import numpy
 from pydub import AudioSegment
-from audio_tools import normaliseFormat
-import logger
-from pipeline_events import PipelineEvents
+from drdictaphone.audio_tools import normaliseFormat
+from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

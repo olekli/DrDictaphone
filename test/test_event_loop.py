@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-from event_loop import EventLoop, connect, associateWithEventLoop, forwardEvents
+from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop, forwardEvents
 from events import Events
-from event_spy import EventSpy
+from drdictaphone.event_spy import EventSpy
 import time
 
 class DummyClass:

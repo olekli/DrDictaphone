@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-from config import config
+from drdictaphone.config import config
 
 def get(module):
   logger = logging.getLogger(module)

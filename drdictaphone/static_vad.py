@@ -4,8 +4,8 @@
 import tempfile
 from pydub import AudioSegment
 from speechbrain.pretrained import VAD
-from pipeline_events import PipelineEvents
-import logger
+from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 

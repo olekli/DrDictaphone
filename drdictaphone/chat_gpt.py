@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from openai import OpenAI
-from config import config
+from drdictaphone.config import config
 import json
-import logger
+from drdictaphone import logger
 
 logger = logger.get(__name__)
 
