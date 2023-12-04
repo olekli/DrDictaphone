@@ -70,6 +70,40 @@ def test_double_connect_works():
   assert getattr(receiver, 'new_result') == [ 'foo', 'baz' ]
   assert getattr(receiver, 'updated') == [ 'bar', 'lol' ]
 
+def test_double_connect_with_list_explicit():
+  sender = DummyClass()
+  receiver = DummyClass()
+
+  with EventLoop() as event_loop:
+    associateWithEventLoop(sender, event_loop)
+    associateWithEventLoop(receiver, event_loop)
+    connect(sender, [ 'new_result', 'updated' ], receiver, [ 'onNewResult', 'onUpdated' ])
+
+    sender.events.new_result('foo')
+    sender.events.updated('bar')
+    sender.events.updated('lol')
+    sender.events.new_result('baz')
+
+  assert getattr(receiver, 'new_result') == [ 'foo', 'baz' ]
+  assert getattr(receiver, 'updated') == [ 'bar', 'lol' ]
+
+def test_double_connect_with_list_implicit():
+  sender = DummyClass()
+  receiver = DummyClass()
+
+  with EventLoop() as event_loop:
+    associateWithEventLoop(sender, event_loop)
+    associateWithEventLoop(receiver, event_loop)
+    connect(sender, [ 'new_result', 'updated' ], receiver, None)
+
+    sender.events.new_result('foo')
+    sender.events.updated('bar')
+    sender.events.updated('lol')
+    sender.events.new_result('baz')
+
+  assert getattr(receiver, 'new_result') == [ 'foo', 'baz' ]
+  assert getattr(receiver, 'updated') == [ 'bar', 'lol' ]
+
 def test_full_connect_works():
   sender = DummyClass()
   receiver = DummyClass()

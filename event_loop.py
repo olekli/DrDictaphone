@@ -26,10 +26,17 @@ def connect(emitter, event_name, receiver, slot_name):
         forwardEvents(receiver, [event_name])
       if callable(getattr(receiver, slot_name, None)):
         connect_(emitter, event_name, receiver, slot_name)
-  elif event_name == None or slot_name == None:
-    assert False
-  else:
+  elif isinstance(event_name, list) and isinstance(slot_name, list):
+    assert len(event_name) == len(slot_name)
+    for i in range(0, len(event_name)):
+      connect_(emitter, event_name[i], receiver, slot_name[i])
+  elif isinstance(event_name, list) and slot_name == None:
+    for e in event_name:
+      connect_(emitter, e, receiver, makeSlotName(e))
+  elif isinstance(event_name, str) and isinstance(slot_name, str):
     connect_(emitter, event_name, receiver, slot_name)
+  else:
+    assert False
 
 def forwardEvents(self, event_names):
   for event_name in event_names:
