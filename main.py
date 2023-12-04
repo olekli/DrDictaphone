@@ -2,151 +2,59 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from config import readProfile, makeOutputFilename, getProfilePath
-import argparse
-import sys
 import os
-from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter
-from prompt_toolkit.shortcuts import set_title
-from transcriber import Transcriber
-from post_processor import PostProcessor
-from pipeline import Pipeline
-from audio_tools import normaliseFormat
-from pydub import AudioSegment
-from output import Output
 from microphone import Microphone
-from beep import Beep
-from status_line import StatusLine
+from transcriber import Transcriber
 from chat_gpt import ChatGpt
+from post_processor import PostProcessor
+from output import Output
 from aggregator import Aggregator
-from app import App
-from event_loop import EventLoop, connect, associateWithEventLoop
-from cost_counter import CostCounter
 from output_command import OutputCommand
-import logger_config
+from cost_counter import CostCounter
+from pipeline import Pipeline
+from event_loop import EventLoop, connect, associateWithEventLoop
 import logger
 
-def promptForProfile():
-  profile_path = getProfilePath(None)
-  available_profiles = os.listdir(profile_path)
-  available_profiles.sort(
-    key = lambda x: os.path.getatime(os.path.join(profile_path, x)),
-    reverse = True
-  )
-  available_profiles = [
-    x for x, y in [
-      os.path.splitext(entry) for entry in available_profiles
-    ]
-  ]
-  completer = WordCompleter(available_profiles)
-  print('Available profiles:\n')
-  for profile in available_profiles:
-    print(f'{profile}')
-  print('')
-  user_input = prompt(f'Select profile ({available_profiles[0]}): ', completer = completer)
-  if user_input == '':
-    user_input = available_profiles[0]
-  print(f'selected {user_input}')
-  return user_input
+logger = logger.get(__name__)
 
-if __name__ == '__main__':
-  logger = logger.get(__name__)
-
-  set_title('DrDictaphone')
-
-  if len(sys.argv) > 1:
-    parser = argparse.ArgumentParser(description = 'DrDictaphone')
-    parser.add_argument('profile', type = str, default = 'default', help = 'profile to use')
-    parser.add_argument('--output', type = str, default = None, help = 'output file')
-    args = parser.parse_args()
-
-    profile_name = args.profile
-    profile = readProfile(getProfilePath(profile_name))
-
-    if args.output == None:
-      output = makeOutputFilename(profile.output)
-    else:
-      output = args.output
-  else:
-    profile_name = promptForProfile()
+class Main:
+  def __init__(self, profile_name):
     profile_path = getProfilePath(profile_name)
     os.utime(profile_path, None)
-    profile = readProfile(profile_path)
-    output = makeOutputFilename(profile.output)
+    self.profile = readProfile(profile_path)
 
-  set_title(profile_name)
+    self.microphone = Microphone()
+    self.vad = None
+    if self.profile.enable_vad:
+      from static_vad import StaticVad
+      self.vad = StaticVad()
+    self.transcriber = Transcriber(self.profile.language)
+    self.chat_gpt = ChatGpt(self.profile.post_processor)
+    self.post_processor = PostProcessor(self.chat_gpt)
+    self.output = Output(makeOutputFilename(self.profile.output))
+    self.aggregator = Aggregator()
+    self.output_command = None
+    if self.profile.output_command:
+      self.output_command = OutputCommand(self.profile.output_command)
+    self.cost_counter = CostCounter()
+    self.pipeline = Pipeline([
+      self.microphone,
+      self.vad,
+      self.transcriber,
+      self.post_processor,
+      self.output,
+      self.aggregator,
+      self.output_command,
+      self.cost_counter
+    ])
+    self.event_loop = EventLoop()
+    associateWithEventLoop(self.pipeline, self.event_loop)
 
-  print('running...')
+  def __enter__(self):
+    self.pipeline.__enter__()
+    self.event_loop.__enter__()
+    return self
 
-  chat_gpt = ChatGpt(profile.post_processor)
-
-  microphone = Microphone()
-  pipeline_assembly = [ microphone ]
-  if profile.enable_vad:
-    from static_vad import StaticVad
-    vad = StaticVad()
-    pipeline_assembly.append(vad)
-  transcriber = Transcriber(profile.language)
-  pipeline_assembly.append(transcriber)
-  post_processor = PostProcessor(chat_gpt)
-  pipeline_assembly.append(post_processor)
-  pipeline_assembly.append(Output(output))
-  aggregator = Aggregator()
-  pipeline_assembly.append(aggregator)
-  if profile.output_command:
-    output_command = OutputCommand(profile.output_command)
-    pipeline_assembly.append(output_command)
-  cost_counter = CostCounter()
-  with Pipeline(pipeline_assembly) as pipeline:
-    with EventLoop() as main_loop, EventLoop() as beep_loop:
-      associateWithEventLoop(pipeline, main_loop)
-      associateWithEventLoop(cost_counter, main_loop)
-
-      app = App()
-      associateWithEventLoop(app, main_loop)
-
-      status_line = StatusLine(profile_name)
-      associateWithEventLoop(status_line, main_loop)
-      connect(microphone, 'active', status_line, 'onMICactive')
-      connect(microphone, 'idle', status_line, 'onMICidle')
-      connect(transcriber.__event_loop__, 'active', status_line, 'onTRANSactive')
-      connect(transcriber.__event_loop__, 'idle', status_line, 'onTRANSidle')
-      connect(post_processor.__event_loop__, 'active', status_line, 'onPOSTactive')
-      connect(post_processor.__event_loop__, 'idle', status_line, 'onPOSTidle')
-
-      connect(status_line, 'status_update_left', app, 'updateStatusLeft')
-      connect(status_line, 'status_update_center', app, 'updateStatusCenter')
-      connect(status_line, 'status_update_right', app, 'updateStatusRight')
-      connect(aggregator, 'result', app, 'updateText')
-
-      connect(app, 'start_rec', pipeline, 'onStartRec')
-      connect(app, 'stop_rec', pipeline, 'onStopRec')
-      connect(app, 'pause_mic', pipeline, 'onPauseMic')
-      connect(app, 'unpause_mic', pipeline, 'onUnpauseMic')
-
-      connect(app, 'clear_buffer', pipeline, 'onClearBuffer')
-
-      beep = Beep()
-      associateWithEventLoop(beep, beep_loop)
-
-      if profile.enable_vad:
-        connect(vad.__event_loop__, 'active', status_line, 'onVADactive')
-        connect(vad.__event_loop__, 'idle', status_line, 'onVADidle')
-
-      connect(app, 'start_rec', beep, 'beepHighLong')
-      connect(app, 'stop_rec', beep, 'beepLowLong')
-      connect(app, 'pause_mic', beep, 'beepLowShort')
-      connect(app, 'unpause_mic', beep, 'beepHighShort')
-
-      connect(transcriber, 'costs', cost_counter, 'addCosts')
-      connect(post_processor, 'costs', cost_counter, 'addCosts')
-      connect(cost_counter, 'updated', status_line, 'onUpdateCosts')
-
-      connect(microphone, 'time_recorded', status_line, 'onUpdateTimeRecorded')
-
-      app.updateStatusLeft(status_line.getStatusLineLeft())
-      app.updateStatusCenter(status_line.getStatusLineCenter())
-      app.updateStatusRight(status_line.getStatusLineRight())
-
-      app.run()
-  print('exited.')
+  def __exit__(self, exc_type, exc_value, traceback):
+    self.pipeline.__exit__(exc_type, exc_value, traceback)
+    self.event_loop.__exit__(exc_type, exc_value, traceback)

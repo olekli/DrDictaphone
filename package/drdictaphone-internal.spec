@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['main.py'],
+    ['ui.py'],
     pathex=[],
     binaries=[],
     datas=[('post_processor', 'post_processor'), ('instructions', 'instructions'), ('tools', 'tools'), ('gpt_model', 'gpt_model'), ('profile', 'profile')],

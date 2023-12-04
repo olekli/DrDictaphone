@@ -14,7 +14,7 @@ class Pipeline:
     forwardEvents(self, list(PipelineEvents.__events__))
 
     prev_op = self
-    for operation in operations:
+    for operation in [op for op in operations if op]:
       self.event_loops.append(EventLoop())
       self.operations.append(operation)
       associateWithEventLoop(self.operations[-1], self.event_loops[-1])
