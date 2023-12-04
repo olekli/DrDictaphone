@@ -5,6 +5,7 @@ import asyncio
 from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
+import logging
 
 logger_config = {
   'level': logging.WARNING,
