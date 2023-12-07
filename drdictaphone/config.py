@@ -11,34 +11,45 @@ from drdictaphone.model.context import Context
 from drdictaphone.model.profile import Profile
 from drdictaphone.find_ffmpeg import findFfmpeg
 
-findFfmpeg()
-
 config = {
   'loglevel': os.environ.get('LOG_LEVEL', 'DEBUG'),
   'logfile': os.environ.get('LOG_FILE', 'drdictaphone.log'),
-  'is_frozen': getattr(sys, 'frozen', False),
   'paths': {
     'config': {},
     'output': {}
   }
 }
 
-user_path = os.path.expanduser('~/DrDictaphone')
+def initConfig(application_mode = 'frozen' if getattr(sys, 'frozen', False) else ''):
+  findFfmpeg()
 
-if config['is_frozen']:
-  config['paths']['application'] = sys._MEIPASS
-  config['paths']['log'] = os.path.join(user_path, config['logfile'])
-  config['paths']['config']['user'] = os.path.join(user_path)
-  config['paths']['config']['internal'] = config['paths']['application']
-  config['paths']['output']['user'] = os.path.join(user_path, 'output')
-  config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
-else:
-  config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
-  config['paths']['log'] = os.path.join(config['paths']['application'], config['logfile'])
-  config['paths']['config']['user'] = config['paths']['application']
-  config['paths']['output']['user'] = os.path.join(config['paths']['application'], 'output')
-  config['paths']['config']['internal'] = config['paths']['application']
-  config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+  user_path = os.path.expanduser('~/DrDictaphone')
+  config['application_mode'] = application_mode
+
+  if config['application_mode'] == 'frozen':
+    config['paths']['application'] = sys._MEIPASS
+    config['paths']['log'] = os.path.join(user_path, config['logfile'])
+    config['paths']['config']['user'] = os.path.join(user_path)
+    config['paths']['config']['internal'] = config['paths']['application']
+    config['paths']['output']['user'] = os.path.join(user_path, 'output')
+    config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+  elif config['application_mode'] == 'plugin':
+    config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
+    config['paths']['log'] = os.path.join(user_path, config['logfile'])
+    config['paths']['config']['user'] = os.path.join(user_path)
+    config['paths']['config']['internal'] = config['paths']['application']
+    config['paths']['output']['user'] = os.path.join(user_path, 'output')
+    config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+  else:
+    config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
+    config['paths']['log'] = os.path.join(config['paths']['application'], config['logfile'])
+    config['paths']['config']['user'] = config['paths']['application']
+    config['paths']['output']['user'] = os.path.join(config['paths']['application'], 'output')
+    config['paths']['config']['internal'] = config['paths']['application']
+    config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+
+  createConfigSkel()
+  config['openai_api_key'] = getApiKey()
 
 def getPath(type, path):
   if os.path.isabs(path):
@@ -60,13 +71,11 @@ def createConfigSkel():
   if not os.path.exists(os.path.join(config['paths']['config']['user'], 'profile')):
     os.makedirs(os.path.join(config['paths']['config']['user'], 'profile'), exist_ok = True)
     source = os.path.join(config['paths']['config']['internal'], 'profile', 'default.yaml')
-    target =  os.path.join(config['paths']['config']['user'], 'profile', 'default.yaml')
+    target = os.path.join(config['paths']['config']['user'], 'profile', 'default.yaml')
     with open(source, 'rt') as file:
       default = file.read()
     with open(target, 'wt') as file:
       file.write(default)
-
-createConfigSkel()
 
 def getApiKey():
   path = config['paths']['openai_api_key']
@@ -81,8 +90,6 @@ def getApiKey():
     print(f'Please provide OpenAI API key in file: {path}')
     sys.exit(1)
   return key
-
-config['openai_api_key'] = getApiKey()
 
 def getProfilePath(profile):
   profile_path = getPath('config', 'profile')

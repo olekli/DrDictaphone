@@ -8,6 +8,8 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.shortcuts import set_title
 from mreventloop import EventLoop, connect, setEventLoop, getEventLoop
+from drdictaphone.config import initConfig
+initConfig()
 from drdictaphone.config import getProfilePath
 from drdictaphone.beep import Beep
 from drdictaphone.status_line import StatusLine
