@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from mreventloop import emits, slot, supports_event_loop, forwards, EventLoop
+from drdictaphone.config import initConfig
+initConfig('plugin')
 from drdictaphone.main import Main
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone import logger
