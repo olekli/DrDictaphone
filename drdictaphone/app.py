@@ -10,19 +10,10 @@ from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import TextArea
 from prompt_toolkit.layout.controls import FormattedTextControl
 from mreventloop import emits
-from events import Events
 from functools import partial
 from drdictaphone import logger
 
 logger = logger.get(__name__)
-
-def call_in_event_loop(method):
-  def wrapper(self, *args, **kwargs):
-    if self.app.loop:
-      self.app.loop.call_soon_threadsafe(partial(method, self, *args, **kwargs))
-    else:
-      method(self, *args, **kwargs)
-  return wrapper
 
 @emits('events', [ 'start_rec', 'stop_rec', 'pause_mic', 'unpause_mic', 'clear_buffer' ])
 class App:
@@ -101,25 +92,21 @@ class App:
   def exit(self):
     self.app.exit()
 
-  @call_in_event_loop
   def updateText(self, new_text):
     self.text_area.text = new_text
     self.app.invalidate()
 
-  @call_in_event_loop
   def updateStatusLeft(self, new_status):
     self.status_bar_left.content = FormattedTextControl(new_status)
     self.app.invalidate()
 
-  @call_in_event_loop
   def updateStatusCenter(self, new_status):
     self.status_bar_center.content = FormattedTextControl(new_status)
     self.app.invalidate()
 
-  @call_in_event_loop
   def updateStatusRight(self, new_status):
     self.status_bar_right.content = FormattedTextControl(new_status)
     self.app.invalidate()
 
-  def run(self):
-    self.app.run()
+  async def run(self):
+    await self.app.run_async()

@@ -1,16 +1,17 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import asyncio
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
-from mreventloop import emits, slot, supports_event_loop
+from mreventloop import emits, slot, has_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone.config import config
 from drdictaphone import logger
 logger = logger.get(__name__)
 
-@supports_event_loop('event_loop')
+@has_event_loop('event_loop')
 @emits('events', PipelineEvents)
 class Transcriber:
   cost_second = (0.6 / 60)
@@ -48,10 +49,10 @@ class Transcriber:
       return transcript.text
 
   @slot
-  def onResult(self, audio_segment):
+  async def onResult(self, audio_segment):
     logger.debug(f'received audio of length: {len(audio_segment)}')
     self.buffer += audio_segment
-    text = self.transcribeBuffer()
+    text = await asyncio.get_event_loop().run_in_executor(None, self.transcribeBuffer)
     self.events.result(text)
 
   @slot

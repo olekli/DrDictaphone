@@ -1,7 +1,7 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import argparse
+import asyncio
 import sys
 import os
 from prompt_toolkit import prompt
@@ -41,23 +41,15 @@ def promptForProfile():
   print(f'selected {user_input}')
   return user_input
 
-if __name__ == '__main__':
-  logger = logger.get(__name__)
-
-  set_title('DrDictaphone')
-
-  profile_name = promptForProfile()
-  set_title(profile_name)
-
+async def main():
   print('running...')
-
-  with Main(profile_name) as main:
-    with EventLoop() as beep_loop:
+  async with Main(profile_name) as main:
+    async with EventLoop() as misc_loop:
       app = App()
-      setEventLoop(app, main.event_loop)
+      setEventLoop(app, misc_loop)
 
       status_line = StatusLine(profile_name)
-      setEventLoop(status_line, main.event_loop)
+      setEventLoop(status_line, misc_loop)
       connect(main.microphone, 'active', status_line, 'onMICactive')
       connect(main.microphone, 'idle', status_line, 'onMICidle')
       connect(getEventLoop(main.transcriber), 'active', status_line, 'onTRANSactive')
@@ -78,7 +70,7 @@ if __name__ == '__main__':
       connect(app, 'clear_buffer', main.pipeline, 'onClearBuffer')
 
       beep = Beep()
-      setEventLoop(beep, beep_loop)
+      setEventLoop(beep, misc_loop)
 
       if main.profile.enable_vad:
         connect(getEventLoop(main.vad), 'active', status_line, 'onVADactive')
@@ -97,5 +89,17 @@ if __name__ == '__main__':
       app.updateStatusCenter(status_line.getStatusLineCenter())
       app.updateStatusRight(status_line.getStatusLineRight())
 
-      app.run()
+      await app.run()
   print('exited.')
+
+if __name__ == '__main__':
+  logger = logger.get(__name__)
+
+  set_title('DrDictaphone')
+
+  profile_name = promptForProfile()
+  set_title(profile_name)
+
+  asyncio.set_event_loop(asyncio.new_event_loop())
+
+  asyncio.run(main())

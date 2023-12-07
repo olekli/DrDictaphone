@@ -12,7 +12,7 @@ from drdictaphone.model.profile import Profile
 from drdictaphone.find_ffmpeg import findFfmpeg
 
 config = {
-  'loglevel': os.environ.get('LOG_LEVEL', 'INFO'),
+  'loglevel': os.environ.get('LOG_LEVEL', 'DEBUG'),
   'logfile': os.environ.get('LOG_FILE', 'drdictaphone.log'),
   'paths': {
     'config': {},

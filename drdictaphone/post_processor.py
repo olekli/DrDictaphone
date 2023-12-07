@@ -1,14 +1,15 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from mreventloop import emits, slot, supports_event_loop
+import asyncio
+from mreventloop import emits, slot, has_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone.model.exchange import Exchange
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
-@supports_event_loop('event_loop')
+@has_event_loop('event_loop')
 @emits('events', PipelineEvents)
 class PostProcessor:
   def __init__(self, chat_gpt):
@@ -21,8 +22,8 @@ class PostProcessor:
   def makeText(self):
     return ' '.join([line for line in self.text_buffer if line is not None])
 
-  def tryGpt(self, text):
-    response = self.chat_gpt.ask(text)
+  async def tryGpt(self, text):
+    response = await self.chat_gpt.ask(text)
     self.events.costs(self.chat_gpt.last_cost)
     self.attempts += 1
     if 'result' in response:
@@ -47,11 +48,11 @@ class PostProcessor:
     self.events.result(self.makeText())
 
   @slot
-  def onFence(self):
+  async def onFence(self):
     text = self.makeText()
     if len(text) > 0:
       self.text_buffer.append(None)
-      self.tryGpt(text)
+      await self.tryGpt(text)
 
   @slot
   def onClearBuffer(self):

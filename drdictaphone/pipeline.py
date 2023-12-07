@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import functools
-from mreventloop import EventLoop, connect, setEventLoop, emits, forwards, supports_event_loop
+from mreventloop import EventLoop, connect, setEventLoop, emits, forwards, has_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 
-@supports_event_loop('event_loop')
+@has_event_loop('event_loop')
 @forwards([ 'onStartRec', 'onStopRec', 'onPauseMic', 'onUnpauseMic', 'onClearBuffer' ])
 @emits('events', PipelineEvents)
 class Pipeline:
@@ -21,11 +21,11 @@ class Pipeline:
       connect(prev_op, None, self.operations[-1], None)
       prev_op = self.operations[-1]
 
-  def __enter__(self):
+  async def __aenter__(self):
     for event_loop in self.event_loops:
-      event_loop.__enter__()
+      await event_loop.__aenter__()
     return self
 
-  def __exit__(self, exc_type, exc_value, traceback):
+  async def __aexit__(self, exc_type, exc_value, traceback):
     for event_loop in self.event_loops:
-      event_loop.__exit__(exc_type, exc_value, traceback)
+      await event_loop.__aexit__(exc_type, exc_value, traceback)

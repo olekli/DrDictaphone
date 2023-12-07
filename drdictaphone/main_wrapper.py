@@ -6,6 +6,7 @@ from drdictaphone.config import initConfig
 initConfig('plugin')
 from drdictaphone.main import Main
 from drdictaphone.pipeline_events import PipelineEvents
+import drdictaphone.logger_config
 from drdictaphone import logger
 
 logger = logger.get(__name__)
@@ -15,6 +16,7 @@ logger = logger.get(__name__)
 @emits('events', PipelineEvents)
 class MainWrapper:
   def __init__(self):
+    logger.debug('__init__ MainWrapper')
     self.event_loop = EventLoop()
     self.main = None
     self.result = ''

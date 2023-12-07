@@ -1,14 +1,18 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import pynvim
 from mreventloop import emits, connect
 from drdictaphone.main_wrapper import MainWrapper
+from drdictaphone import logger
+import pynvim
+
+logger = logger.get(__name__)
 
 @pynvim.plugin
 @emits('events', [ 'start_rec', 'stop_rec' ])
 class DrDictaphonePlugin(object):
   def __init__(self, nvim):
+    logger.debug('__init__ neovim')
     self.nvim = nvim
     self.profile_name = ''
     self.main = MainWrapper()
