@@ -7,11 +7,11 @@ import os
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.shortcuts import set_title
+from mreventloop import EventLoop, connect, setEventLoop, getEventLoop
 from drdictaphone.config import getProfilePath
 from drdictaphone.beep import Beep
 from drdictaphone.status_line import StatusLine
 from drdictaphone.app import App
-from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop
 from drdictaphone.main import Main
 import drdictaphone.logger_config
 from drdictaphone import logger
@@ -52,16 +52,16 @@ if __name__ == '__main__':
   with Main(profile_name) as main:
     with EventLoop() as beep_loop:
       app = App()
-      associateWithEventLoop(app, main.event_loop)
+      setEventLoop(app, main.event_loop)
 
       status_line = StatusLine(profile_name)
-      associateWithEventLoop(status_line, main.event_loop)
+      setEventLoop(status_line, main.event_loop)
       connect(main.microphone, 'active', status_line, 'onMICactive')
       connect(main.microphone, 'idle', status_line, 'onMICidle')
-      connect(main.transcriber.__event_loop__, 'active', status_line, 'onTRANSactive')
-      connect(main.transcriber.__event_loop__, 'idle', status_line, 'onTRANSidle')
-      connect(main.post_processor.__event_loop__, 'active', status_line, 'onPOSTactive')
-      connect(main.post_processor.__event_loop__, 'idle', status_line, 'onPOSTidle')
+      connect(getEventLoop(main.transcriber), 'active', status_line, 'onTRANSactive')
+      connect(getEventLoop(main.transcriber), 'idle', status_line, 'onTRANSidle')
+      connect(getEventLoop(main.post_processor), 'active', status_line, 'onPOSTactive')
+      connect(getEventLoop(main.post_processor), 'idle', status_line, 'onPOSTidle')
 
       connect(status_line, 'status_update_left', app, 'updateStatusLeft')
       connect(status_line, 'status_update_center', app, 'updateStatusCenter')
@@ -76,11 +76,11 @@ if __name__ == '__main__':
       connect(app, 'clear_buffer', main.pipeline, 'onClearBuffer')
 
       beep = Beep()
-      associateWithEventLoop(beep, beep_loop)
+      setEventLoop(beep, beep_loop)
 
       if main.profile.enable_vad:
-        connect(main.vad.__event_loop__, 'active', status_line, 'onVADactive')
-        connect(main.vad.__event_loop__, 'idle', status_line, 'onVADidle')
+        connect(getEventLoop(main.vad), 'active', status_line, 'onVADactive')
+        connect(getEventLoop(main.vad), 'idle', status_line, 'onVADidle')
 
       connect(app, 'start_rec', beep, 'beepHighLong')
       connect(app, 'stop_rec', beep, 'beepLowLong')

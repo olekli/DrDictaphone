@@ -4,11 +4,14 @@
 import tempfile
 from pydub import AudioSegment
 from speechbrain.pretrained import VAD
+from mreventloop import emits, slot, supports_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
+@supports_event_loop('event_loop')
+@emits('events', PipelineEvents)
 class StaticVad:
   def __init__(self, silence_threshold = 1000):
     self.events = PipelineEvents()
@@ -16,6 +19,7 @@ class StaticVad:
 
     self.vad = VAD.from_hparams(source = 'speechbrain/vad-crdnn-libriparty', savedir = 'tmpdir')
 
+  @slot
   def onResult(self, audio_segment):
     if len(audio_segment) < 3000:
       self.events.result(audio_segment)
@@ -46,5 +50,6 @@ class StaticVad:
         if len(result) > 0:
           self.events.result(result)
 
+  @slot
   def onFence(self):
     self.events.fence()

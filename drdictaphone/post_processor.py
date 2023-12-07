@@ -1,15 +1,17 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from mreventloop import emits, slot, supports_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone.model.exchange import Exchange
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
+@supports_event_loop('event_loop')
+@emits('events', PipelineEvents)
 class PostProcessor:
   def __init__(self, chat_gpt):
-    self.events = PipelineEvents()
     self.chat_gpt = chat_gpt
 
     self.text_buffer = [None]
@@ -39,16 +41,19 @@ class PostProcessor:
       logger.warning(f'input was: {text}')
     return False
 
+  @slot
   def onResult(self, text):
     self.text_buffer[-1] = text
     self.events.result(self.makeText())
 
+  @slot
   def onFence(self):
     text = self.makeText()
     if len(text) > 0:
       self.text_buffer.append(None)
       self.tryGpt(text)
 
+  @slot
   def onClearBuffer(self):
     self.text_buffer = [None]
     self.attempts = 0

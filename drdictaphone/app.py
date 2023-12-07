@@ -9,6 +9,7 @@ from prompt_toolkit.layout.containers import HSplit, VSplit, Window, WindowAlign
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import TextArea
 from prompt_toolkit.layout.controls import FormattedTextControl
+from mreventloop import emits
 from events import Events
 from functools import partial
 from drdictaphone import logger
@@ -23,9 +24,9 @@ def call_in_event_loop(method):
       method(self, *args, **kwargs)
   return wrapper
 
+@emits('events', [ 'start_rec', 'stop_rec', 'pause_mic', 'unpause_mic', 'clear_buffer' ])
 class App:
   def __init__(self):
-    self.events = Events(('start_rec', 'stop_rec', 'pause_mic', 'unpause_mic', 'clear_buffer'))
     self.bindings = self.makeKeyBinds()
     self.text_area = TextArea(focusable = False, read_only = True)
     self.status_bar_left = Window(

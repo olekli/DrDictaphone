@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
+from mreventloop import EventLoop, setEventLoop
 from drdictaphone.config import readProfile, makeOutputFilename, getProfilePath
 from drdictaphone.microphone import Microphone
 from drdictaphone.transcriber import Transcriber
@@ -12,7 +13,6 @@ from drdictaphone.aggregator import Aggregator
 from drdictaphone.output_command import OutputCommand
 from drdictaphone.cost_counter import CostCounter
 from drdictaphone.pipeline import Pipeline
-from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop
 from drdictaphone import logger
 
 logger = logger.get(__name__)
@@ -48,7 +48,7 @@ class Main:
       self.cost_counter
     ])
     self.event_loop = EventLoop()
-    associateWithEventLoop(self.pipeline, self.event_loop)
+    setEventLoop(self.pipeline, self.event_loop)
 
   def __enter__(self):
     self.pipeline.__enter__()

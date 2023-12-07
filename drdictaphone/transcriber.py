@@ -4,16 +4,18 @@
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
+from mreventloop import emits, slot, supports_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone.config import config
 from drdictaphone import logger
 logger = logger.get(__name__)
 
+@supports_event_loop('event_loop')
+@emits('events', PipelineEvents)
 class Transcriber:
   cost_second = (0.6 / 60)
 
   def __init__(self, language):
-    self.events = PipelineEvents()
     self.language = language
     self.context = []
     self.buffer = AudioSegment.empty()
@@ -45,12 +47,14 @@ class Transcriber:
       self.mark = len(self.buffer)
       return transcript.text
 
+  @slot
   def onResult(self, audio_segment):
     logger.debug(f'received audio of length: {len(audio_segment)}')
     self.buffer += audio_segment
     text = self.transcribeBuffer()
     self.events.result(text)
 
+  @slot
   def onFence(self):
     if len(self.buffer) > 0:
       if len(self.buffer) > self.mark:
@@ -64,6 +68,7 @@ class Transcriber:
       self.events.result(text)
     self.events.fence()
 
+  @slot
   def onClearBuffer(self):
     self.text_buffer = ''
     self.mark = 0

@@ -2,16 +2,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import subprocess
+from mreventloop import emits, slot, supports_event_loop
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
+@supports_event_loop('event_loop')
+@emits('events', PipelineEvents)
 class OutputCommand:
   def __init__(self, command):
-    self.events = PipelineEvents()
     self.command = command
 
+  @slot
   def onResult(self, result):
     process = subprocess.Popen(
       self.command,
@@ -25,5 +28,6 @@ class OutputCommand:
       logger.error(f'Output command reports error: {error}')
     self.events.result(result)
 
+  @slot
   def onFence(self):
     self.events.fence()
