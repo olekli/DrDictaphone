@@ -1,11 +1,13 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from events import Events
+from mreventloop import emits, slot, has_event_loop
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
+@has_event_loop('event_loop')
+@emits('events', [ 'status_update_left', 'status_update_center', 'status_update_right' ])
 class StatusLine:
   mapping = {
     'Mic': 'MIC',
@@ -19,7 +21,6 @@ class StatusLine:
     return lambda: self.onUpdateActivity(item, status)
 
   def __init__(self, profile_name):
-    self.events = Events(('status_update_left', 'status_update_center', 'status_update_right'))
     self.profile_name = profile_name
     self.items = [ 'MIC', 'VAD', 'TRANS', 'POST', 'OUT' ]
     self.status = {
@@ -39,14 +40,17 @@ class StatusLine:
     self.events.status_update_left(self.getStatusLineLeft())
     self.events.status_update_right(self.getStatusLineRight())
 
+  @slot
   def onUpdateActivity(self, op, status):
     self.status[op] = status
     self.events.status_update_left(self.getStatusLineLeft())
 
+  @slot
   def onUpdateCosts(self, new_costs):
     self.costs = new_costs
     self.events.status_update_right(self.getStatusLineRight())
 
+  @slot
   def onUpdateTimeRecorded(self, new_time):
     self.time_recorded = new_time
     self.events.status_update_center(self.getStatusLineCenter())

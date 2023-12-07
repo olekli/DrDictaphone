@@ -1,6 +1,7 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import asyncio
 import numpy as np
 import sounddevice as sd
 
@@ -23,9 +24,12 @@ class Beep:
     audio = audio.astype(np.int16)
     return audio
 
-  def beep(self, audio):
-    sd.play(audio, self.sample_rate, blocksize = int(self.sample_rate / 5))
+  def beep_(self, audio):
+    sd.play(audio, self.sample_rate, blocksize = int(self.sample_rate / 5), blocking = False)
     sd.wait()
+
+  def beep(self, audio):
+    asyncio.create_task(asyncio.to_thread(self.beep_, audio))
 
   def beepHighShort(self):
     self.beep(self.high_beep_audio_short)

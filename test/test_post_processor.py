@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
+from mreventloop import connect
 from drdictaphone.post_processor import PostProcessor
 import drdictaphone.logger_config
 
@@ -30,8 +31,8 @@ def make():
   gpt = DummyGpt()
   spy = Spy()
   post_processor = PostProcessor(gpt)
-  post_processor.events.result += spy.onResult
-  post_processor.events.fence += spy.onFence
+  connect(post_processor, 'result', spy, 'onResult')
+  connect(post_processor, 'fence', spy, 'onFence')
 
   return (gpt, spy, post_processor)
 

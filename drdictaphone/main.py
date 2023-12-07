@@ -12,7 +12,6 @@ from drdictaphone.aggregator import Aggregator
 from drdictaphone.output_command import OutputCommand
 from drdictaphone.cost_counter import CostCounter
 from drdictaphone.pipeline import Pipeline
-from drdictaphone.event_loop import EventLoop, connect, associateWithEventLoop
 from drdictaphone import logger
 
 logger = logger.get(__name__)
@@ -26,7 +25,7 @@ class Main:
     self.microphone = Microphone()
     self.vad = None
     if self.profile.enable_vad:
-      from static_vad import StaticVad
+      from drdictaphone.static_vad import StaticVad
       self.vad = StaticVad()
     self.transcriber = Transcriber(self.profile.language)
     self.chat_gpt = ChatGpt(self.profile.post_processor)
@@ -37,24 +36,22 @@ class Main:
     if self.profile.output_command:
       self.output_command = OutputCommand(self.profile.output_command)
     self.cost_counter = CostCounter()
-    self.pipeline = Pipeline([
-      self.microphone,
-      self.vad,
-      self.transcriber,
-      self.post_processor,
-      self.output,
-      self.aggregator,
-      self.output_command,
-      self.cost_counter
-    ])
-    self.event_loop = EventLoop()
-    associateWithEventLoop(self.pipeline, self.event_loop)
+    self.pipeline = Pipeline(
+      [
+        self.microphone,
+        self.vad,
+        self.transcriber,
+        self.post_processor,
+        self.output,
+        self.aggregator,
+        self.output_command,
+        self.cost_counter
+      ]
+    )
 
-  def __enter__(self):
-    self.pipeline.__enter__()
-    self.event_loop.__enter__()
+  async def __aenter__(self):
+    await self.pipeline.__aenter__()
     return self
 
-  def __exit__(self, exc_type, exc_value, traceback):
-    self.pipeline.__exit__(exc_type, exc_value, traceback)
-    self.event_loop.__exit__(exc_type, exc_value, traceback)
+  async def __aexit__(self, exc_type, exc_value, traceback):
+    return await self.pipeline.__aexit__(exc_type, exc_value, traceback)

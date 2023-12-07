@@ -4,15 +4,17 @@
 import sounddevice
 import numpy
 from pydub import AudioSegment
+from mreventloop import emits, slot, has_event_loop
 from drdictaphone.audio_tools import normaliseFormat
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
+@has_event_loop('event_loop')
+@emits('events', PipelineEvents)
 class Microphone:
   def __init__(self):
-    self.events = PipelineEvents()
     self.buffer = AudioSegment.empty()
     self.recording = False
     self.paused = False
@@ -22,6 +24,7 @@ class Microphone:
     self.sample_rate = None
     self.channels = None
 
+  @slot
   def onStartRec(self):
     assert not self.recording
     logger.debug('start recording')
@@ -30,6 +33,7 @@ class Microphone:
     self.events.active()
     self.events.start_rec()
 
+  @slot
   def onStopRec(self):
     assert self.recording
     logger.debug('stop recording')
@@ -47,6 +51,7 @@ class Microphone:
     self.events.time_recorded(0)
     self.events.fence()
 
+  @slot
   def onPauseMic(self):
     assert self.recording and not self.paused
     logger.debug('pause mic')
@@ -54,6 +59,7 @@ class Microphone:
     self.paused = True
     self.events.idle()
 
+  @slot
   def onUnpauseMic(self):
     assert self.paused
     self.paused = False
@@ -73,7 +79,7 @@ class Microphone:
     time_recorded = int(len(self.buffer) / 1000)
     if self.time_recorded != time_recorded:
       self.time_recorded = time_recorded
-      self.events.time_recorded(self.time_recorded)
+      #self.events.time_recorded(self.time_recorded)
 
   def makeInputStream(self, callback):
     device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
