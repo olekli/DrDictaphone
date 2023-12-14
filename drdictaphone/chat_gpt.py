@@ -1,7 +1,6 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import asyncio
 from openai import OpenAI
 from drdictaphone.config import config
 import json
@@ -30,7 +29,7 @@ class ChatGpt:
     if self.context.topic:
       self.messages += [ makeMessage('system', m) for m in self.context.topic ]
 
-  async def ask(self, question):
+  def ask(self, question):
     this_messages = list(self.messages)
     this_messages += [ makeMessage('user', question) ]
 
@@ -45,10 +44,7 @@ class ChatGpt:
     logger.debug(f'messages: {this_messages}')
 
     client = OpenAI(api_key = config['openai_api_key'])
-    self.last_completion = await asyncio.get_event_loop().run_in_executor(
-      None,
-      lambda: client.chat.completions.create(messages = this_messages, **options)
-    )
+    self.last_completion = client.chat.completions.create(messages = this_messages, **options)
     usage = self.last_completion.usage
     self.prompt_tokens += usage.prompt_tokens
     self.completion_tokens += usage.completion_tokens

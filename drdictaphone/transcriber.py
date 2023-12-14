@@ -5,13 +5,13 @@ import asyncio
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
-from mreventloop import emits, slot, has_event_loop
+from mreventloop import emits, slot, has_event_loop_thread
 from drdictaphone.pipeline_events import PipelineEvents
 from drdictaphone.config import config
 from drdictaphone import logger
 logger = logger.get(__name__)
 
-@has_event_loop('event_loop')
+@has_event_loop_thread('event_loop')
 @emits('events', PipelineEvents)
 class Transcriber:
   cost_second = (0.6 / 60)
@@ -49,10 +49,10 @@ class Transcriber:
       return transcript.text
 
   @slot
-  async def onResult(self, audio_segment):
+  def onResult(self, audio_segment):
     logger.debug(f'received audio of length: {len(audio_segment)}')
     self.buffer += audio_segment
-    text = await asyncio.get_event_loop().run_in_executor(None, self.transcribeBuffer)
+    text = self.transcribeBuffer()
     self.events.result(text)
 
   @slot

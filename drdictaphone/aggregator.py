@@ -1,10 +1,10 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from mreventloop import emits, slot, has_event_loop
+from mreventloop import emits, slot, has_event_loop_thread
 from drdictaphone.pipeline_events import PipelineEvents
 
-@has_event_loop('event_loop')
+@has_event_loop_thread('event_loop')
 @emits('events', PipelineEvents)
 class Aggregator:
   def __init__(self):

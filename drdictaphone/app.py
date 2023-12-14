@@ -9,12 +9,13 @@ from prompt_toolkit.layout.containers import HSplit, VSplit, Window, WindowAlign
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import TextArea
 from prompt_toolkit.layout.controls import FormattedTextControl
-from mreventloop import emits
+from mreventloop import slot, emits, has_event_loop_async
 from functools import partial
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
+@has_event_loop_async('event_loop')
 @emits('events', [ 'start_rec', 'stop_rec', 'pause_mic', 'unpause_mic', 'clear_buffer' ])
 class App:
   def __init__(self):
@@ -92,18 +93,22 @@ class App:
   def exit(self):
     self.app.exit()
 
+  @slot
   def updateText(self, new_text):
     self.text_area.text = new_text
     self.app.invalidate()
 
+  @slot
   def updateStatusLeft(self, new_status):
     self.status_bar_left.content = FormattedTextControl(new_status)
     self.app.invalidate()
 
+  @slot
   def updateStatusCenter(self, new_status):
     self.status_bar_center.content = FormattedTextControl(new_status)
     self.app.invalidate()
 
+  @slot
   def updateStatusRight(self, new_status):
     self.status_bar_right.content = FormattedTextControl(new_status)
     self.app.invalidate()

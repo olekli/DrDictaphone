@@ -58,4 +58,4 @@ typing_extensions==4.8.0
 urllib3==2.1.0
 wcwidth==0.2.12
 yarg==0.1.9
-MrEventLoop @ git+https://github.com/olekli/MrEventLoop.git@d0436d795711d32cccf4ba488c86818faa07151c
+MrEventLoop @ git+https://github.com/olekli/MrEventLoop.git@v0.3.0

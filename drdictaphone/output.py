@@ -2,12 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-import asyncio
-import aiofiles
-from mreventloop import emits, slot, has_event_loop
+from mreventloop import emits, slot, has_event_loop_thread
 from drdictaphone.pipeline_events import PipelineEvents
 
-@has_event_loop('event_loop')
+@has_event_loop_thread('event_loop')
 @emits('events', PipelineEvents)
 class Output:
   def __init__(self, filename = None):
@@ -20,17 +18,17 @@ class Output:
       self.last_final_pos = file.tell()
 
   @slot
-  async def onResult(self, result):
+  def onResult(self, result):
     if self.filename:
-      async with aiofiles.open(self.filename, 'r+t') as file:
-        await file.seek(self.last_final_pos)
-        await file.truncate()
-        await file.write(f'\n{result}\n')
+      with open(self.filename, 'r+t') as file:
+        file.seek(self.last_final_pos)
+        file.truncate()
+        file.write(f'\n{result}\n')
     self.events.result(result)
 
   @slot
-  async def onFence(self):
-    async with aiofiles.open(self.filename, 'rt') as file:
-      await file.seek(0, os.SEEK_END)
-      self.last_final_pos = await file.tell()
+  def onFence(self):
+    with open(self.filename, 'rt') as file:
+      file.seek(0, os.SEEK_END)
+      self.last_final_pos = file.tell()
     self.events.fence()

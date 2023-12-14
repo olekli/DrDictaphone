@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-from mreventloop import EventLoop
 from drdictaphone.config import readProfile, makeOutputFilename, getProfilePath
 from drdictaphone.microphone import Microphone
 from drdictaphone.transcriber import Transcriber
@@ -50,9 +49,9 @@ class Main:
       ]
     )
 
-  async def __aenter__(self):
-    await self.pipeline.__aenter__()
+  def __enter__(self):
+    self.pipeline.__enter__()
     return self
 
-  async def __aexit__(self, exc_type, exc_value, traceback):
-    return await self.pipeline.__aexit__(exc_type, exc_value, traceback)
+  def __exit__(self, exc_type, exc_value, traceback):
+    return self.pipeline.__exit__(exc_type, exc_value, traceback)
