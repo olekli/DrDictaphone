@@ -133,6 +133,7 @@ context_transformations = {
 }
 
 profile_transformations = {
+  'gpt_model': [readContentOrFile],
   'post_processor': [readContentOrFile, lambda content: transform(context_transformations, content)]
 }
 
