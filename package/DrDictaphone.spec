@@ -55,7 +55,7 @@ app = BUNDLE(
     	'CFBundleInfoDictionaryVersion': '6.0',
     	'CFBundleName': 'DrDictaphone',
     	'CFBundlePackageType': 'APPL',
-    	'CFBundleShortVersionString': '0.0.0',
+    	'CFBundleShortVersionString': '0.7.0',
     	'SHighResolutionCapable': True,
       'NSMicrophoneUsageDescription': 'Give mic.'
     }
