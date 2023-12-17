@@ -5,7 +5,7 @@ a = Analysis(
     ['package/launch.py'],
     pathex=[],
     binaries=[],
-    datas=[('dist/drdictaphone-internal', 'app'), ('package/kitty-default.conf', '.')],
+    datas=[],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
