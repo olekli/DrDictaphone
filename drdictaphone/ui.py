@@ -65,6 +65,7 @@ async def main():
         connect(app, 'stop_rec', main.pipeline, 'onStopRec')
         connect(app, 'pause_mic', main.pipeline, 'onPauseMic')
         connect(app, 'unpause_mic', main.pipeline, 'onUnpauseMic')
+        connect(app, 'discard_rec', main.pipeline, 'onDiscardRec')
 
         connect(app, 'clear_buffer', main.pipeline, 'onClearBuffer')
 
@@ -79,6 +80,7 @@ async def main():
         connect(app, 'stop_rec', beep, 'beepLowLong')
         connect(app, 'pause_mic', beep, 'beepLowShort')
         connect(app, 'unpause_mic', beep, 'beepHighShort')
+        connect(app, 'discard_rec', beep, 'beepLowShortTwice')
 
         connect(main.cost_counter, 'costs', status_line, 'onUpdateCosts')
 

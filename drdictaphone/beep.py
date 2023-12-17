@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import asyncio
+from mreventloop import emits, slot, has_event_loop, forwards
 import numpy as np
 import sounddevice as sd
 
+@has_event_loop('event_loop')
 class Beep:
   def __init__(self):
     self.sample_rate = 44100
@@ -28,17 +30,26 @@ class Beep:
     sd.play(audio, self.sample_rate, blocksize = int(self.sample_rate / 5), blocking = False)
     sd.wait()
 
-  def beep(self, audio):
-    asyncio.create_task(asyncio.to_thread(self.beep_, audio))
+  async def beep(self, audio):
+    await asyncio.to_thread(self.beep_, audio)
 
-  def beepHighShort(self):
-    self.beep(self.high_beep_audio_short)
+  @slot
+  async def beepHighShort(self):
+    await self.beep(self.high_beep_audio_short)
 
-  def beepLowShort(self):
-    self.beep(self.low_beep_audio_short)
+  @slot
+  async def beepLowShort(self):
+    await self.beep(self.low_beep_audio_short)
 
-  def beepHighLong(self):
-    self.beep(self.high_beep_audio_long)
+  @slot
+  async def beepLowShortTwice(self):
+    await self.beep(self.low_beep_audio_short)
+    await self.beep(self.low_beep_audio_short)
 
-  def beepLowLong(self):
-    self.beep(self.low_beep_audio_long)
+  @slot
+  async def beepHighLong(self):
+    await self.beep(self.high_beep_audio_long)
+
+  @slot
+  async def beepLowLong(self):
+    await self.beep(self.low_beep_audio_long)

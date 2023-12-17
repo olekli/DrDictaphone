@@ -45,6 +45,25 @@ class Microphone:
     self.input_stream.stop()
     self.input_stream.close()
 
+  def stopRec(self, pass_recording):
+    assert self.recording
+    logger.debug('stop recording')
+    self.stopStream()
+
+    if not pass_recording:
+      logger.debug('discarding')
+      self.buffer = AudioSegment.empty()
+
+    self.recording = False
+    self.paused = False
+    self.time_recorded = 0
+    self.events.idle()
+    self.events.stop_rec()
+    self.events.time_recorded(0)
+    if len(self.buffer) > 0:
+      self.events.result(self.buffer)
+      self.events.fence()
+
   @slot
   def onStartRec(self):
     assert not self.recording
@@ -57,20 +76,11 @@ class Microphone:
 
   @slot
   def onStopRec(self):
-    assert self.recording
-    logger.debug('stop recording')
-    self.stopStream()
+    self.stopRec(True)
 
-    if len(self.buffer) > 0:
-      self.events.result(self.buffer)
-
-    self.recording = False
-    self.paused = False
-    self.time_recorded = 0
-    self.events.idle()
-    self.events.stop_rec()
-    self.events.time_recorded(0)
-    self.events.fence()
+  @slot
+  def onDiscardRec(self):
+    self.stopRec(False)
 
   @slot
   def onPauseMic(self):

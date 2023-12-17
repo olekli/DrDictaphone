@@ -16,7 +16,7 @@ from drdictaphone import logger
 logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
-@emits('events', [ 'start_rec', 'stop_rec', 'pause_mic', 'unpause_mic', 'clear_buffer' ])
+@emits('events', [ 'start_rec', 'stop_rec', 'pause_mic', 'unpause_mic', 'clear_buffer', 'discard_rec' ])
 class App:
   def __init__(self):
     self.bindings = self.makeKeyBinds()
@@ -62,6 +62,7 @@ class App:
     bindings.add('q')(lambda event: self.exit())
     bindings.add(Keys.Vt100MouseEvent)(self.onMouseEvent)
     bindings.add('c')(lambda event: self.events.clear_buffer())
+    bindings.add('d')(lambda event: self.discardRec())
 
     return bindings
 
@@ -92,6 +93,12 @@ class App:
 
   def exit(self):
     self.app.exit()
+
+  def discardRec(self):
+    if self.is_recording:
+      self.events.discard_rec()
+      self.is_recording = False
+      self.is_paused = False
 
   @slot
   def updateText(self, new_text):
