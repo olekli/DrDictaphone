@@ -4,10 +4,11 @@
 import os
 import asyncio
 import aiofiles
-from mreventloop import emits, slot, has_event_loop
-from drdictaphone.pipeline_events import PipelineEvents
+from mreventloop import emits, slot, has_event_loop, forwards
+from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 
 @has_event_loop('event_loop')
+@forwards(PipelineSlots)
 @emits('events', PipelineEvents)
 class Output:
   def __init__(self, filename = None):

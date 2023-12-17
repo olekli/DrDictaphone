@@ -5,13 +5,14 @@ import asyncio
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
-from mreventloop import emits, slot, has_event_loop
-from drdictaphone.pipeline_events import PipelineEvents
+from mreventloop import emits, slot, has_event_loop, forwards
+from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 from drdictaphone.config import config
 from drdictaphone import logger
 logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
+@forwards(PipelineSlots)
 @emits('events', PipelineEvents)
 class Transcriber:
   cost_second = (0.6 / 60)

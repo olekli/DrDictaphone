@@ -3,10 +3,10 @@
 
 import functools
 from mreventloop import connect, emits, forwards, has_event_loop
-from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 
 @has_event_loop('event_loop')
-@forwards([ 'onStartRec', 'onStopRec', 'onPauseMic', 'onUnpauseMic', 'onClearBuffer' ])
+@forwards(PipelineSlots)
 @emits('events', PipelineEvents)
 class Pipeline:
   def __init__(self, operations):

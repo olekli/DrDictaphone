@@ -14,3 +14,17 @@ PipelineEvents = [
   'time_recorded',
   'clear_buffer',
 ]
+
+PipelineSlots = [
+  'onResult',
+  'onFence',
+  'onActive',
+  'onIdle',
+  'onStartRec',
+  'onStopRec',
+  'onCosts',
+  'onPauseMic',
+  'onUnpauseMic',
+  'onTimeRecorded',
+  'onClearBuffer',
+]

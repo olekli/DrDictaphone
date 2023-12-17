@@ -4,14 +4,15 @@
 import sounddevice
 import numpy
 from pydub import AudioSegment
-from mreventloop import emits, slot, has_event_loop
+from mreventloop import emits, slot, has_event_loop, forwards
 from drdictaphone.audio_tools import normaliseFormat
-from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
+@forwards(PipelineSlots)
 @emits('events', PipelineEvents)
 class Microphone:
   def __init__(self):

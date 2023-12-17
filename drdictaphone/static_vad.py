@@ -5,13 +5,14 @@ import asyncio
 import tempfile
 from pydub import AudioSegment
 from speechbrain.pretrained import VAD
-from mreventloop import emits, slot, has_event_loop
-from drdictaphone.pipeline_events import PipelineEvents
+from mreventloop import emits, slot, has_event_loop, forwards
+from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
+@forwards(PipelineSlots)
 @emits('events', PipelineEvents)
 class StaticVad:
   def __init__(self, silence_threshold = 1000):

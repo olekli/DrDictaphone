@@ -17,7 +17,7 @@ Jinja2==3.1.2
 joblib==1.3.2
 MarkupSafe==2.1.3
 mpmath==1.3.0
-mreventloop @ git+https://github.com/olekli/MrEventLoop.git@v0.4.0
+mreventloop @ git+https://github.com/olekli/MrEventLoop.git@v0.4.1
 networkx==3.2.1
 numpy==1.26.2
 openai==1.4.0

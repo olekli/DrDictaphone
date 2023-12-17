@@ -2,14 +2,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import asyncio
-from mreventloop import emits, slot, has_event_loop
-from drdictaphone.pipeline_events import PipelineEvents
+from mreventloop import emits, slot, has_event_loop, forwards
+from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 from drdictaphone.model.exchange import Exchange
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
+@forwards(PipelineSlots)
 @emits('events', PipelineEvents)
 class PostProcessor:
   def __init__(self, chat_gpt):
