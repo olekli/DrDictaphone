@@ -20,14 +20,18 @@ config = {
   }
 }
 
-def initConfig(application_mode = 'frozen' if getattr(sys, 'frozen', False) else ''):
+default_application_mode = 'frozen' \
+  if (getattr(sys, 'frozen', False) or 'DRDICTAPHONE_PROD' in os.environ) \
+  else ''
+
+def initConfig(application_mode = default_application_mode):
   findFfmpeg()
 
   user_path = os.path.expanduser('~/DrDictaphone')
   config['application_mode'] = application_mode
 
   if config['application_mode'] == 'frozen':
-    config['paths']['application'] = sys._MEIPASS
+    config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
     config['paths']['log'] = os.path.join(user_path, config['logfile'])
     config['paths']['config']['user'] = os.path.join(user_path)
     config['paths']['config']['internal'] = config['paths']['application']
