@@ -82,7 +82,7 @@ async def main():
 
         connect(main.cost_counter, 'costs', status_line, 'onUpdateCosts')
 
-        connect(main.microphone, 'time_recorded', status_line, 'onUpdateTimeRecorded')
+        # connect(main.microphone, 'time_recorded', status_line, 'onUpdateTimeRecorded')
 
         app.updateStatusLeft(status_line.getStatusLineLeft())
         app.updateStatusCenter(status_line.getStatusLineCenter())
