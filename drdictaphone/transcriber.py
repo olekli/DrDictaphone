@@ -19,17 +19,15 @@ class Transcriber:
   def __init__(self, language):
     self.language = language
     self.context = []
-    self.buffer = AudioSegment.empty()
-    self.text_buffer = ''
-    self.mark = 0
 
-  def transcribeBuffer(self):
+  def transcribeBuffer(self, audio):
     with tempfile.NamedTemporaryFile(
       prefix = "recorded_audio_",
       suffix = ".mp3",
       delete = True
     ) as temp_file:
-      self.buffer.export(temp_file.name, format = 'mp3')
+      audio.export(temp_file.name, format = 'mp3')
+      logger.debug(f'audio file: {temp_file.name}')
       audio_file = open(temp_file.name, 'rb')
       client = OpenAI(api_key = config['openai_api_key'])
       transcript = client.audio.transcriptions.create(
@@ -38,39 +36,26 @@ class Transcriber:
         language = self.language,
         prompt = ' '.join(self.context)
       )
-      length_seconds = len(self.buffer) / 1000
-      costs = length_seconds * Transcriber.cost_second
-      self.events.costs(costs)
-      logger.debug(f'costs: {costs}')
-      logger.debug(f'whisper replied: {transcript.text}')
-      logger.debug(f'context was: {self.context}')
-      self.text_buffer = transcript.text
-      self.mark = len(self.buffer)
       return transcript.text
 
   @slot
-  async def onResult(self, audio_segment):
-    logger.debug(f'received audio of length: {len(audio_segment)}')
-    self.buffer += audio_segment
-    text = await asyncio.get_event_loop().run_in_executor(None, self.transcribeBuffer)
+  async def onResult(self, audio):
+    logger.debug(f'received audio of length: {len(audio)}')
+    text = await asyncio.get_event_loop().run_in_executor(None, self.transcribeBuffer, audio)
+    logger.debug(f'whisper replied: {text}')
+    logger.debug(f'context was: {self.context}')
+    length_seconds = len(audio) / 1000
+    costs = length_seconds * Transcriber.cost_second
+    logger.debug(f'costs: {costs}')
     self.events.result(text)
+    self.events.costs(costs)
+    self.context.append(text)
 
   @slot
   def onFence(self):
-    if len(self.buffer) > 0:
-      if len(self.buffer) > self.mark:
-        text = self.transcribeBuffer()
-      else:
-        text = self.text_buffer
-      self.context.append(text)
-      self.buffer = AudioSegment.empty()
-      self.text_buffer = ''
-      self.mark = 0
-      self.events.result(text)
     self.events.fence()
 
   @slot
   def onClearBuffer(self):
-    self.text_buffer = ''
-    self.mark = 0
+    self.context = []
     self.events.clear_buffer()

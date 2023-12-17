@@ -1,12 +1,11 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import sounddevice
-import numpy
 from pydub import AudioSegment
 from mreventloop import emits, slot, has_event_loop
 from drdictaphone.audio_tools import normaliseFormat
 from drdictaphone.pipeline_events import PipelineEvents
+from drdictaphone.pa import pa
 from drdictaphone import logger
 
 logger = logger.get(__name__)
@@ -18,18 +17,45 @@ class Microphone:
     self.buffer = AudioSegment.empty()
     self.recording = False
     self.paused = False
-    self.time_recorded = 0
-    self.dtype = numpy.int16
-    self.sample_width = None
-    self.sample_rate = None
-    self.channels = None
+
+    default_device_index = pa.get_default_input_device_info()['index']
+    device_info = pa.get_device_info_by_index(default_device_index)
+
+    logger.debug(f'{device_info}')
+    logger.info(f'recording on device: {device_info["name"]}')
+    logger.debug(f'{device_info}')
+
+    self.sample_rate = int(device_info['defaultSampleRate'])
+    self.channels = 1
+    self.audio_format = pyaudio.paInt16
+    self.sample_width = pa.get_sample_size(self.audio_format)
+    logger.debug(f'sw: {self.sample_width}')
+    logger.debug(f'sr: {self.sample_rate}')
+    self.chunk = 1024
+
+    self.stream = None
+
+  def startStream(self):
+    self.stream = pa.open(
+      format = self.audio_format,
+      channels = self.channels,
+      rate = self.sample_rate,
+      input = True,
+      frames_per_buffer = self.chunk,
+      stream_callback = self.callback
+    )
+
+  def stopStream(self):
+    self.stream.stop_stream()
+    self.stream.close()
 
   @slot
   def onStartRec(self):
     assert not self.recording
     logger.debug('start recording')
+    self.buffer = AudioSegment.empty()
     self.recording = True
-    self.makeInputStream(self.callback_recording)
+    self.startStream()
     self.events.active()
     self.events.start_rec()
 
@@ -37,25 +63,19 @@ class Microphone:
   def onStopRec(self):
     assert self.recording
     logger.debug('stop recording')
-    self.input_stream.__exit__(None, None, None, None)
-
-    if len(self.buffer) > 0:
-      self.events.result(self.buffer)
-
+    self.stopStream()
+    self.events.result(normaliseFormat(self.buffer))
     self.recording = False
     self.paused = False
-    self.time_recorded = 0
-    self.buffer = AudioSegment.empty()
     self.events.idle()
     self.events.stop_rec()
-    self.events.time_recorded(0)
     self.events.fence()
 
   @slot
   def onPauseMic(self):
     assert self.recording and not self.paused
     logger.debug('pause mic')
-    self.input_stream.__exit__(None, None, None, None)
+    self.input_stream.stop()
     self.paused = True
     self.events.idle()
 
@@ -63,36 +83,17 @@ class Microphone:
   def onUnpauseMic(self):
     assert self.paused
     self.paused = False
-    self.makeInputStream(self.callback_recording)
+    self.input_stream.start()
     self.events.active()
 
-  def makeAudioSegment(self, indata, sample_width, sample_rate, channels):
-    return normaliseFormat(AudioSegment(
-      data = indata.tobytes(),
-      sample_width = sample_width,
-      frame_rate = sample_rate,
-      channels = channels
-    ))
-
-  def callback_recording(self, indata, frames, time, status):
-    self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
-    time_recorded = int(len(self.buffer) / 1000)
-    if self.time_recorded != time_recorded:
-      self.time_recorded = time_recorded
-      #self.events.time_recorded(self.time_recorded)
-
-  def makeInputStream(self, callback):
-    device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
-    logger.info(f'recording on device: {device_info["name"]}')
-    self.sample_rate = int(device_info['default_samplerate'])
-    self.channels = device_info['max_input_channels']
-    self.sample_width = numpy.dtype(self.dtype).itemsize
-
-    self.input_stream = sounddevice.InputStream(
-      samplerate = self.sample_rate,
-      channels = self.channels,
-      dtype = self.dtype,
-      blocksize = int(self.sample_rate / 10),
-      callback = callback
+  def makeAudioSegment(self, indata):
+    return AudioSegment(
+      data = indata,
+      sample_width = self.sample_width,
+      frame_rate = self.sample_rate,
+      channels = self.channels
     )
-    self.input_stream.__enter__()
+
+  def callback(self, indata, frames, time, status):
+    self.buffer += self.makeAudioSegment(indata)
+    return (None, pyaudio.paContinue)
