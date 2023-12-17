@@ -24,12 +24,33 @@ class Microphone:
     self.sample_rate = None
     self.channels = None
 
+  def startStream(self):
+    device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
+    logger.info(f'recording on device: {device_info["name"]}')
+    self.sample_rate = int(device_info['default_samplerate'])
+    self.channels = 1
+    self.sample_width = numpy.dtype(self.dtype).itemsize
+
+    self.input_stream = sounddevice.InputStream(
+      samplerate = self.sample_rate,
+      channels = self.channels,
+      dtype = self.dtype,
+      blocksize = int(self.sample_rate / 10),
+      callback = self.callback
+    )
+    self.input_stream.start()
+
+  def stopStream(self):
+    self.input_stream.stop()
+    self.input_stream.close()
+
   @slot
   def onStartRec(self):
     assert not self.recording
     logger.debug('start recording')
+    self.buffer = AudioSegment.empty()
     self.recording = True
-    self.makeInputStream(self.callback_recording)
+    self.startStream()
     self.events.active()
     self.events.start_rec()
 
@@ -37,7 +58,7 @@ class Microphone:
   def onStopRec(self):
     assert self.recording
     logger.debug('stop recording')
-    self.input_stream.__exit__(None, None, None, None)
+    self.stopStream()
 
     if len(self.buffer) > 0:
       self.events.result(self.buffer)
@@ -45,7 +66,6 @@ class Microphone:
     self.recording = False
     self.paused = False
     self.time_recorded = 0
-    self.buffer = AudioSegment.empty()
     self.events.idle()
     self.events.stop_rec()
     self.events.time_recorded(0)
@@ -55,7 +75,7 @@ class Microphone:
   def onPauseMic(self):
     assert self.recording and not self.paused
     logger.debug('pause mic')
-    self.input_stream.__exit__(None, None, None, None)
+    self.stopStream()
     self.paused = True
     self.events.idle()
 
@@ -63,36 +83,16 @@ class Microphone:
   def onUnpauseMic(self):
     assert self.paused
     self.paused = False
-    self.makeInputStream(self.callback_recording)
+    self.startStream()
     self.events.active()
 
-  def makeAudioSegment(self, indata, sample_width, sample_rate, channels):
+  def makeAudioSegment(self, indata):
     return normaliseFormat(AudioSegment(
       data = indata.tobytes(),
-      sample_width = sample_width,
-      frame_rate = sample_rate,
-      channels = channels
+      sample_width = self.sample_width,
+      frame_rate = self.sample_rate,
+      channels = self.channels
     ))
 
-  def callback_recording(self, indata, frames, time, status):
-    self.buffer += self.makeAudioSegment(indata, self.sample_width, self.sample_rate, self.channels)
-    time_recorded = int(len(self.buffer) / 1000)
-    if self.time_recorded != time_recorded:
-      self.time_recorded = time_recorded
-      #self.events.time_recorded(self.time_recorded)
-
-  def makeInputStream(self, callback):
-    device_info = sounddevice.query_devices(sounddevice.default.device, 'input')
-    logger.info(f'recording on device: {device_info["name"]}')
-    self.sample_rate = int(device_info['default_samplerate'])
-    self.channels = device_info['max_input_channels']
-    self.sample_width = numpy.dtype(self.dtype).itemsize
-
-    self.input_stream = sounddevice.InputStream(
-      samplerate = self.sample_rate,
-      channels = self.channels,
-      dtype = self.dtype,
-      blocksize = int(self.sample_rate / 10),
-      callback = callback
-    )
-    self.input_stream.__enter__()
+  def callback(self, indata, frames, time, status):
+    self.buffer += self.makeAudioSegment(indata)
