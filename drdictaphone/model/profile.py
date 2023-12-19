@@ -21,6 +21,7 @@ class Profile(BaseModel):
   output: str
   output_command: Optional[str]
   enable_vad: bool = False
+  raw: dict
 
   def __str__(self):
     return f'{self.post_processor}, {self.topic}, {self.gpt_model}, {self.options}, {self.language}, {self.output}, {self.output_command}, {self.enable_vad}'

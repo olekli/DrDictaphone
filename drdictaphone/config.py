@@ -152,6 +152,7 @@ def readModel(Model, filename, defaults, transformations):
   filename = getPath('config', filename)
   with open(filename, 'rt') as file:
     data = yaml.safe_load(file)
+  data['raw'] = dict(data)
   data = transform(transformations, applyDefaults(defaults, data))
   data['post_processor']['topic'] = data['topic']
   data['post_processor']['language'] = data['language']
