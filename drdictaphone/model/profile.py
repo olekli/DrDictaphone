@@ -13,6 +13,7 @@ from .instructions import Instructions
 class Profile(BaseModel):
   model_config = ConfigDict(extra = 'forbid')
 
+  id: str
   post_processor: Context
   topic: Instructions
   gpt_model: Optional[GptModel]
@@ -23,4 +24,4 @@ class Profile(BaseModel):
   enable_vad: bool = False
 
   def __str__(self):
-    return f'{self.post_processor}, {self.topic}, {self.gpt_model}, {self.options}, {self.language}, {self.output}, {self.output_command}, {self.enable_vad}'
+    return f'{self.name}: {self.post_processor}, {self.topic}, {self.gpt_model}, {self.options}, {self.language}, {self.output}, {self.output_command}, {self.enable_vad}'

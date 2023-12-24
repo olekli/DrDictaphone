@@ -159,6 +159,8 @@ def readModel(Model, filename, defaults, transformations):
     data['post_processor']['gpt_model'] = data['gpt_model']
   if data['options']:
     data['post_processor']['options'] = { **data['post_processor']['options'], **data['options'] }
+  if 'id' in Model.__fields__:
+    data['id'] = os.path.splitext(os.path.basename(filename))[0]
   return Model(**data)
 
 def readProfile(filename):
