@@ -19,9 +19,9 @@ class Profile(BaseModel):
   gpt_model: Optional[GptModel]
   options: Optional[Options]
   language: str
-  output: str
+  output: Optional[str]
   output_command: Optional[str]
   enable_vad: bool = False
 
   def __str__(self):
-    return f'{self.name}: {self.post_processor}, {self.topic}, {self.gpt_model}, {self.options}, {self.language}, {self.output}, {self.output_command}, {self.enable_vad}'
+    return f'{self.id}: {self.post_processor}, {self.topic}, {self.gpt_model}, {self.options}, {self.language}, {self.output}, {self.output_command}, {self.enable_vad}'
