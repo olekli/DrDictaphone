@@ -11,7 +11,7 @@ from drdictaphone import logger
 logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
-@emits('events', [ 'profile_change' ])
+@emits('events', [ 'profile_change', 'available_profiles' ])
 class ProfileManager:
   def __init__(self):
     self.profile_name = None
@@ -34,3 +34,18 @@ class ProfileManager:
       file.write(yaml.dump(self.profile.raw))
     self.profile = readProfile(profile_path)
     self.events.profile_change(self.profile)
+
+  @slot
+  def onQueryProfiles(self):
+    profile_path = getProfilePath(None)
+    available_profiles = os.listdir(profile_path)
+    available_profiles.sort(
+      key = lambda x: os.path.getatime(os.path.join(profile_path, x)),
+      reverse = True
+    )
+    available_profiles = [
+      x for x, y in [
+        os.path.splitext(entry) for entry in available_profiles
+      ]
+    ]
+    self.events.available_profiles(available_profiles)

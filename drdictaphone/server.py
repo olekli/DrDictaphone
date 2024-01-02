@@ -25,11 +25,13 @@ class Server:
     self.ui = ServerUi()
     self.rpc_server = RpcServer(
       'ipc:///tmp/drdictaphone.ipc',
-      [ 'start_rec', 'stop_rec', 'profile_selected', 'shutdown' ],
-      [ 'status', 'result' ]
+      [ 'start_rec', 'stop_rec', 'profile_selected', 'shutdown', 'query_profiles' ],
+      [ 'status', 'result', 'available_profiles' ]
     )
     connect(self.rpc_server, 'profile_selected', self.profile_manager, 'onProfileSelected')
+    connect(self.rpc_server, 'query_profiles', self.profile_manager, 'onQueryProfiles')
     connect(self.profile_manager, 'profile_change', self, 'onProfileChange')
+    connect(self.profile_manager, 'available_profiles', self.rpc_server.publish, 'available_profiles')
     connect(self.profile_manager, 'profile_change', self.status_line, 'onProfileChange')
     connect(self, 'recording', self.status_line, 'onRecording')
     connect(self, 'processing', self.status_line, 'onProcessing')

@@ -7,10 +7,10 @@ from mreventloop import Client as RpcClient
 from mreventloop import connect
 
 async def main():
-  pub_events = [ 'status', 'result' ]
+  pub_events = [ 'status', 'result', 'available_profiles' ]
   rpc_client = RpcClient(
     'ipc:///tmp/drdictaphone.ipc',
-    [ 'start_rec', 'stop_rec', 'profile_selected', 'shutdown' ],
+    [ 'start_rec', 'stop_rec', 'profile_selected', 'shutdown', 'query_profiles' ],
     pub_events
   )
 
