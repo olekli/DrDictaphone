@@ -6,9 +6,8 @@ from drdictaphone.config import config
 
 logger_config = {
   'level': logging.DEBUG,
-  'filename': config['paths']['log'],
+#  'filename': config['paths']['log'],
   'format': '%(asctime)s %(levelname)s: %(name)s: %(message)s'
-#  format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 }
 
 logging.basicConfig(**logger_config)
