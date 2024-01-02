@@ -46,33 +46,33 @@ class Microphone:
     self.input_stream.close()
 
   def stopRec(self, pass_recording):
-    assert self.recording
-    logger.debug('stop recording')
-    self.stopStream()
+    if self.recording:
+      logger.debug('stop recording')
+      self.stopStream()
 
-    if not pass_recording:
-      logger.debug('discarding')
-      self.buffer = AudioSegment.empty()
+      if not pass_recording:
+        logger.debug('discarding')
+        self.buffer = AudioSegment.empty()
 
-    self.recording = False
-    self.paused = False
-    self.time_recorded = 0
-    self.events.idle()
-    self.events.stop_rec()
-    self.events.time_recorded(0)
-    if len(self.buffer) > 0:
-      self.events.result(self.buffer)
-      self.events.fence()
+      self.recording = False
+      self.paused = False
+      self.time_recorded = 0
+      self.events.idle()
+      self.events.stop_rec()
+      self.events.time_recorded(0)
+      if len(self.buffer) > 0:
+        self.events.result(self.buffer)
+        self.events.fence()
 
   @slot
   def onStartRec(self):
-    assert not self.recording
-    logger.debug('start recording')
-    self.buffer = AudioSegment.empty()
-    self.recording = True
-    self.startStream()
-    self.events.active()
-    self.events.start_rec()
+    if not self.recording:
+      logger.debug('start recording')
+      self.buffer = AudioSegment.empty()
+      self.recording = True
+      self.startStream()
+      self.events.active()
+      self.events.start_rec()
 
   @slot
   def onStopRec(self):
@@ -84,18 +84,18 @@ class Microphone:
 
   @slot
   def onPauseMic(self):
-    assert self.recording and not self.paused
-    logger.debug('pause mic')
-    self.stopStream()
-    self.paused = True
-    self.events.idle()
+    if self.recording and not self.paused:
+      logger.debug('pause mic')
+      self.stopStream()
+      self.paused = True
+      self.events.idle()
 
   @slot
   def onUnpauseMic(self):
-    assert self.paused
-    self.paused = False
-    self.startStream()
-    self.events.active()
+    if self.paused:
+      self.paused = False
+      self.startStream()
+      self.events.active()
 
   def makeAudioSegment(self, indata):
     return normaliseFormat(AudioSegment(
