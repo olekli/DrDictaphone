@@ -3,7 +3,7 @@
 
 import asyncio
 from mreventloop import connect, disconnect, has_event_loop, emits, slot, getEventLoop, EventLoop
-from mreventloop import Server as RpcServer
+from drdictaphone.rpc import RpcServer
 from drdictaphone.config import readProfile, makeOutputFilename, getProfilePath
 from drdictaphone.profile_manager import ProfileManager
 from drdictaphone.server_pipeline import ServerPipeline
@@ -23,11 +23,7 @@ class Server:
     self.status_line = ServerStatusLine()
     self.status_line.event_loop = self.event_loop
     self.ui = ServerUi()
-    self.rpc_server = RpcServer(
-      'ipc:///tmp/drdictaphone.ipc',
-      [ 'start_rec', 'stop_rec', 'profile_selected', 'shutdown', 'query_profiles' ],
-      [ 'status', 'result', 'available_profiles' ]
-    )
+    self.rpc_server = RpcServer()
     connect(self.rpc_server, 'profile_selected', self.profile_manager, 'onProfileSelected')
     connect(self.rpc_server, 'query_profiles', self.profile_manager, 'onQueryProfiles')
     connect(self.profile_manager, 'profile_change', self, 'onProfileChange')

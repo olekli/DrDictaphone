@@ -3,18 +3,13 @@
 
 import sys
 import asyncio
-from mreventloop import Client as RpcClient
 from mreventloop import connect
+from drdictaphone.rpc import RpcClient, pub_event_names
 
 async def main():
-  pub_events = [ 'status', 'result', 'available_profiles' ]
-  rpc_client = RpcClient(
-    'ipc:///tmp/drdictaphone.ipc',
-    [ 'start_rec', 'stop_rec', 'profile_selected', 'shutdown', 'query_profiles' ],
-    pub_events
-  )
+  rpc_client = RpcClient()
 
-  for event_name in pub_events:
+  for event_name in pub_event_names:
     connect(
       rpc_client, event_name,
       None, lambda *args, event_name=event_name, **kwargs: print(f'{event_name}: {args}')
