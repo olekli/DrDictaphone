@@ -37,9 +37,12 @@ class PostProcessor:
         self.events.result(response['result'])
         self.text_buffer = []
         self.attempts = 0
+      else:
+        self.events.error()
     else:
       logger.warning(f'post replied with error: {response["err"]}')
       logger.warning(f'input was: {text}')
+      self.events.error()
 
   @slot
   async def onResult(self, text):

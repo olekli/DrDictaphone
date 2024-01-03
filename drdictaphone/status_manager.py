@@ -8,7 +8,13 @@ from mreventloop import emits, has_event_loop, slot
 @emits('events', [ 'updated' ])
 class StatusManager:
   def __init__(self):
-    self.status = { 'profile_name': '', 'mic': False, 'processing': False, 'costs': 0.0 }
+    self.status = {
+      'profile_name': '',
+      'mic': False,
+      'processing': False,
+      'error': False,
+      'costs': 0.0,
+    }
 
   @slot
   def onStartRec(self):
@@ -28,6 +34,16 @@ class StatusManager:
   @slot
   def onStopProcessing(self):
     self.status['processing'] = False
+    self.events.updated(self.status)
+
+  @slot
+  def onErrorSet(self):
+    self.status['error'] = True
+    self.events.updated(self.status)
+
+  @slot
+  def onErrorUnset(self):
+    self.status['error'] = False
     self.events.updated(self.status)
 
   @slot

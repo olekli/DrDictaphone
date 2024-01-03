@@ -12,6 +12,7 @@ PipelineEvents = [
   'clear_buffer',
   'active',
   'idle',
+  'error',
 ]
 
 PipelineSlots = [
@@ -23,4 +24,5 @@ PipelineSlots = [
   'onPauseMic',
   'onUnpauseMic',
   'onClearBuffer',
+  'onError',
 ]

@@ -8,7 +8,8 @@ logger = logger.get(__name__)
 def makeStatusLine(status):
   to_print = [
     'MIC' if status['mic'] else '',
-    'PROCESSING' if status['processing'] else '',
+    'PROC' if status['processing'] else '',
+    'ERR' if status['error'] else '',
   ]
   left = '  ' + ''.join(f'{word:<6}' for word in to_print)
   right = f'{status["profile_name"]}      costs: {(status["costs"] / 100):.2f}$  '

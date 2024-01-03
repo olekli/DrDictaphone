@@ -49,6 +49,8 @@ class Server:
     connect(self.rpc, 'start_rec', self.pipeline.microphone, 'onStartRec')
     connect(self.rpc, 'stop_rec', self.pipeline.microphone, 'onStopRec')
     connect(self.pipeline.outlet, 'result', self.rpc.publish, 'result')
+    connect(self.pipeline.outlet, 'result', self.status_manager, lambda _: self.status_manager.onErrorUnset())
+    connect(self.pipeline.outlet, 'error', self.status_manager, 'onErrorSet')
     connect(self.pipeline.cost_counter, 'costs_incurred', self.status_manager, 'onCostsIncurred')
     connect(self.pipeline.microphone, 'active', self.status_manager, 'onStartRec')
     connect(self.pipeline.microphone, 'idle', self.status_manager, 'onStopRec')
