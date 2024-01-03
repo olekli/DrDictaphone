@@ -19,6 +19,7 @@ class Client:
     connect(self.ui, 'query_profiles', self.rpc_client.request, 'query_profiles')
     connect(self.ui, 'profile_selected', self.rpc_client.request, 'profile_selected')
     connect(self.ui, 'clear_buffer', self.rpc_client.request, 'clear_buffer')
+    connect(self.ui, 'shutdown', self.rpc_client.request, 'shutdown')
     connect(self.rpc_client, 'result', self.ui, 'onResult')
     connect(self.rpc_client, 'status', self.ui, 'onStatus')
     connect(self.rpc_client, 'available_profiles', self.ui, 'onAvailableProfiles')

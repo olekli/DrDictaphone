@@ -30,6 +30,7 @@ logger = logger.get(__name__)
   'discard_rec',
   'query_profiles',
   'profile_selected',
+  'shutdown',
 ])
 class ClientUi:
   def __init__(self):
@@ -96,6 +97,7 @@ class ClientUi:
       self.is_recording = True
 
   def exit(self):
+    self.events.shutdown()
     self.app.exit()
 
   def discardRec(self):

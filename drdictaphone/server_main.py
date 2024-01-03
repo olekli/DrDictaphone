@@ -5,7 +5,13 @@ import asyncio
 from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
-import drdictaphone.logger_config
+
+logger_config = {
+  'level': logging.WARNING,
+  'format': '%(asctime)s %(levelname)s: %(name)s: %(message)s'
+}
+logging.basicConfig(**logger_config)
+
 from drdictaphone import logger
 
 async def main():
