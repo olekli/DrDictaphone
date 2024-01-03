@@ -13,6 +13,7 @@ class Client:
     self.ui = ClientUi()
     connect(self.ui, 'start_rec', self.rpc_client.request, 'start_rec')
     connect(self.ui, 'stop_rec', self.rpc_client.request, 'stop_rec')
+    connect(self.ui, 'discard_rec', self.rpc_client.request, 'discard_rec')
     connect(self.ui, 'query_profiles', self.rpc_client.request, 'query_profiles')
     connect(self.ui, 'profile_selected', self.rpc_client.request, 'profile_selected')
     connect(self.rpc_client, 'result', self.ui, 'onResult')

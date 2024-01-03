@@ -6,6 +6,7 @@ from mreventloop import Server, Client
 req_event_names = [
   'start_rec',
   'stop_rec',
+  'discard_rec',
   'profile_selected',
   'shutdown',
   'query_profiles'
