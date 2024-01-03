@@ -13,25 +13,12 @@ from drdictaphone.pipeline_events import PipelineEvents, PipelineSlots
 class Output:
   def __init__(self, filename = None):
     self.filename = filename
-    self.last_final_pos = 0
     with open(self.filename, 'a'):
       pass
-    with open(self.filename, 'rt') as file:
-      file.seek(0, os.SEEK_END)
-      self.last_final_pos = file.tell()
 
   @slot
   async def onResult(self, result):
     if self.filename:
-      async with aiofiles.open(self.filename, 'r+t') as file:
-        await file.seek(self.last_final_pos)
-        await file.truncate()
-        await file.write(f'\n{result}\n')
+      async with aiofiles.open(self.filename, 'at') as file:
+        await file.write(f'\n\n{result}')
     self.events.result(result)
-
-  @slot
-  async def onFence(self):
-    async with aiofiles.open(self.filename, 'rt') as file:
-      await file.seek(0, os.SEEK_END)
-      self.last_final_pos = await file.tell()
-    self.events.fence()

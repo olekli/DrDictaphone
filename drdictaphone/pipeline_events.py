@@ -3,30 +3,24 @@
 
 PipelineEvents = [
   'result',
-  'fence',
-  'active',
-  'idle',
   'start_rec',
   'stop_rec',
   'discard_rec',
-  'costs',
+  'costs_incurred',
   'pause_mic',
   'unpause_mic',
-  'time_recorded',
   'clear_buffer',
+  'active',
+  'idle',
 ]
 
 PipelineSlots = [
   'onResult',
-  'onFence',
-  'onActive',
-  'onIdle',
   'onStartRec',
   'onStopRec',
   'onDiscardRec',
-  'onCosts',
+  'onCostsIncurred',
   'onPauseMic',
   'onUnpauseMic',
-  'onTimeRecorded',
   'onClearBuffer',
 ]

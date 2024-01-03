@@ -27,7 +27,3 @@ class OutputCommand:
     if process.returncode != 0:
       logger.error(f'Output command reports error: {error}')
     self.events.result(result)
-
-  @slot
-  def onFence(self):
-    self.events.fence()

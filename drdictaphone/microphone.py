@@ -19,7 +19,6 @@ class Microphone:
     self.buffer = AudioSegment.empty()
     self.recording = False
     self.paused = False
-    self.time_recorded = 0
     self.dtype = numpy.int16
     self.sample_width = None
     self.sample_rate = None
@@ -56,13 +55,10 @@ class Microphone:
 
       self.recording = False
       self.paused = False
-      self.time_recorded = 0
       self.events.idle()
       self.events.stop_rec()
-      self.events.time_recorded(0)
       if len(self.buffer) > 0:
         self.events.result(self.buffer)
-        self.events.fence()
 
   @slot
   def onStartRec(self):

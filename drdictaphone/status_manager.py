@@ -37,5 +37,5 @@ class StatusManager:
 
   @slot
   def onCostsIncurred(self, costs):
-    self.status['costs'] += costs
+    self.status['costs'] = costs
     self.events.updated(self.status)

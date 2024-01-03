@@ -57,7 +57,3 @@ class StaticVad:
         prev_end = end
       if len(result) > 0:
         self.events.result(result)
-
-  @slot
-  def onFence(self):
-    self.events.fence()

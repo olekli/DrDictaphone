@@ -10,12 +10,8 @@ logger = logger.get(__name__)
 @has_event_loop('event_loop')
 @forwards(PipelineSlots)
 @emits('events', PipelineEvents)
-class CostCounter:
-  def __init__(self):
-    self.total_costs = 0
-
+class Outlet:
   @slot
-  def onCostsIncurred(self, costs):
-    logger.debug(f'recording costs: {costs}')
-    self.total_costs += costs
-    self.events.costs_incurred(self.total_costs)
+  def onResult(self, result):
+    logger.debug(f'result: {result}')
+    self.events.result(result)

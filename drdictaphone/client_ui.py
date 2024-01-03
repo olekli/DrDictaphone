@@ -56,7 +56,7 @@ class ClientUi:
     self.app = Application(
       layout = self.layout,
       key_bindings = self.bindings,
-      full_screen = False,
+      full_screen = True,
       mouse_support = False
     )
 
@@ -132,7 +132,9 @@ class ClientUi:
 
   @slot
   def onResult(self, new_text):
-    self.text_area.text += new_text
+    if self.text_area.text:
+      self.text_area.text += '\n\n'
+    self.text_area.text += f'{new_text}'
     self.app.invalidate()
 
   @slot

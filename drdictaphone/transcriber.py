@@ -49,12 +49,8 @@ class Transcriber:
     costs = length_seconds * Transcriber.cost_second
     logger.debug(f'costs: {costs}')
     self.events.result(text)
-    self.events.costs(costs)
+    self.events.costs_incurred(costs)
     self.context.append(text)
-
-  @slot
-  def onFence(self):
-    self.events.fence()
 
   @slot
   def onClearBuffer(self):

@@ -16,47 +16,39 @@ class PostProcessor:
   def __init__(self, chat_gpt):
     self.chat_gpt = chat_gpt
 
-    self.text_buffer = [None]
+    self.text_buffer = []
     self.attempts = 0
     self.max_attempts = 5
 
   def makeText(self):
-    return ' '.join([line for line in self.text_buffer if line is not None])
+    return '\n\n'.join(self.text_buffer)
 
-  async def tryGpt(self, text):
+  async def tryGpt(self):
+    text = self.makeText()
     response = await self.chat_gpt.ask(text)
-    self.events.costs(self.chat_gpt.last_cost)
+    self.events.costs_incurred(self.chat_gpt.last_cost)
     self.attempts += 1
     if 'result' in response:
       logger.debug(f'post replied: {response}')
       logger.debug(f'input was: {text}')
-      self.events.result(response['result'])
       if ('coherent' in response and response['coherent']) or self.attempts >= self.max_attempts:
         if self.attempts >= self.max_attempts:
           logger.warning(f'accepting incoherent unit of text: {response["result"]}')
-        self.text_buffer = [None]
+        self.events.result(response['result'])
+        self.text_buffer = []
         self.attempts = 0
-        self.events.fence()
-        return True
     else:
       logger.warning(f'post replied with error: {response["err"]}')
       logger.warning(f'input was: {text}')
-    return False
 
   @slot
-  def onResult(self, text):
-    self.text_buffer[-1] = text
-    self.events.result(self.makeText())
-
-  @slot
-  async def onFence(self):
-    text = self.makeText()
+  async def onResult(self, text):
     if len(text) > 0:
-      self.text_buffer.append(None)
-      await self.tryGpt(text)
+      self.text_buffer.append(text)
+      await self.tryGpt()
 
   @slot
   def onClearBuffer(self):
-    self.text_buffer = [None]
+    self.text_buffer = []
     self.attempts = 0
     self.events.clear_buffer()

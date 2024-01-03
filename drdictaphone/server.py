@@ -8,6 +8,7 @@ from drdictaphone.config import readProfile, makeOutputFilename, getProfilePath
 from drdictaphone.profile_manager import ProfileManager
 from drdictaphone.server_pipeline import ServerPipeline
 from drdictaphone.status_manager import StatusManager
+from drdictaphone.status_aggregator import StatusAggregator
 from drdictaphone import logger
 
 logger = logger.get(__name__)
@@ -28,6 +29,7 @@ class Server:
     connect(self.profile_manager, 'profile_change', self.status_manager, 'onProfileChange')
     connect(self.status_manager, 'updated', self.rpc.publish, 'status')
     connect(self.rpc, 'shutdown', self, 'onShutdown')
+    self.status_aggregator = None
 
     self.exiting = asyncio.Event()
 
@@ -46,34 +48,21 @@ class Server:
 
     connect(self.rpc, 'start_rec', self.pipeline.microphone, 'onStartRec')
     connect(self.rpc, 'stop_rec', self.pipeline.microphone, 'onStopRec')
-    connect(self.pipeline.result_buffer, 'result', self.rpc.publish, 'result')
+    connect(self.pipeline.outlet, 'result', self.rpc.publish, 'result')
+    connect(self.pipeline.cost_counter, 'costs_incurred', self.status_manager, 'onCostsIncurred')
     connect(self.pipeline.microphone, 'active', self.status_manager, 'onStartRec')
     connect(self.pipeline.microphone, 'idle', self.status_manager, 'onStopRec')
-    if self.pipeline.vad:
-      connect(
-        self.pipeline.vad.event_loop, 'active',
-        self.status_manager, 'onStartProcessing'
-      )
-      connect(
-        self.pipeline.vad.event_loop, 'idle',
-        self.status_manager, 'onStopProcessing'
-      )
-    connect(
-      self.pipeline.transcriber.event_loop, 'active',
-      self.status_manager, 'onStartProcessing'
-    )
-    connect(
-      self.pipeline.transcriber.event_loop, 'idle',
-      self.status_manager, 'onStopProcessing'
-    )
-    connect(
-      self.pipeline.post_processor.event_loop, 'active',
-      self.status_manager, 'onStartProcessing'
-    )
-    connect(
-      self.pipeline.post_processor.event_loop, 'idle',
-      self.status_manager, 'onStopProcessing'
-    )
+    if self.status_aggregator:
+      disconnect(self.status_aggregator, 'active')
+      disconnect(self.status_aggregator, 'idle')
+    self.status_aggregator = StatusAggregator([
+      self.pipeline.vad.event_loop,
+      self.pipeline.transcriber.event_loop,
+      self.pipeline.post_processor.event_loop,
+    ])
+    self.status_aggregator.event_loop = self.event_loop
+    connect(self.status_aggregator, 'active', self.status_manager, 'onStartProcessing')
+    connect(self.status_aggregator, 'idle', self.status_manager, 'onStopProcessing')
 
     await self.pipeline.__aenter__()
 

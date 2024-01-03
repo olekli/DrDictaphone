@@ -8,15 +8,13 @@ from drdictaphone.transcriber import Transcriber
 from drdictaphone.chat_gpt import ChatGpt
 from drdictaphone.post_processor import PostProcessor
 from drdictaphone.output import Output
-from drdictaphone.aggregator import Aggregator
 from drdictaphone.cost_counter import CostCounter
-from drdictaphone.result_buffer import ResultBuffer
+from drdictaphone.outlet import Outlet
 from drdictaphone.pipeline import Pipeline
 from drdictaphone import logger
 
 logger = logger.get(__name__)
 
-@emits('events', [ 'exception' ])
 class ServerPipeline:
   def __init__(self, profile):
     self.profile = profile
@@ -31,18 +29,16 @@ class ServerPipeline:
     self.output = None
     if self.profile.output:
       self.output = Output(makeOutputFilename(self.profile.output))
-    self.aggregator = Aggregator()
     self.cost_counter = CostCounter()
-    self.result_buffer = ResultBuffer()
+    self.outlet = Outlet()
     modules = [
       self.microphone,
       self.vad,
       self.transcriber,
       self.post_processor,
       self.output,
-      self.aggregator,
       self.cost_counter,
-      self.result_buffer
+      self.outlet,
     ]
     self.pipeline = Pipeline(modules)
 
