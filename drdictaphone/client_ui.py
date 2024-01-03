@@ -104,6 +104,11 @@ class ClientUi:
       self.is_recording = False
       self.is_paused = False
 
+  def clearBuffer(self):
+    self.text_area.text = ''
+    self.app.invalidate()
+    self.events.clear_buffer()
+
   def selectProfile(self):
     self.events.query_profiles()
 

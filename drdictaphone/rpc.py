@@ -7,15 +7,18 @@ req_event_names = [
   'start_rec',
   'stop_rec',
   'discard_rec',
+  'pause_mic',
+  'unpause_mic',
   'profile_selected',
   'shutdown',
-  'query_profiles'
+  'query_profiles',
+  'clear_buffer',
 ]
 
 pub_event_names = [
   'status',
   'result',
-  'available_profiles'
+  'available_profiles',
 ]
 
 socket_path = 'ipc:///tmp/drdictaphone.ipc'
