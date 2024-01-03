@@ -9,6 +9,7 @@ from drdictaphone.profile_manager import ProfileManager
 from drdictaphone.server_pipeline import ServerPipeline
 from drdictaphone.status_manager import StatusManager
 from drdictaphone.status_aggregator import StatusAggregator
+from drdictaphone.beep import Beep
 from drdictaphone import logger
 
 logger = logger.get(__name__)
@@ -30,6 +31,8 @@ class Server:
     connect(self.status_manager, 'updated', self.rpc.publish, 'status')
     connect(self.rpc, 'shutdown', self, 'onShutdown')
     self.status_aggregator = None
+    self.beep = Beep()
+    self.beep.event_loop = self.event_loop
 
     self.exiting = asyncio.Event()
 
@@ -52,6 +55,11 @@ class Server:
     connect(self.rpc, 'pause_mic', self.pipeline.microphone, 'onPauseMic')
     connect(self.rpc, 'unpause_mic', self.pipeline.microphone, 'onUnpauseMic')
     connect(self.rpc, 'clear_buffer', self.pipeline.pipeline, 'onClearBuffer')
+    connect(self.rpc, 'start_rec', self.beep, 'beepHighLong')
+    connect(self.rpc, 'stop_rec', self.beep, 'beepLowLong')
+    connect(self.rpc, 'discard_rec', self.beep, 'beepLowShortTwice')
+    connect(self.rpc, 'pause_mic', self.beep, 'beepLowShort')
+    connect(self.rpc, 'unpause_mic', self.beep, 'beepHighShort')
     connect(self.pipeline.outlet, 'result', self.rpc.publish, 'result')
     connect(self.pipeline.outlet, 'result', self.status_manager, lambda _: self.status_manager.onErrorUnset())
     connect(self.pipeline.outlet, 'error', self.status_manager, 'onErrorSet')
@@ -76,6 +84,10 @@ class Server:
     logger.debug('stopping pipeline')
     disconnect(self.rpc, 'start_rec')
     disconnect(self.rpc, 'stop_rec')
+    disconnect(self.rpc, 'discard_rec')
+    disconnect(self.rpc, 'pause_mic')
+    disconnect(self.rpc, 'unpause_mic')
+    disconnect(self.rpc, 'clear_buffer')
     if self.pipeline:
       await self.pipeline.__aexit__(None, None, None)
 
