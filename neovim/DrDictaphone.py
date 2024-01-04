@@ -102,8 +102,12 @@ class DrDictaphonePlugin(object):
 
   def insertText(self, lines):
     row, _ = self.nvim.current.window.cursor
-    for line in lines:
-      self.nvim.current.buffer.append(line, row)
+    i = 0
+    for i, line in enumerate(lines):
+      self.nvim.current.buffer.append(line, row + i)
+      i += 1
+    line_length = len(self.nvim.current.buffer[row + i])
+    self.nvim.current.window.cursor = [row + i, line_length - 1]
 
   def updateStatus(self, status):
     self.nvim.vars['airline_section_b'] = status
