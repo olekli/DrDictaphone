@@ -6,6 +6,7 @@ from mreventloop import Server, Client
 req_event_names = [
   'start_rec',
   'stop_rec',
+  'toggle_rec',
   'discard_rec',
   'pause_mic',
   'unpause_mic',

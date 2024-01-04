@@ -60,8 +60,7 @@ class Microphone:
       if len(self.buffer) > 0:
         self.events.result(self.buffer)
 
-  @slot
-  def onStartRec(self):
+  def startRec(self):
     if not self.recording:
       logger.debug('start recording')
       self.buffer = AudioSegment.empty()
@@ -71,8 +70,19 @@ class Microphone:
       self.events.start_rec()
 
   @slot
+  def onStartRec(self):
+    self.startRec()
+
+  @slot
   def onStopRec(self):
     self.stopRec(True)
+
+  @slot
+  def onToggleRec(self):
+    if self.recording:
+      self.stopRec(True)
+    else:
+      self.startRec()
 
   @slot
   def onDiscardRec(self):
