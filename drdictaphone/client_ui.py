@@ -31,6 +31,7 @@ logger = logger.get(__name__)
   'query_profiles',
   'profile_selected',
   'shutdown',
+  'query_status',
 ])
 class ClientUi:
   def __init__(self):
@@ -154,6 +155,7 @@ class ClientUi:
   async def __aenter__(self):
     await self.event_loop.__aenter__()
     self.main = asyncio.create_task(self.app.run_async())
+    self.events.query_status()
     return self
 
   async def __aexit__(self, exc_type, exc_value, traceback):

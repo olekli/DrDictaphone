@@ -13,6 +13,7 @@ req_event_names = [
   'shutdown',
   'query_profiles',
   'clear_buffer',
+  'query_status',
 ]
 
 pub_event_names = [

@@ -28,6 +28,7 @@ class Server:
     connect(self.profile_manager, 'profile_change', self, 'onProfileChange')
     connect(self.profile_manager, 'available_profiles', self.rpc.publish, 'available_profiles')
     connect(self.profile_manager, 'profile_change', self.status_manager, 'onProfileChange')
+    connect(self.rpc, 'query_status', self.status_manager, 'onQueryStatus')
     connect(self.status_manager, 'updated', self.rpc.publish, 'status')
     connect(self.rpc, 'shutdown', self, 'onShutdown')
     self.status_aggregator = None

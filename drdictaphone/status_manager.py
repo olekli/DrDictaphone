@@ -9,7 +9,7 @@ from mreventloop import emits, has_event_loop, slot
 class StatusManager:
   def __init__(self):
     self.status = {
-      'profile_name': '',
+      'profile_name': 'no profile selected',
       'mic': False,
       'processing': False,
       'error': False,
@@ -54,4 +54,8 @@ class StatusManager:
   @slot
   def onCostsIncurred(self, costs):
     self.status['costs'] = costs
+    self.events.updated(self.status)
+
+  @slot
+  def onQueryStatus(self):
     self.events.updated(self.status)
