@@ -100,9 +100,10 @@ class DrDictaphonePlugin(object):
     logger.debug(f'received status: {status}')
     self.nvim.async_call(lambda: self.updateStatus(makeStatusLinePlugin(status)))
 
-  def insertText(self, text):
+  def insertText(self, lines):
     row, _ = self.nvim.current.window.cursor
-    self.nvim.current.buffer.append(text, row)
+    for line in lines:
+      self.nvim.current.buffer.append(line, row)
 
   def updateStatus(self, status):
     self.nvim.vars['airline_section_b'] = status

@@ -142,7 +142,8 @@ class ClientUi:
   def onResult(self, new_text):
     if self.text_area.text:
       self.text_area.text += '\n\n'
-    self.text_area.text += f'{new_text}'
+    text = '\n\n'.join(new_text)
+    self.text_area.text += f'{text}'
     self.app.invalidate()
 
   @slot

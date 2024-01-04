@@ -21,7 +21,7 @@ class PostProcessor:
     self.max_attempts = 5
 
   def makeText(self):
-    return '\n\n'.join(self.text_buffer)
+    return '\n'.join(self.text_buffer)
 
   async def tryGpt(self):
     text = self.makeText()
@@ -34,7 +34,7 @@ class PostProcessor:
       if ('coherent' in response and response['coherent']) or self.attempts >= self.max_attempts:
         if self.attempts >= self.max_attempts:
           logger.warning(f'accepting incoherent unit of text: {response["result"]}')
-        self.events.result(response['result'])
+        self.events.result(response['result'].split('\n'))
         self.text_buffer = []
         self.attempts = 0
       else:
