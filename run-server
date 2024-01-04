@@ -1,0 +1,8 @@
+#!/bin/sh
+
+VENV_PATH="./.venv"
+cd "$(dirname "$(readlink -f "$0")")"
+
+source $VENV_PATH/bin/activate
+DRDICTAPHONE_PROD=True python -m drdictaphone.server_main
+deactivate

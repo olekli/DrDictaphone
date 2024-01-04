@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import asyncio
+import signal
 from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
@@ -17,6 +18,8 @@ from drdictaphone import logger
 
 async def main():
   async with Server() as server:
+    loop = asyncio.get_running_loop()
+    loop.add_signal_handler(signal.SIGINT, server.onShutdown)
     await server
 
 if __name__ == '__main__':
