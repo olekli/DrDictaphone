@@ -7,12 +7,10 @@ import os
 import sys
 import yaml
 from datetime import datetime
-from drdictaphone.model.context import Context
 from drdictaphone.model.profile import Profile
 from drdictaphone.find_ffmpeg import findFfmpeg
 
 config = {
-  'loglevel': os.environ.get('LOG_LEVEL', 'DEBUG'),
   'logfile': os.environ.get('LOG_FILE', 'drdictaphone.log'),
   'paths': {
     'config': {},
@@ -31,6 +29,7 @@ def initConfig(application_mode = default_application_mode):
   config['application_mode'] = application_mode
 
   if config['application_mode'] == 'frozen':
+    config['loglevel'] = os.environ.get('LOG_LEVEL', 'INFO')
     config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
     config['paths']['log'] = os.path.join(user_path, config['logfile'])
     config['paths']['config']['user'] = os.path.join(user_path)
@@ -38,6 +37,7 @@ def initConfig(application_mode = default_application_mode):
     config['paths']['output']['user'] = os.path.join(user_path, 'output')
     config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
   elif config['application_mode'] == 'plugin':
+    config['loglevel'] = os.environ.get('LOG_LEVEL', 'INFO')
     config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
     config['paths']['log'] = os.path.join(user_path, config['logfile'])
     config['paths']['config']['user'] = os.path.join(user_path)
@@ -45,6 +45,7 @@ def initConfig(application_mode = default_application_mode):
     config['paths']['output']['user'] = os.path.join(user_path, 'output')
     config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
   else:
+    config['loglevel'] = os.environ.get('LOG_LEVEL', 'DEBUG')
     config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
     config['paths']['log'] = os.path.join(config['paths']['application'], config['logfile'])
     config['paths']['config']['user'] = config['paths']['application']
