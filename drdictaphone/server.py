@@ -44,7 +44,8 @@ class Server:
     self.exiting.set()
 
   async def startPipeline(self, profile):
-    logger.debug(f'starting pipeline: {profile}')
+    logger.info(f'starting pipeline: {profile.id}')
+    logger.debug(f'profile: {profile}')
     self.pipeline = ServerPipeline(profile)
 
     connect(self.rpc, 'start_rec', self.pipeline.pipeline, 'onStartRec')
@@ -75,7 +76,7 @@ class Server:
     await self.pipeline.__aenter__()
 
   async def stopPipeline(self):
-    logger.debug('stopping pipeline')
+    logger.info('stopping pipeline')
     disconnect(self.rpc, 'start_rec')
     disconnect(self.rpc, 'stop_rec')
     disconnect(self.rpc, 'toggle_rec')
@@ -87,13 +88,13 @@ class Server:
       await self.pipeline.__aexit__(None, None, None)
 
   async def __aenter__(self):
-    logger.debug('starting server...')
+    logger.info('starting server...')
     await self.event_loop.__aenter__()
     await self.rpc.__aenter__()
     return self
 
   async def __aexit__(self, exc_type, exc_value, traceback):
-    logger.debug('stopping server...')
+    logger.info('stopping server...')
     await self.stopPipeline()
     await self.event_loop.__aexit__(exc_type, exc_value, traceback)
     await self.rpc.__aexit__(exc_type, exc_value, traceback)
