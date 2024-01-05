@@ -101,13 +101,21 @@ class DrDictaphonePlugin(object):
     self.nvim.async_call(lambda: self.updateStatus(makeStatusLinePlugin(status)))
 
   def insertText(self, lines):
-    row, _ = self.nvim.current.window.cursor
-    i = 0
-    for i, line in enumerate(lines):
-      self.nvim.current.buffer.append(line, row + i)
-      i += 1
-    line_length = len(self.nvim.current.buffer[row + i])
-    self.nvim.current.window.cursor = [row + i, line_length - 1]
+    if lines:
+      buffer = self.nvim.current.buffer
+      window = self.nvim.current.window
+      row, _ = window.cursor
+      if len(buffer[row - 1]) == 0:
+        buffer[row - 1] = lines[0]
+        lines = lines[1:]
+        last_row = row - 1
+        row += 1
+      if lines:
+        buffer.append(lines, row if row < len(buffer) else -1)
+        last_row = row - 1 + len(lines)
+        last_row = last_row if last_row < len(buffer) else len(buffer) - 1
+      line_length = len(buffer[last_row])
+      window.cursor = [last_row + 1, line_length - 1]
 
   def updateStatus(self, status):
     self.nvim.vars['airline_section_b'] = status
