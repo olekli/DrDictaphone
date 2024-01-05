@@ -1,37 +1,40 @@
 # DrDictaphone
 
-Dictation app for the terminal, using Whisper for transcription and ChatGPT for post-processing.
+Dictation app for the terminal and Neovim, using Whisper for transcription and ChatGPT for post-processing.
+
+### Installation
+
+```
+$ mkdir ~/DrDictaphone
+$ cd ~/DrDictaphone
+$ git clone git@github.com:olekli/DrDictaphone.git app --single-branch
+$ cp -r app/profile .
+```
+
+Set up environment and install dependencies or simply run `./install`.
+
+Place OpenAI API key in `~/DrDictaphone/config/openai_api_key`.
 
 ### Running
 
-```
-$ mkdir config
-$ echo 'YOUR_SECRET_OPENAI_API_KEY' > config/openai_api_key
-```
+To start the standalone app, do `python -m drdictaphone.main` inside the appropriate environment or simply do `./run` inside `app` dir.
+
+To start only the server, do `python -m drdictaphone.server_main` or simply `./run-server`.
+
+### Neovim Plugin
 
 ```
-$ python main.py
+$ ln -s ~/DrDictaphone/app/neovim/DrDictaphone.py ~/.config/nvim/rplugin/python3/.
 ```
 
-### Controlling:
+Then start the server. Use `DrDictaphoneSetProfile`, `DrDictaphoneToggle` vim commands.
 
-- `p` or `right mouse`: start/stop recording
-- `Space` or `left mouse`: pause/unpause recording
+### Controlling Standalone App:
+
+- `s`: select profile
+- `p`: start / stop and transcribe recording
+- `d`: stop and discard recording
 - `q`: exit
-
-On stopping the recording, the transcription and post-processing is invoked, but not on pausing the recording.
-
-### Voice Activation (VAD)
-
-To enable VAD, you need to set `enable_vad: true` in your profile.
-
-This adds the control:
-
-- `v`: start/stop recording with voice activation
-
-VAD is sketchy, though.
-
-You can still use normal recording with VAD enabled. You can disable it as it slows down application startup.
 
 ### Profiles
 
@@ -40,14 +43,12 @@ Profiles consist of:
 - `topic` for transcribing and post-processing, a list of strings
 - `language` to use for the transcriber, a string
 - `output` directory, a string
+- `output_command` to pipe output to
 - `enable_vad` whether or not to enable VAD, a bool, defaults to `false`
-- `post_processor` specs for post-processing, either a filename to load from or an object, defaults to `post_processor/default.yaml`
-- `gpt_model` to use for post-processing, either a filename to load from or an object, optional
-- `options` to use for post-processing, either a filename to load from or an object, optional
 
 Output will be written to a timestamped file in the output directory.
 
-If you specify `--output filename` on the command line, the specified filename will be used, ignoring the output directory.
+VAD will filter recordings for parts with voice before processing them.
 
 ### Post-Processor
 
@@ -59,5 +60,3 @@ The Post-Processor specs consist of:
 - `tools` to use for the post-processor, either a filename to load from or an object
 
 The context for the post-processor is built from the profile and the post-processor specs. Settings in the profile take precedence over settings in the specs.
-
-Usually, you would just want to set the topic and lanugage in your profile, and maybe change the temperature in the options. If you are feeling particularly lucky, you could try to tweak the instructions or even the tools in the post-processor specs.
