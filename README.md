@@ -5,10 +5,10 @@ Dictation app for the terminal and Neovim, using Whisper for transcription and C
 ### Installation
 
 ```
-$ mkdir ~/DrDictaphone
-$ cd ~/DrDictaphone
-$ git clone git@github.com:olekli/DrDictaphone.git app --single-branch
-$ cp -r app/profile .
+mkdir ~/DrDictaphone
+cd ~/DrDictaphone
+git clone git@github.com:olekli/DrDictaphone.git app --single-branch
+cp -r app/profile .
 ```
 
 Set up environment and install dependencies or simply run `./install`.
@@ -24,10 +24,16 @@ To start only the server, do `python -m drdictaphone.server_main` or simply `./r
 ### Neovim Plugin
 
 ```
-$ ln -s ~/DrDictaphone/app/neovim/DrDictaphone.py ~/.config/nvim/rplugin/python3/.
+ln -s ~/DrDictaphone/app/neovim/DrDictaphone.py ~/.config/nvim/rplugin/python3/.
 ```
 
-Then start the server. Use `DrDictaphoneSetProfile`, `DrDictaphoneToggle` vim commands.
+You need to set up a virtual environment where you install DrDictaphone and all its dependencies, e.g. in `~/.neovim-venv`. Then you need to add
+```
+let g:python3_host_prog = '~/.neovim-venv/.venv/bin/python'
+```
+to your `init.vim`. (You may need to spell out `~`.)
+
+Then start the server. Do `:UpdateRemotePlugins` once in Neovim, restart. Use `DrDictaphoneSetProfile`, `DrDictaphoneToggle` vim commands.
 
 ### Controlling Standalone App:
 
