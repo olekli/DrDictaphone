@@ -12,8 +12,8 @@ class StatusAggregator:
   def __init__(self, emitters):
     self.statuses = { emitter: False for emitter in emitters }
     for emitter in [ e for e in emitters if e ]:
-      connect(emitter, 'active', self, lambda emitter=emitter: self.onActive(emitter))
-      connect(emitter, 'idle', self, lambda emitter=emitter: self.onIdle(emitter))
+      connect(emitter, 'active', lambda emitter=emitter: self.onActive(emitter))
+      connect(emitter, 'idle', lambda emitter=emitter: self.onIdle(emitter))
 
   @slot
   def onActive(self, emitter):

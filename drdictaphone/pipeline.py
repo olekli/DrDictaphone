@@ -15,7 +15,7 @@ class Pipeline:
     prev_op = self
     for operation in [op for op in operations if op]:
       self.operations.append(operation)
-      connect(prev_op, None, self.operations[-1], None)
+      connect(prev_op, self.operations[-1])
       prev_op = self.operations[-1]
 
   async def __aenter__(self):

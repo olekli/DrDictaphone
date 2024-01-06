@@ -12,7 +12,7 @@ async def main():
   for event_name in pub_event_names:
     connect(
       rpc_client, event_name,
-      None, lambda *args, event_name=event_name, **kwargs: print(f'{event_name}: {args}')
+      lambda *args, event_name=event_name, **kwargs: print(f'{event_name}: {args}')
     )
 
   async with rpc_client:

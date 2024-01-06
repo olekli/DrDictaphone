@@ -1,7 +1,6 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from mreventloop import emits, connect
 from drdictaphone.config import makeOutputFilename
 from drdictaphone.audio_feedback import AudioFeedback
 from drdictaphone.microphone import Microphone

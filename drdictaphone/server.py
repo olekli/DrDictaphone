@@ -56,14 +56,13 @@ class Server:
     connect(self.rpc, 'unpause_mic', self.pipeline.pipeline, 'onUnpauseMic')
     connect(self.rpc, 'clear_buffer', self.pipeline.pipeline, 'onClearBuffer')
     connect(self.pipeline.outlet, 'result', self.rpc.publish, 'result')
-    connect(self.pipeline.outlet, 'result', self.status_manager, lambda _: self.status_manager.onErrorUnset())
+    connect(self.pipeline.outlet, 'result', lambda _: self.status_manager.onErrorUnset())
     connect(self.pipeline.outlet, 'error', self.status_manager, 'onErrorSet')
     connect(self.pipeline.cost_counter, 'costs_incurred', self.status_manager, 'onCostsIncurred')
     connect(self.pipeline.microphone, 'active', self.status_manager, 'onStartRec')
     connect(self.pipeline.microphone, 'idle', self.status_manager, 'onStopRec')
     if self.status_aggregator:
-      disconnect(self.status_aggregator, 'active')
-      disconnect(self.status_aggregator, 'idle')
+      disconnect(self.status_aggregator)
     self.status_aggregator = StatusAggregator([
       self.pipeline.vad.event_loop,
       self.pipeline.transcriber.event_loop,

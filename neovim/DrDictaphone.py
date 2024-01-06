@@ -49,7 +49,7 @@ class DrDictaphonePlugin(object):
     self.rpc = RpcClient()
     connect(self.rpc, 'result', self, 'onResult')
     connect(self.rpc, 'status', self, 'onStatus')
-    connect(self.event_loop, 'started', self, lambda: self.rpc.request.query_status())
+    connect(self.event_loop, 'started', lambda: self.rpc.request.query_status())
     asyncio.create_task(self.rpc.__aenter__())
     asyncio.create_task(self.event_loop.__aenter__())
 
