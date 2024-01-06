@@ -6,6 +6,7 @@ import signal
 from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
+from drdictaphone.rpc import RpcBroker
 import logging
 
 logger_config = {
@@ -17,7 +18,7 @@ logging.basicConfig(**logger_config)
 from drdictaphone import logger
 
 async def main():
-  async with Server() as server:
+  async with RpcBroker(), Server() as server:
     loop = asyncio.get_running_loop()
     loop.add_signal_handler(signal.SIGINT, server.onShutdown)
     await server

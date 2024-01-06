@@ -16,9 +16,6 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from mreventloop import slot, emits, has_event_loop
 from drdictaphone.status_line import makeStatusLine
-from drdictaphone import logger
-
-logger = logger.get(__name__)
 
 @has_event_loop('event_loop')
 @emits('events', [
@@ -130,7 +127,6 @@ class ClientUi:
       if user_input == '':
         user_input = available_profiles[0]
       print(f'selected {user_input}')
-      logger.debug(f'selected {user_input}')
       return user_input
 
   @slot

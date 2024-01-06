@@ -1,10 +1,6 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from drdictaphone import logger
-
-logger = logger.get(__name__)
-
 def makeStatusLine(status):
   to_print = [
     'MIC' if status['mic'] else '',

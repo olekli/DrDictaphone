@@ -1,7 +1,7 @@
 # Copyright 2023 Ole Kliemann
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from mreventloop import Server, Client
+from mreventloop import Peer, Broker
 
 req_event_names = [
   'start_rec',
@@ -23,7 +23,9 @@ pub_event_names = [
   'available_profiles',
 ]
 
-socket_path = 'ipc:///tmp/drdictaphone.ipc'
+in_socket_path = 'ipc:///tmp/drdictaphone_in.ipc'
+out_socket_path = 'ipc:///tmp/drdictaphone_out.ipc'
 
-RpcServer = lambda: Server(socket_path, req_event_names, pub_event_names)
-RpcClient = lambda: Client(socket_path, req_event_names, pub_event_names)
+RpcBroker = lambda: Broker(in_socket_path, out_socket_path)
+RpcServer = lambda: Peer(in_socket_path, out_socket_path, req_event_names, pub_event_names)
+RpcClient = lambda: Peer(in_socket_path, out_socket_path, pub_event_names, req_event_names)

@@ -10,6 +10,7 @@ from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
 from drdictaphone.client import Client
+from drdictaphone.rpc import RpcBroker
 import drdictaphone.logger_config
 from drdictaphone import logger
 
@@ -18,7 +19,7 @@ async def client_main():
     await client
 
 async def server_main():
-  async with Server() as server:
+  async with RpcBroker(), Server() as server:
     await server
 
 def server_entry():
