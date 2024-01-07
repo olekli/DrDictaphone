@@ -12,7 +12,7 @@ description = "Dictation app for the terminal and Neovim"
 dependencies = [
   "MrEventLoop==0.6.1",
 ]
-license = { file = "../LICENSE" }
+license = { file = "LICENSE" }
 requires-python = ">=3.6"
 classifiers = [
   "Programming Language :: Python :: 3",
