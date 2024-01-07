@@ -4,6 +4,7 @@
 import logging.config
 import logging
 import os
+from drdictaphone_shared.config_path import getConfigPath
 
 logger_config = {
     'version': 1,
@@ -17,14 +18,14 @@ logger_config = {
         'file_handler': {
             'class': 'logging.FileHandler',
             'formatter': 'standard',
-            'filename': os.path.expanduser('~/DrDictaphone/neovim.log'),
-            'level': logging.DEBUG,
+            'filename': os.path.join(getConfigPath(), 'neovim.log'),
+            'level': logging.INFO,
         },
     },
     'loggers': {
         'neovim-plugin': {
             'handlers': ['file_handler'],
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': False
         },
     }

@@ -9,6 +9,7 @@ import yaml
 from datetime import datetime
 from drdictaphone.model.profile import Profile
 from drdictaphone.find_ffmpeg import findFfmpeg
+from drdictaphone_shared.config_path import getConfigPath
 
 config = {
   'logfile': os.environ.get('LOG_FILE', 'drdictaphone.log'),
@@ -25,10 +26,16 @@ default_application_mode = 'frozen' \
 def initConfig(application_mode = default_application_mode):
   findFfmpeg()
 
-  user_path = os.path.expanduser('~/DrDictaphone')
   config['application_mode'] = application_mode
 
   if config['application_mode'] == 'frozen':
+    user_path = getConfigPath()
+
+    if not user_path:
+      print('Configuration not set up properly.')
+      print('`~/.drdictaphonerc` needs to contain the path to your installation.')
+      sys.exit(1)
+
     config['loglevel'] = os.environ.get('LOG_LEVEL', 'INFO')
     config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
     config['paths']['log'] = os.path.join(user_path, config['logfile'])
@@ -36,14 +43,7 @@ def initConfig(application_mode = default_application_mode):
     config['paths']['config']['internal'] = config['paths']['application']
     config['paths']['output']['user'] = os.path.join(user_path, 'output')
     config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
-  elif config['application_mode'] == 'plugin':
-    config['loglevel'] = os.environ.get('LOG_LEVEL', 'INFO')
-    config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
-    config['paths']['log'] = os.path.join(user_path, config['logfile'])
-    config['paths']['config']['user'] = os.path.join(user_path)
-    config['paths']['config']['internal'] = config['paths']['application']
-    config['paths']['output']['user'] = os.path.join(user_path, 'output')
-    config['paths']['openai_api_key'] = os.path.join(config['paths']['config']['user'], 'config', 'openai_api_key')
+
   else:
     config['loglevel'] = os.environ.get('LOG_LEVEL', 'DEBUG')
     config['paths']['application'] = os.path.dirname(os.path.abspath(__file__))
