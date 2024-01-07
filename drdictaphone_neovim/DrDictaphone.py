@@ -36,8 +36,8 @@ logger = logging.getLogger('neovim-plugin')
 import pynvim
 import asyncio
 from mreventloop import has_event_loop, slot, connect
-from drdictaphone.rpc import RpcClient
-from drdictaphone.status_line import makeStatusLinePlugin
+from drdictaphone_shared.rpc import RpcClient
+from drdictaphone_shared.status_line import makeStatusLinePlugin
 
 @pynvim.plugin
 @has_event_loop('event_loop')

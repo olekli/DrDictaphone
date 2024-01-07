@@ -4,7 +4,7 @@
 import sys
 import asyncio
 from mreventloop import connect
-from drdictaphone.rpc import RpcClient, pub_event_names
+from drdictaphone_shared.rpc import RpcClient, pub_event_names
 
 async def main():
   rpc_client = RpcClient()

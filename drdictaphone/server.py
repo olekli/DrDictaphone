@@ -3,7 +3,7 @@
 
 import asyncio
 from mreventloop import connect, disconnect, has_event_loop, emits, slot, getEventLoop, EventLoop
-from drdictaphone.rpc import RpcServer
+from drdictaphone_shared.rpc import RpcServer
 from drdictaphone.config import readProfile, makeOutputFilename, getProfilePath
 from drdictaphone.profile_manager import ProfileManager
 from drdictaphone.server_pipeline import ServerPipeline

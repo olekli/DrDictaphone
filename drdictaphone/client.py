@@ -4,7 +4,7 @@
 import sys
 import asyncio
 from mreventloop import connect
-from drdictaphone.rpc import RpcClient
+from drdictaphone_shared.rpc import RpcClient
 from drdictaphone.client_ui import ClientUi
 
 class Client:

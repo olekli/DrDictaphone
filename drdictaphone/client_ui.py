@@ -15,7 +15,7 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 from mreventloop import slot, emits, has_event_loop
-from drdictaphone.status_line import makeStatusLine
+from drdictaphone_shared.status_line import makeStatusLine
 
 @has_event_loop('event_loop')
 @emits('events', [

@@ -6,7 +6,7 @@ import signal
 from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
-from drdictaphone.rpc import RpcBroker
+from drdictaphone_shared.rpc import RpcBroker
 import logging
 
 logger_config = {

@@ -10,7 +10,7 @@ from drdictaphone.config import initConfig
 initConfig()
 from drdictaphone.server import Server
 from drdictaphone.client import Client
-from drdictaphone.rpc import RpcBroker
+from drdictaphone_shared.rpc import RpcBroker
 import drdictaphone.logger_config
 from drdictaphone import logger
 
