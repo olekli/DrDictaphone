@@ -14,6 +14,8 @@ from drdictaphone_shared.rpc import RpcBroker
 import drdictaphone.logger_config
 from drdictaphone import logger
 
+logger = logger.get(__name__)
+
 async def client_main():
   async with Client() as client:
     await client
@@ -30,9 +32,7 @@ def client_entry():
   asyncio.set_event_loop(asyncio.new_event_loop())
   asyncio.run(client_main())
 
-if __name__ == '__main__':
-  logger = logger.get(__name__)
-
+def runStandalone():
   server_thread = threading.Thread(target = server_entry)
   server_thread.start()
 
@@ -47,3 +47,6 @@ if __name__ == '__main__':
     os.kill(os.getpid(), signal.SIGTERM)
     time.sleep(1)
     os.kill(os.getpid(), signal.SIGKILL)
+
+if __name__ == '__main__':
+  runStandalone()

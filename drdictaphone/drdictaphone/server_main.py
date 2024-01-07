@@ -15,16 +15,15 @@ logger_config = {
 }
 logging.basicConfig(**logger_config)
 
-from drdictaphone import logger
-
 async def main():
   async with RpcBroker(), Server() as server:
     loop = asyncio.get_running_loop()
     loop.add_signal_handler(signal.SIGINT, server.onShutdown)
     await server
 
-if __name__ == '__main__':
-  logger = logger.get(__name__)
-
+def runServer():
   asyncio.set_event_loop(asyncio.new_event_loop())
   asyncio.run(main())
+
+if __name__ == '__main__':
+  runServer()

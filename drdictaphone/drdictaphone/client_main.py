@@ -16,6 +16,9 @@ async def main():
   async with Client() as client:
     await client
 
-if __name__ == '__main__':
+def runClient():
   asyncio.set_event_loop(asyncio.new_event_loop())
   asyncio.run(main())
+
+if __name__ == '__main__':
+  runClient()
