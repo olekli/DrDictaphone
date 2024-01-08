@@ -37,7 +37,7 @@ let g:python3_host_prog = '~/.neovim-venv/bin/python'
 
 Inside this virtual environment, install the Neovim plugin:
 ```
-pip install drdictaphone-neovim
+pip install drdictaphone-neovim-plugin
 ```
 
 Now you need to add the plugin to your Neovim config directory:
