@@ -4,34 +4,47 @@ Dictation app for the terminal and Neovim, using Whisper for transcription and C
 
 ### Installation
 
+You can use the installation script:
 ```
-mkdir ~/DrDictaphone
-cd ~/DrDictaphone
-git clone git@github.com:olekli/DrDictaphone.git app --single-branch
-cp -r app/profile .
+curl https://raw.githubusercontent.com/olekli/DrDictaphone/main/script/install.sh | sh
 ```
 
-Set up environment and install dependencies or simply run `./install`.
+Or create a virtual environment and do:
+```
+pip install drdictaphone
+python -m drdictaphone.cli install ~/DrDictaphone
+```
 
 Place OpenAI API key in `~/DrDictaphone/config/openai_api_key`.
 
 ### Running
 
-To start the standalone app, do `python -m drdictaphone.main` inside the appropriate environment or simply do `./run` inside `app` dir.
+To start the standalone app, do `./drdictaphone`.
 
-To start only the server, do `python -m drdictaphone.server_main` or simply `./run-server`.
+To start only the server, do `./drdictaphone server`.
+
+Shutdown a running server by doing `./drdictaphone shutdown`.
 
 ### Neovim Plugin
 
+If you are not already using Python plugins in Neovim,
+you need to create a virtual environment for Neovim to use.
+Tell Neovim about it by adding to your `init.vim`:
 ```
-ln -s ~/DrDictaphone/app/neovim/DrDictaphone.py ~/.config/nvim/rplugin/python3/.
+let g:python3_host_prog = '~/.neovim-venv/bin/python'
+```
+(Or wherever your venv is located.)
+
+Inside this virtual environment, install the Neovim plugin:
+```
+pip install drdictaphone-neovim
 ```
 
-You need to set up a virtual environment where you install DrDictaphone and all its dependencies, e.g. in `~/.neovim-venv`. Then you need to add
+Now you need to add the plugin to your Neovim config directory:
 ```
-let g:python3_host_prog = '~/.neovim-venv/.venv/bin/python'
+ln -s ~/.neovim-venv/lib/python3.11/site-packages/drdictaphone_neovim/DrDictaphone.py ~/.config/nvim/rplugin/python3/.
 ```
-to your `init.vim`. (You may need to spell out `~`.)
+(Your paths may vary.)
 
 Then start the server. Do `:UpdateRemotePlugins` once in Neovim, restart. Use `DrDictaphoneSetProfile`, `DrDictaphoneToggle` vim commands.
 
