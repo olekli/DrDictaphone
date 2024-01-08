@@ -3,8 +3,9 @@
 
 import asyncio
 import signal
-from drdictaphone.config import initConfig
+from drdictaphone.config import initConfig, checkConfig
 initConfig()
+checkConfig()
 from drdictaphone.server import Server
 from drdictaphone_shared.rpc import RpcBroker
 import logging

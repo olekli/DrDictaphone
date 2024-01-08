@@ -56,6 +56,11 @@ def initConfig(application_mode = default_application_mode):
   createConfigSkel()
   config['openai_api_key'] = getApiKey()
 
+def checkConfig():
+  if not config['openai_api_key']:
+    print(f'Please provide OpenAI API key in file: {config["paths"]["openai_api_key"]}')
+    sys.exit(1)
+
 def getPath(type, path):
   if os.path.isabs(path):
     return path
@@ -92,8 +97,7 @@ def getApiKey():
     with open(path, 'at'):
       pass
   if not key:
-    print(f'Please provide OpenAI API key in file: {path}')
-    sys.exit(1)
+    return None
   return key
 
 def getProfilePath(profile):

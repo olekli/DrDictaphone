@@ -4,6 +4,7 @@
 import os
 import sys
 from drdictaphone_shared.config_path import getConfigPath, drdictaphonerc_path
+from drdictaphone.config import initConfig
 
 def install(target_path):
   user_path = getConfigPath()
@@ -22,7 +23,4 @@ def install(target_path):
 
   os.chmod(script_path, os.stat(script_path).st_mode | 0o111)
 
-  os.environ['DRDICTAPHONE_PROD'] = 'True'
-
-  from drdictaphone.config import initConfig
-  initConfig()
+  initConfig('frozen')

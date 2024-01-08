@@ -6,8 +6,9 @@ import signal
 import time
 import asyncio
 import threading
-from drdictaphone.config import initConfig
+from drdictaphone.config import initConfig, checkConfig
 initConfig()
+checkConfig()
 from drdictaphone.server import Server
 from drdictaphone.client import Client
 from drdictaphone_shared.rpc import RpcBroker
