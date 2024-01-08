@@ -15,7 +15,7 @@ def install(target_path):
 
   os.makedirs(target_path, exist_ok = True)
 
-  script_content = f'#!/bin/sh\nsource {sys.prefix}/bin/activate && DRDICTAPHONE_PROD=True python -m drdictaphone.cli && deactivate'
+  script_content = f'#!/bin/sh\nsource {sys.prefix}/bin/activate && DRDICTAPHONE_PROD=True python -m drdictaphone.cli "$@" && deactivate'
   script_path = os.path.join(target_path, 'drdictaphone')
 
   with open(script_path, 'w') as file:
