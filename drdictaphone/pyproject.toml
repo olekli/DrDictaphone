@@ -4,22 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "DrDictaphone"
-version = "0.8.3"
+version = "0.8.4"
 authors = [
     { name = "Ole Kliemann", email = "mail@olekliemann.de" }
 ]
 description = "Dictation app for the terminal and Neovim"
 dependencies = [
-  "sounddevice==0.4.6",
-  "speechbrain==0.5.16",
-  "pydub==0.25.1",
-  "pydantic==2.5.3",
-  "openai==1.6.1",
-  "python-dotenv==1.0.0",
-  "prompt-toolkit==3.0.43",
-  "MrEventLoop==0.6.1",
-  "aiofiles==23.2.1",
-  "drdictaphone-shared==0.8.2",
+  "sounddevice>=0.4.6",
+  "speechbrain>=0.5.16",
+  "pydub>=0.25.1",
+  "pydantic>=2.5.3",
+  "openai>=1.6.1",
+  "python-dotenv>=1.0.0",
+  "prompt-toolkit>=3.0.43",
+  "MrEventLoop>=0.6.1",
+  "aiofiles>=23.2.1",
+  "drdictaphone-shared>=0.8.2",
 ]
 readme = "README.md"
 license = { file = "LICENSE" }

@@ -50,7 +50,7 @@ class DrDictaphonePlugin(object):
     self.rpc = RpcClient()
     connect(self.rpc, 'result', self, 'onResult')
     connect(self.rpc, 'status', self, 'onStatus')
-    connect(self.event_loop, 'started', lambda: self.rpc.request.query_status())
+    connect(self.event_loop, 'started', lambda: self.rpc.publish.query_status())
     asyncio.create_task(self.rpc.__aenter__())
     asyncio.create_task(self.event_loop.__aenter__())
 
@@ -65,7 +65,7 @@ class DrDictaphonePlugin(object):
   async def setProfile_(self, args):
     logger.debug(f'selecting profile: {args[0]}')
     if len(args) > 0:
-      await self.rpc.request.profile_selected(args[0])
+      await self.rpc.publish.profile_selected(args[0])
 
   @pynvim.command('DrDictaphoneStart', nargs = '0')
   def startDictate(self, args):
@@ -73,7 +73,7 @@ class DrDictaphonePlugin(object):
 
   async def startDictate_(self):
     logger.debug(f'start recording')
-    await self.rpc.request.start_rec()
+    await self.rpc.publish.start_rec()
 
   @pynvim.command('DrDictaphoneStop', nargs = '0')
   def stopDictate(self, args):
@@ -81,7 +81,7 @@ class DrDictaphonePlugin(object):
 
   async def stopDictate_(self):
     logger.debug(f'stop recording')
-    await self.rpc.request.stop_rec()
+    await self.rpc.publish.stop_rec()
 
   @pynvim.command('DrDictaphoneToggle', nargs = '0')
   def toggleDictate(self, args):
@@ -89,7 +89,7 @@ class DrDictaphonePlugin(object):
 
   async def toggleDictate_(self):
     logger.debug(f'toggle recording')
-    await self.rpc.request.toggle_rec()
+    await self.rpc.publish.toggle_rec()
 
   @slot
   def onResult(self, result):
