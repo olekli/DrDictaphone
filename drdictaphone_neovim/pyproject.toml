@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "drdictaphone-neovim-plugin"
-version = "0.8.1"
+version = "0.8.2"
 authors = [
     { name = "Ole Kliemann", email = "mail@olekliemann.de" }
 ]
 description = "DrDictaphone plugin for Neovim"
 dependencies = [
   "MrEventLoop==0.6.1",
-  "drdictaphone-shared==0.8.0",
+  "drdictaphone-shared==0.8.2",
   "pynvim==0.5.0",
 ]
 license = { file = "LICENSE" }
