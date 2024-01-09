@@ -2,18 +2,20 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
+from drdictaphone.client_commands import client_commands
 
 parser = argparse.ArgumentParser(description = 'DrDictaphone')
 subparsers = parser.add_subparsers(dest = 'command')
 
 command_parser = subparsers.add_parser('install', help = 'Install run script and configuration')
 command_parser.add_argument('directory', type = str, help = 'Directory for DrDictaphone')
-
 command_parser = subparsers.add_parser('server', help = 'Only run server')
 command_parser = subparsers.add_parser('shutdown', help = 'Shutdown a running server')
-# command_parser.add_argument('--no-daemon', action = 'store_true', help = 'Do not fork')
+command_parser = subparsers.add_parser('client', help = 'Only run client')
 
-command_parser = subparsers.add_parser('client', help='Only run client')
+for command in client_commands:
+  command_parser = subparsers.add_parser(command)
+  command_parser.add_argument('arg', type = str)
 
 args = parser.parse_args()
 
@@ -29,6 +31,8 @@ elif args.command == 'client':
 elif args.command == 'shutdown':
   from drdictaphone.cli_client import sendRequest
   sendRequest('shutdown')
+elif args.command in client_commands:
+  client_commands[args.command](args.arg)
 else:
   from drdictaphone.main import runStandalone
   runStandalone()

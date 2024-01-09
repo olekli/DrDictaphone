@@ -3,6 +3,7 @@
 
 from drdictaphone.config import makeOutputFilename
 from drdictaphone.audio_feedback import AudioFeedback
+from drdictaphone.file_input import FileInput
 from drdictaphone.microphone import Microphone
 from drdictaphone.transcriber import Transcriber
 from drdictaphone.chat_gpt import ChatGpt
@@ -19,6 +20,7 @@ class ServerPipeline:
   def __init__(self, profile):
     self.profile = profile
     self.audio_feedback = AudioFeedback()
+    self.file_input = FileInput()
     self.microphone = Microphone()
     self.vad = None
     if self.profile.enable_vad:
@@ -34,6 +36,7 @@ class ServerPipeline:
     self.outlet = Outlet()
     modules = [
       self.audio_feedback,
+      self.file_input,
       self.microphone,
       self.vad,
       self.transcriber,

@@ -11,7 +11,7 @@ from drdictaphone_shared.rpc import RpcBroker
 import logging
 
 logger_config = {
-  'level': logging.WARNING,
+  'level': logging.INFO,
   'format': '%(asctime)s %(levelname)s: %(name)s: %(message)s'
 }
 logging.basicConfig(**logger_config)

@@ -46,7 +46,9 @@ class PostProcessor:
 
   @slot
   async def onResult(self, text):
-    if len(text) > 0:
+    if not text:
+      self.events.result(None)
+    else:
       self.text_buffer.append(text)
       await self.tryGpt()
 

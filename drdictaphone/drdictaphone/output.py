@@ -18,7 +18,7 @@ class Output:
 
   @slot
   async def onResult(self, result):
-    if self.filename:
+    if self.filename and result:
       async with aiofiles.open(self.filename, 'at') as file:
         await file.write(f'\n\n{result}')
     self.events.result(result)

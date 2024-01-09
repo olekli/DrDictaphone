@@ -39,20 +39,25 @@ class StaticVad:
 
   @slot
   async def onResult(self, audio_segment):
-    if len(audio_segment) < 3000:
-      audio_segment += AudioSegment.silent(duration = 3000 - len(audio_segment))
-    logger.debug(f'received audio of length: {len(audio_segment)}')
-    predictions = await asyncio.get_event_loop().run_in_executor(
-      None,
-      self.getPredictions, audio_segment
-    )
-    result = AudioSegment.empty()
-    prev_end = 0
-    for start, end in predictions:
-      if (start - prev_end) < self.silence_threshold:
-        result += audio_segment[prev_end:end]
+    if not audio_segment:
+      self.events.result(None)
+    else:
+      if len(audio_segment) < 3000:
+        audio_segment += AudioSegment.silent(duration = 3000 - len(audio_segment))
+      logger.debug(f'received audio of length: {len(audio_segment)}')
+      predictions = await asyncio.get_event_loop().run_in_executor(
+        None,
+        self.getPredictions, audio_segment
+      )
+      result = AudioSegment.empty()
+      prev_end = 0
+      for start, end in predictions:
+        if (start - prev_end) < self.silence_threshold:
+          result += audio_segment[prev_end:end]
+        else:
+          result += audio_segment[(start - self.silence_threshold):end]
+        prev_end = end
+      if len(result) > 0:
+        self.events.result(result)
       else:
-        result += audio_segment[(start - self.silence_threshold):end]
-      prev_end = end
-    if len(result) > 0:
-      self.events.result(result)
+        self.events.result(None)

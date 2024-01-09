@@ -55,6 +55,7 @@ class Server:
     connect(self.rpc, 'pause_mic', self.pipeline.pipeline, 'onPauseMic')
     connect(self.rpc, 'unpause_mic', self.pipeline.pipeline, 'onUnpauseMic')
     connect(self.rpc, 'clear_buffer', self.pipeline.pipeline, 'onClearBuffer')
+    connect(self.rpc, 'load_file', self.pipeline.pipeline, 'onLoadFile')
     connect(self.pipeline.outlet, 'result', self.rpc.publish, 'result')
     connect(self.pipeline.outlet, 'result', lambda _: self.status_manager.onErrorUnset())
     connect(self.pipeline.outlet, 'error', self.status_manager, 'onErrorSet')
@@ -83,6 +84,7 @@ class Server:
     disconnect(self.rpc, 'pause_mic')
     disconnect(self.rpc, 'unpause_mic')
     disconnect(self.rpc, 'clear_buffer')
+    disconnect(self.rpc, 'load_file')
     if self.pipeline:
       await self.pipeline.__aexit__(None, None, None)
 

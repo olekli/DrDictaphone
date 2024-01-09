@@ -41,16 +41,19 @@ class Transcriber:
 
   @slot
   async def onResult(self, audio):
-    logger.debug(f'received audio of length: {len(audio)}')
-    text = await asyncio.get_event_loop().run_in_executor(None, self.transcribeBuffer, audio)
-    logger.debug(f'whisper replied: {text}')
-    logger.debug(f'context was: {self.context}')
-    length_seconds = len(audio) / 1000
-    costs = length_seconds * Transcriber.cost_second
-    logger.debug(f'costs: {costs}')
-    self.events.result(text)
-    self.events.costs_incurred(costs)
-    self.context.append(text)
+    if not audio:
+      self.events.result(None)
+    else:
+      logger.debug(f'received audio of length: {len(audio)}')
+      text = await asyncio.get_event_loop().run_in_executor(None, self.transcribeBuffer, audio)
+      logger.debug(f'whisper replied: {text}')
+      logger.debug(f'context was: {self.context}')
+      length_seconds = len(audio) / 1000
+      costs = length_seconds * Transcriber.cost_second
+      logger.debug(f'costs: {costs}')
+      self.events.result(text)
+      self.events.costs_incurred(costs)
+      self.context.append(text)
 
   @slot
   def onClearBuffer(self):

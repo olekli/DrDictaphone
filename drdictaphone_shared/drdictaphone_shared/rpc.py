@@ -15,6 +15,7 @@ req_event_names = [
   'query_profiles',
   'clear_buffer',
   'query_status',
+  'load_file',
 ]
 
 pub_event_names = [
