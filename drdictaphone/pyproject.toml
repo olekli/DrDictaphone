@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "DrDictaphone"
-version = "0.8.4"
+version = "0.9.1"
 authors = [
     { name = "Ole Kliemann", email = "mail@olekliemann.de" }
 ]
@@ -17,9 +17,9 @@ dependencies = [
   "openai>=1.6.1",
   "python-dotenv>=1.0.0",
   "prompt-toolkit>=3.0.43",
-  "MrEventLoop>=0.6.1",
+  "MrEventLoop>=0.6.2",
   "aiofiles>=23.2.1",
-  "drdictaphone-shared>=0.8.2",
+  "drdictaphone-shared>=0.9.1",
 ]
 readme = "README.md"
 license = { file = "LICENSE" }

@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "drdictaphone-shared"
-version = "0.8.4"
+version = "0.9.1"
 authors = [
     { name = "Ole Kliemann", email = "mail@olekliemann.de" }
 ]
 description = "Dictation app for the terminal and Neovim"
 dependencies = [
-  "MrEventLoop>=0.6.1",
+  "MrEventLoop>=0.6.2",
 ]
 license = { file = "LICENSE" }
 requires-python = ">=3.6"
