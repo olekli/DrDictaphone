@@ -1,4 +1,4 @@
-# Copyright 2023 Ole Kliemann
-# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright 2024 Ole Kliemann
+# SPDX-License-Identifier: Apache-2.0
 
 Options = dict
