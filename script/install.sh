@@ -5,6 +5,7 @@ TARGET="$1" &&
 echo "Installing to $TARGET" &&
 mkdir -p "$TARGET" &&
 cd "$TARGET" &&
+rm -fr .venv &&
 python3 -m venv .venv &&
 . .venv/bin/activate &&
 pip install drdictaphone &&
