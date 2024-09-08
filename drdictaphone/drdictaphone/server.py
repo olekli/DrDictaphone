@@ -65,7 +65,7 @@ class Server:
     if self.status_aggregator:
       disconnect(self.status_aggregator)
     self.status_aggregator = StatusAggregator([
-      self.pipeline.vad.event_loop,
+      self.pipeline.vad.event_loop if self.pipeline.vad else None,
       self.pipeline.transcriber.event_loop,
       self.pipeline.post_processor.event_loop,
     ])

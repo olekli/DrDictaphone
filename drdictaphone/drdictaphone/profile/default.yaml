@@ -3,4 +3,4 @@ topic:
 language: en
 output: general
 output_command: pbcopy
-enable_vad: true
+enable_vad: false

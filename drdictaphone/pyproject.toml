@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "DrDictaphone"
-version = "0.9.3"
+version = "0.9.5"
 authors = ["Ole Kliemann <mail@olekliemann.de>"]
 description = "Dictation app for the terminal and Neovim"
 readme = "README.md"
@@ -16,9 +16,9 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.10"
 sounddevice = ">=0.4.6"
-speechbrain = ">=0.5.16"
+#speechbrain = ">=0.5.16"
 pydub = "0.25.1"
 pydantic = ">=2.5.3"
 openai = ">=1.6.1"
@@ -27,6 +27,8 @@ prompt-toolkit = ">=3.0.43"
 MrEventLoop = ">=0.6.2"
 aiofiles = ">=23.2.1"
 drdictaphone-shared = "0.9.3"
+#numpy = ">=1.26.0,<2"
+pyyaml = "^6.0.2"
 
 [build-system]
 requires = ["poetry-core"]

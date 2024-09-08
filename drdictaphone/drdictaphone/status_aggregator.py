@@ -10,7 +10,7 @@ logger = logger.get(__name__)
 @has_event_loop('event_loop')
 class StatusAggregator:
   def __init__(self, emitters):
-    self.statuses = { emitter: False for emitter in emitters }
+    self.statuses = { emitter: False for emitter in emitters if emitter }
     for emitter in [ e for e in emitters if e ]:
       connect(emitter, 'active', lambda emitter=emitter: self.onActive(emitter))
       connect(emitter, 'idle', lambda emitter=emitter: self.onIdle(emitter))
