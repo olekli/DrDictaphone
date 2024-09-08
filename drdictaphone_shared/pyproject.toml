@@ -1,19 +1,9 @@
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "drdictaphone-shared"
-version = "0.9.2"
-authors = [
-    { name = "Ole Kliemann", email = "mail@olekliemann.de" }
-]
+version = "0.9.3"
+authors = ["Ole Kliemann <mail@olekliemann.de>"]
 description = "Dictation app for the terminal and Neovim"
-dependencies = [
-  "MrEventLoop>=0.6.2",
-]
-license = { file = "LICENSE" }
-requires-python = ">=3.6"
+license = "LICENSE"
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: Apache Software License",
@@ -23,6 +13,14 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: End Users/Desktop",
 ]
+
+[tool.poetry.dependencies]
+python = ">=3.6"
+MrEventLoop = ">=0.6.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [project.urls]
 homepage = "https://github.com/olekli/DrDictaphone"
