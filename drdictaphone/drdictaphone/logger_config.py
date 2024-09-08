@@ -5,7 +5,7 @@ import logging
 from drdictaphone.config import config
 
 logger_config = {
-  'level': logging.INF,
+  'level': logging.INFO,
   'filename': config['paths']['log'],
   'format': '%(asctime)s %(levelname)s: %(name)s: %(message)s'
 }
